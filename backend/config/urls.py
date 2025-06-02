@@ -7,7 +7,6 @@ from ninja.security import HttpBearer
 from django.contrib.auth.models import User
 from apps.authentication.jwt_auth import JWTAuth
 
-
 # Create the main API instance
 api = NinjaAPI(
     title="MTK-Care API",
@@ -76,6 +75,8 @@ def get_user_profile(request):
 # Include API routers when they're created
 # api.add_router("/tasks/", "apps.tasks.api.router")
 # api.add_router("/departments/", "apps.departments.api.router") 
+from apps.users.api import router as users_router
+api.add_router("/users/", users_router)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

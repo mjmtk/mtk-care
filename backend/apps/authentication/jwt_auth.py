@@ -117,8 +117,9 @@ class JWTAuth(HttpBearer):
             
             # Update user attributes from token
             updated_fields = False
-            if user.email != payload.get('email', user.email): # Check if different before assigning
-                user.email = payload.get('email', user.email)
+            new_email = payload.get('email') or payload.get('upn') or payload.get('preferred_username') or user.email
+            if user.email != new_email:
+                user.email = new_email
                 updated_fields = True
             if user.first_name != payload.get('given_name', user.first_name):
                 user.first_name = payload.get('given_name', user.first_name)

@@ -1,0 +1,5 @@
+-r base.txt
+sentry-sdk>=1.32
+psycopg2-binary>=2.9
+redis>=4.5
+dj-database-url>=2.1

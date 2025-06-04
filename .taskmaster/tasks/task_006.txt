@@ -1,11 +1,11 @@
 # Task ID: 6
-# Title: Implement Team CRUD API Endpoints
+# Title: Update Imports and References
 # Status: pending
-# Dependencies: 4
-# Priority: high
-# Description: Create Django Ninja API endpoints for team management operations
+# Dependencies: 5
+# Priority: low
+# Description: Update all import statements and references throughout the codebase to reflect the new router structure
 # Details:
-Create teams/api.py with Django Ninja router. Implement endpoints: POST / (create team, admin only), GET / (list teams, authenticated users), GET /{team_id}/ (retrieve team, authenticated users), PUT /{team_id}/ (update team, admin or team manager), DELETE /{team_id}/ (soft delete via is_active=False, admin only). Use proper authentication decorators and permission checks.
+Search the entire codebase for any references to the old router structure. Update import statements in test files, other API modules, and any configuration files that reference the routers. Ensure all references to users_router and roles_router are correctly updated. Update any documentation or comments that reference the old structure.
 
 # Test Strategy:
-Write API tests for each endpoint covering success cases, permission checks, and error handling. Test with different user roles (admin, team manager, regular user)
+Run the full test suite to ensure no import errors or broken references. Perform a codebase search for any remaining references to the old router names. Test the complete API functionality to ensure all endpoints work correctly with the new structure.

@@ -1,11 +1,11 @@
 # Task ID: 4
-# Title: Create Pydantic Schemas for Teams
+# Title: Move Role Endpoints to Roles Router
 # Status: pending
-# Dependencies: 2
-# Priority: high
-# Description: Implement Pydantic schemas for Team API serialization and validation
+# Dependencies: 3
+# Priority: medium
+# Description: Identify and move all role-related CRUD operations from users_router to the new roles_router
 # Details:
-Create teams/schemas.py with Pydantic schemas: TeamSchema (response) with all Team fields including nested User data for manager/members, TeamCreateSchema (input) with name, optional description and manager_id, TeamUpdateSchema (input) with optional name, description, manager_id, and is_active, TeamMemberSchema with user_id field. Use proper type hints and validation.
+Identify all role-related endpoints currently in users_router (likely including GET /roles/, POST /roles/, PUT /roles/{id}, DELETE /roles/{id}, etc.). Move these endpoint definitions to roles_router. Update all decorator references from @users_router to @roles_router for role endpoints. Ensure all role-related dependencies, models, and schemas are properly imported and accessible.
 
 # Test Strategy:
-Write tests to validate schema serialization/deserialization with valid and invalid data, ensuring proper validation errors are raised
+Test all moved role endpoints to ensure they function correctly under the new router. Verify CRUD operations for roles (Create, Read, Update, Delete). Test endpoint responses and status codes match expected behavior.

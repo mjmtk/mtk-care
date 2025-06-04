@@ -1,7 +1,10 @@
 from typing import List, Optional
-from django.contrib.auth.models import User
-from .models import Role, UserProfile
 from django.db import transaction
+from django.contrib.auth import get_user_model
+from .models import Role, UserProfile
+
+# Use get_user_model() to support custom user models
+User = get_user_model()
 
 class UserService:
     """Service layer for user management."""

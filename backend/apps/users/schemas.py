@@ -1,14 +1,19 @@
 from ninja import Schema
 from typing import List, Optional
 
+from uuid import UUID
+
+# NOTE: All IDs in schemas (except optionlists/items) should be UUIDs for consistency.
 class RoleOut(Schema):
-    id: int
+    id: UUID
     name: str
     description: Optional[str] = None
     level: int
 
+from uuid import UUID
+
 class UserProfileOut(Schema):
-    id: int
+    id: UUID
     phone_number: Optional[str] = None
     employee_id: Optional[str] = None
     title: Optional[str] = None
@@ -17,7 +22,7 @@ class UserProfileOut(Schema):
     azure_ad_groups: list
 
 class UserOut(Schema):
-    id: int
+    id: UUID
     username: str
     email: str
     is_active: bool

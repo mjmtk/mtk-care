@@ -40,12 +40,19 @@ def get_user_from_token(request):
             logger.info(f"Created new user profile for {user.username}")
         
         # TODO: Recommendation: For initial deployment, simplify by disabling group-based role mapping if it's not immediately essential.
-        # Get Azure AD groups from the user object (set by JWT auth)
-        # azure_groups = getattr(user, 'azure_ad_groups', []) or []
-        # logger.info(f"User {user.email} has Azure AD groups: {azure_groups}")
-        azure_groups = []
-        logger.info(f"User {user.email} has Azure AD groups: {azure_groups}")
+        # Retrieve Azure AD groups attached to the user object by the auth backend
+        retrieved_groups_from_token = getattr(user, '_azure_ad_groups_from_token', [])
+        logger.info(f"Retrieved temporary _azure_ad_groups_from_token for user {user.username}: {retrieved_groups_from_token}")
+
+        # Persist these groups to the UserProfile if they differ
+        if profile.azure_ad_groups != retrieved_groups_from_token:
+            profile.azure_ad_groups = retrieved_groups_from_token
+            profile.save(update_fields=['azure_ad_groups'])
+            logger.info(f"UserProfile {profile.id} for {user.username} updated in DB with Azure AD groups: {profile.azure_ad_groups}")
         
+        # Use the (now persisted) groups from the profile for role mapping
+        azure_groups = profile.azure_ad_groups
+        logger.info(f"User {user.email} using Azure AD groups from profile for role mapping: {azure_groups}")
 
         # Find the highest role from the user's Azure AD groups
         highest_role = None

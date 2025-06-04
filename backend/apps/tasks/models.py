@@ -1,5 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import User, Group
+from django.conf import settings
+from django.contrib.auth.models import Group
 from apps.common.models import TimeStampedModel
 
 class TaskPriority(models.TextChoices):
@@ -23,7 +24,7 @@ class Task(TimeStampedModel):
     
     # Assignment
     assigned_to = models.ForeignKey(
-        User, 
+        settings.AUTH_USER_MODEL, 
         on_delete=models.SET_NULL, 
         null=True, 
         blank=True, 

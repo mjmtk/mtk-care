@@ -8,7 +8,7 @@ from ninja.security import HttpBearer
 from ninja.errors import AuthenticationError # Import for proper error handling
 import logging
 from datetime import timedelta # Import for leeway
-from django.http import JsonResponse
+
 
 # Assuming UserProfile is in the same app's models.py
 from .models import UserProfile 
@@ -77,9 +77,7 @@ class JWTAuth(HttpBearer):
             )
         except jwt.ExpiredSignatureError:
             logger.warning("Token has expired.")
-            response = JsonResponse({"detail": "Token has expired"}, status=401)
-            response['WWW-Authenticate'] = 'Bearer error="invalid_token", error_description="The access token expired"'
-            return response
+            raise AuthenticationError("Token has expired. error=\"invalid_token\", error_description=\"The access token expired\"")
         except jwt.InvalidAudienceError as e: # Catch specifically
             # Log the expected and actual audience for easier debugging
             actual_audience = getattr(e, 'actual_audience', 'N/A') # PyJWT might add this attribute
@@ -196,9 +194,10 @@ class JWTAuth(HttpBearer):
             except Exception as e:
                 logger.error(f"Failed to fetch groups from Microsoft Graph: {e}")
         
-        # Store the Azure AD groups on the user object for later use in middleware
-        user.azure_ad_groups = azure_groups
-        logger.info(f"User {user.username} has Azure AD groups: {azure_groups}")
+        # Attach Azure AD groups to the user object as a temporary attribute
+        # The middleware will handle persisting this to the UserProfile.
+        user._azure_ad_groups_from_token = azure_groups
+        logger.info(f"Attaching temporary _azure_ad_groups_from_token to user {user.username}: {azure_groups}")
         
         # Sync with Django groups if needed (optional)
         if azure_groups:

@@ -1,10 +1,10 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 from apps.common.models import TimeStampedModel
 
 class AuditLog(models.Model):
     """Audit trail for user actions."""
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='audit_logs')
     action = models.CharField(max_length=50)
     resource = models.CharField(max_length=200)
     resource_id = models.CharField(max_length=100, blank=True)

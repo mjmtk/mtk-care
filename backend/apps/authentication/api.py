@@ -1,16 +1,19 @@
 """
 API endpoints for authentication and user information.
 """
-from ninja import Router
+from ninja import Router, Schema
+from ninja.responses import Response
 from ninja.security import HttpBearer
-from django.http import JsonResponse
 from typing import Dict, Any
 
 from .jwt_auth import JWTAuth
 
+class ErrorSchema(Schema):
+    detail: str
+
 router = Router()
 
-@router.get("/me", auth=JWTAuth())
+@router.get("/me", auth=JWTAuth(), response={200: Dict[str, Any], 401: ErrorSchema, 500: ErrorSchema})
 def get_current_user(request):
     """
     Returns the current authenticated user's information and role.
@@ -19,11 +22,8 @@ def get_current_user(request):
     user = request.auth
     
     # Check if user is authenticated
-    if not user or not user.is_authenticated:
-        return JsonResponse(
-            {"error": "Authentication required"}, 
-            status=401
-        )
+    if not user or not getattr(user, 'is_authenticated', False):
+        return 401, ErrorSchema(detail="Authentication required")
     
     # Get user profile and role
     try:
@@ -44,7 +44,4 @@ def get_current_user(request):
             "is_superuser": user.is_superuser,
         }
     except Exception as e:
-        return JsonResponse(
-            {"error": f"Error retrieving user profile: {str(e)}"}, 
-            status=500
-        )
+        return 500, ErrorSchema(detail=f"Error retrieving user profile: {str(e)}")

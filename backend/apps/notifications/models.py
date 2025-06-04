@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 from apps.common.models import TimeStampedModel
 
 class NotificationType(models.TextChoices):
@@ -11,7 +11,8 @@ class NotificationType(models.TextChoices):
 
 class Notification(TimeStampedModel):
     """User notifications."""
-    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='+')
+    recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')
     notification_type = models.CharField(max_length=20, choices=NotificationType.choices)
     title = models.CharField(max_length=200)
     message = models.TextField()

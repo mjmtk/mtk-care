@@ -1,0 +1,76 @@
+# Product Requirements Document: MTK-Care API Refactoring and Enhancement
+
+## 1. Introduction
+
+This document outlines the requirements for refactoring and enhancing the MTK-Care API. The primary goal is to align the API with REST best practices, improve its overall structure for better maintainability, and implement specific functional enhancements identified during a recent code review. This effort will focus on user management, role management, API routing, and schema definitions.
+
+## 2. Goals
+
+*   Implement consistent API versioning and path structures (e.g., `/api/v1/...`).
+*   Improve maintainability by refactoring complex endpoint logic into service layers.
+*   Refine data schemas for improved clarity, type safety, and completeness.
+*   Enhance user and role management capabilities with more granular control.
+*   Ensure API methods align with semantic REST principles (e.g., `PATCH` for partial updates).
+
+## 3. Key Features/Requirements
+
+### 3.1. API Structure & Routing (config/urls.py, apps/users/api.py)
+
+*   **Task 3.1.1:** Standardize User Endpoints:
+    *   Ensure all user-related CRUD and action endpoints are consistently routed under `/api/v1/users/`.
+    *   Update `api.add_router("/users/", users_router)` in `config/urls.py` to `api.add_router("/v1/users/", users_router)`.
+*   **Task 3.1.2:** Standardize Role Endpoints:
+    *   Ensure all role-related CRUD and action endpoints are consistently routed under `/api/v1/roles/`.
+    *   This involves separating role endpoints from the `users_router` in `apps/users/api.py` into a new `roles_router`.
+    *   Add the new `roles_router` in `config/urls.py` as `api.add_router("/v1/roles/", roles_router)`.
+*   **Task 3.1.3:** Update `apps/users/api.py`:
+    *   Modify the existing `router` (which currently handles both users and roles) to be `users_router` and only contain user-specific endpoints (e.g., `/`, `/{user_id}/`, `/{user_id}/activate/`, etc., which will resolve to `/api/v1/users/...`).
+    *   Create a new `roles_router = Router(tags=["roles"])` in `apps/users/api.py` and move all role-specific endpoints (e.g., `/`, `/{role_id}/`) to it. These will resolve to `/api/v1/roles/...`.
+
+### 3.2. Endpoint Logic Refactoring (config/urls.py, new service file)
+
+*   **Task 3.2.1:** Refactor `/api/profile` Endpoint Logic:
+    *   Move the business logic currently within the `/api/profile` endpoint in `config/urls.py` into a new dedicated service method (e.g., `UserProfileService.get_profile_details(user)` or similar in `apps/users/services.py` or a new `apps/authentication/services.py`).
+    *   The endpoint in `config/urls.py` should then call this service method.
+
+### 3.3. Schema Enhancements (apps/users/schemas.py, apps/users/services.py)
+
+*   **Task 3.3.1:** Address Password Handling in `UserCreate`:
+    *   Add a `password: str` field to the `UserCreate` schema in `apps/users/schemas.py`.
+    *   Update the `UserService.create_user` method in `apps/users/services.py` to securely hash and set this password for the new user.
+*   **Task 3.3.2:** Incorporate User Profile Attributes in User Schemas:
+    *   Define `UserProfileCreateSchema` and `UserProfileUpdateSchema` (or similar) in `apps/users/schemas.py` for profile attributes (e.g., `phone_number`, `employee_id`, `title`, `avatar`, `preferences`).
+    *   Add an optional `profile: UserProfileCreateSchema` field to `UserCreate`.
+    *   Add an optional `profile: UserProfileUpdateSchema` field to `UserUpdate`.
+    *   Update `UserService.create_user` and `UserService.update_user` to handle creation/update of associated `UserProfile` data.
+*   **Task 3.3.3:** Enhance Specificity of `UserProfileOut` Fields:
+    *   For `preferences: dict` in `UserProfileOut`: If a known structure exists, define a `PreferencesSchema` and use `preferences: PreferencesSchema`. Otherwise, document expected keys.
+    *   For `azure_ad_groups: list` in `UserProfileOut`: Change to `azure_ad_groups: List[str]` if it's a list of group IDs/names, or define an `AzureADGroupSchema` if items are more complex.
+
+### 3.4. HTTP Method Adjustments (apps/users/api.py)
+
+*   **Task 3.4.1:** Use `PATCH` for Partial Updates:
+    *   Change the HTTP method from `@router.put(...)` to `@router.patch(...)` for `update_user` in the `users_router`.
+    *   Change the HTTP method from `@router.put(...)` to `@router.patch(...)` for `update_role` in the (new) `roles_router`.
+    *   Ensure the service methods (`UserService.update_user`, `RoleService.update_role`) correctly handle partial data. (The current `data.dict(exclude_unset=True)` is good for this).
+
+### 3.5. User-Role Management Enhancements (apps/users/api.py, apps/users/services.py)
+
+*   **Task 3.5.1:** Implement Granular Role Assignment:
+    *   Create a new endpoint `PATCH /api/v1/users/{user_id}/roles/{role_id}/` (or `PUT`) in `users_router` to assign a single, specific role to a user.
+    *   This endpoint should call a new method in `UserService`, e.g., `UserService.assign_specific_role(user_id, role_id)`.
+*   **Task 3.5.2:** Implement Granular Role Removal:
+    *   Create a new endpoint `DELETE /api/v1/users/{user_id}/roles/{role_id}/` in `users_router` to remove a single, specific role from a user.
+    *   This endpoint should call a new method in `UserService`, e.g., `UserService.remove_specific_role(user_id, role_id)`.
+*   **Task 3.5.3 (Optional):** Review `POST /users/{user_id}/roles/` (Assign Roles List):
+    *   Clarify if the existing `POST /api/v1/users/{user_id}/roles/` (which takes `List[int]` of `role_ids`) should replace all existing roles or append. Current behavior is likely replacement. Ensure this is intended and documented.
+
+## 4. Non-Functional Requirements
+
+*   Maintain existing test coverage and add new tests for changed/added functionality.
+*   Ensure API documentation (e.g., Swagger/OpenAPI generated by Ninja) reflects all changes accurately.
+
+## 5. Out of Scope
+
+*   Major changes to the authentication mechanism itself (beyond schema/service adjustments for user creation).
+*   Frontend changes to consume these API modifications.

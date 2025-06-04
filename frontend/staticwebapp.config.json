@@ -1,0 +1,16 @@
+{
+  "routes": [
+    {
+      "route": "/api/*",
+      "rewrite": "https://mtkcare-backend-abbffge3c9gqcqhr.newzealandnorth-01.azurewebsites.net/api/*"
+    }
+  ],
+  "globalHeaders": {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "X-XSS-Protection": "1; mode=block"
+  },
+  "platform": {
+    "apiRuntime": "node:18"
+  }
+}

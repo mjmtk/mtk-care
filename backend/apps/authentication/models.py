@@ -1,20 +1,18 @@
 from django.db import models
-from django.conf import settings # Though not used directly, good practice
+from django.conf import settings
 from django.contrib.auth import get_user_model
-
-User = get_user_model()
 
 class UserProfile(models.Model):
     user = models.OneToOneField(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name='azure_profile', # Changed from 'profile'
+        related_name='azure_profile', 
         help_text="The Django User instance."
     )
     azure_oid = models.CharField(
-        max_length=36,  # Azure AD Object IDs are GUIDs (e.g., xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
-        unique=True,    # Ensures no two profiles map to the same Azure AD user
-        db_index=True,  # Improves lookup performance for this field
+        max_length=36,
+        unique=True,
+        db_index=True,
         help_text="Azure AD Object ID for the user. This is the primary immutable identifier."
     )
     # You could add other Azure-specific fields here if needed, for example:

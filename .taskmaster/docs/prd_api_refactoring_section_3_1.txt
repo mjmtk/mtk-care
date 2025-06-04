@@ -1,0 +1,19 @@
+# Product Requirements Document: MTK-Care API Refactoring - Section 3.1
+
+## 3.1. API Structure & Routing (config/urls.py, apps/users/api.py)
+
+### Tasks:
+1. **Standardize User Endpoints**:
+   - Update routing in `config/urls.py` to use `/v1/users/` prefix
+   - Ensure all user-related endpoints are under this prefix
+
+2. **Standardize Role Endpoints**:
+   - Separate role-related endpoints from `users_router` into a new `roles_router`
+   - Move all role CRUD operations to the new router
+   - Add the new `roles_router` in `config/urls.py` with `/v1/roles/` prefix
+
+3. **Update `apps/users/api.py`**:
+   - Rename existing `router` to `users_router`
+   - Create new `roles_router` for role-specific endpoints
+   - Move role-related endpoints to `roles_router`
+   - Update imports and references accordingly

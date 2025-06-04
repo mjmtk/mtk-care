@@ -1,11 +1,11 @@
 # Task ID: 5
-# Title: Configure Django Admin for Teams
+# Title: Add Roles Router to URL Configuration
 # Status: pending
-# Dependencies: 3
+# Dependencies: 4
 # Priority: medium
-# Description: Set up Django admin interface for Team model management
+# Description: Update config/urls.py to include the new roles_router with /v1/roles/ prefix
 # Details:
-In teams/admin.py, register Team model with custom admin configuration. Set list_display to show name, manager, member_count (custom method), and is_active. Add list_filter for is_active and search_fields for name and description. Create a custom method to display member count. Consider adding inline for members if needed.
+In config/urls.py, add a new URL pattern for the roles router: path('v1/roles/', include('apps.users.api.roles_router')). Ensure proper import of the roles_router from apps.users.api. Configure appropriate namespace if needed. Verify the URL pattern is correctly positioned in the urlpatterns list.
 
 # Test Strategy:
-Access Django admin interface and verify Team model appears with correct display fields, filters work properly, and CRUD operations function correctly
+Test that role endpoints are accessible under the new /v1/roles/ prefix. Verify URL routing works correctly and endpoints return expected responses. Test namespace resolution and URL reverse lookups for role endpoints.

@@ -12,23 +12,6 @@ const nextConfig = {
         source: '/api/auth/:path*',
         destination: '/api/auth/:path*',
       },
-      // Rewrite other API requests to the backend
-      {
-        source: '/api/:path*',
-        destination: `${process.env.NEXT_PUBLIC_DJANGO_API_URL || 'http://backend:8000'}/api/:path*`,
-      },
-    ]
-  },
-  async headers() {
-    return [
-      {
-        source: '/:path*',
-        headers: [
-          { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'X-Frame-Options', value: 'DENY' },
-          { key: 'X-XSS-Protection', value: '1; mode=block' },
-        ],
-      },
     ]
   },
   // Environment variables that will be available on the client side

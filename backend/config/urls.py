@@ -135,7 +135,8 @@ def get_user_profile(request):
 
 # Include API routers
 from apps.authentication.api import router as auth_router
-from apps.users.api import router as users_router
+# Import routers directly from their source file to avoid circular imports
+from apps.users.api import users_router, roles_router
 
 # Include API routers
 api.add_router("/auth/", auth_router)
@@ -143,7 +144,8 @@ api.add_router("/auth/", auth_router)
 # Other routers
 # api.add_router("/tasks/", "apps.tasks.api.router")
 # api.add_router("/departments/", "apps.departments.api.router")
-api.add_router("/users/", users_router)
+api.add_router("/v1/users/", users_router)
+api.add_router("/v1/roles/", roles_router)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

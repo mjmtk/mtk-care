@@ -1,0 +1,188 @@
+{
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Setup Django Project with Azure AD Integration",
+      "description": "Initialize Django project structure with Azure AD authentication using django-auth-adfs or similar library",
+      "details": "1. Create Django project with virtual environment\n2. Install required packages: django, django-auth-adfs, djangorestframework, celery, redis\n3. Configure settings.py with Azure AD settings (CLIENT_ID, CLIENT_SECRET, TENANT_ID)\n4. Setup AUTHENTICATION_BACKENDS to use Azure AD\n5. Configure ADFS settings for automatic user creation\n6. Create base project structure with apps: authentication, tasks, notifications, dashboard\n7. Setup database models for User extension and initial migrations\n8. Configure static files and media handling",
+      "testStrategy": "Test Azure AD login flow, verify automatic user creation, test session management and token refresh",
+      "priority": "high",
+      "dependencies": [],
+      "status": "done",
+      "subtasks": []
+    },
+    {
+      "id": 2,
+      "title": "Implement User Management and Role-Based Access Control",
+      "description": "Create user models, role mapping from Azure AD groups, and permission system",
+      "details": "1. Extend Django User model with UserProfile (department, preferences, azure_groups)\n2. Create Role model with hierarchical structure (Admin, Manager, Provider, Staff)\n3. Create GroupRoleMapping model to map Azure AD groups to application roles\n4. Implement custom permission classes for DRF views\n5. Create middleware to sync Azure AD group membership on each request\n6. Implement role-based view decorators and mixins\n7. Create user profile management views and serializers\n8. Setup automatic role assignment based on Azure AD groups",
+      "testStrategy": "Test role assignment from Azure AD groups, verify permission enforcement across different user types, test profile synchronization",
+      "priority": "high",
+      "dependencies": [
+        1
+      ],
+      "status": "in-progress",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Create User Profile and Role Models",
+          "description": "Extend Django User model with UserProfile and create Role model with hierarchical structure",
+          "dependencies": [],
+          "details": "1. Create UserProfile model with OneToOneField to User, including fields for department, preferences (JSONField), and azure_groups (JSONField). 2. Create Role model with fields: name, description, level (integer for hierarchy), permissions (ManyToManyField to Permission). 3. Add roles: Admin (level 1), Manager (level 2), Provider (level 3), Staff (level 4). 4. Create and run migrations.",
+          "status": "pending",
+          "testStrategy": "Unit tests for model creation, field validation, and relationship integrity. Test role hierarchy ordering."
+        },
+        {
+          "id": 2,
+          "title": "Implement Azure AD Group to Role Mapping",
+          "description": "Create GroupRoleMapping model and implement automatic role assignment based on Azure AD groups",
+          "dependencies": [
+            1
+          ],
+          "details": "1. Create GroupRoleMapping model with fields: azure_group_name, role (ForeignKey to Role), is_active. 2. Create management command to populate initial group mappings. 3. Implement utility function to determine user roles based on Azure AD groups. 4. Add role assignment logic in UserProfile model methods.",
+          "status": "pending",
+          "testStrategy": "Test group mapping creation, role assignment logic with various group combinations, and edge cases for missing or invalid groups."
+        },
+        {
+          "id": 3,
+          "title": "Create Azure AD Sync Middleware",
+          "description": "Implement middleware to sync Azure AD group membership and update user roles on each request",
+          "dependencies": [
+            2
+          ],
+          "details": "1. Create middleware class that processes authenticated requests. 2. Extract Azure AD groups from request headers or token claims. 3. Update UserProfile.azure_groups field with current groups. 4. Trigger role reassignment if groups have changed. 5. Add caching mechanism to avoid excessive updates. 6. Handle authentication failures gracefully.",
+          "status": "pending",
+          "testStrategy": "Test middleware with various Azure AD group scenarios, verify role updates, test caching behavior, and ensure performance with concurrent requests."
+        },
+        {
+          "id": 4,
+          "title": "Implement Custom Permission Classes and Decorators",
+          "description": "Create DRF permission classes, view decorators, and mixins for role-based access control",
+          "dependencies": [
+            3
+          ],
+          "details": "1. Create custom DRF permission classes: RoleBasedPermission, MinimumRolePermission. 2. Implement role-based view decorators: @require_role, @minimum_role_required. 3. Create role-based mixins: RoleRequiredMixin, PermissionRequiredMixin. 4. Add permission checking utilities for templates and views. 5. Implement role hierarchy checking (higher roles inherit lower role permissions).",
+          "status": "pending",
+          "testStrategy": "Test permission classes with different user roles, verify decorator functionality, test mixin inheritance, and validate role hierarchy enforcement."
+        },
+        {
+          "id": 5,
+          "title": "Create User Profile Management API and Views",
+          "description": "Implement user profile management views, serializers, and API endpoints",
+          "dependencies": [
+            4
+          ],
+          "details": "1. Create UserProfileSerializer with nested role information. 2. Implement UserProfileViewSet with CRUD operations. 3. Create profile update views with role-based restrictions. 4. Add endpoints for role management (admin only). 5. Implement user search and filtering by role/department. 6. Create profile dashboard view with role-specific content.",
+          "status": "pending",
+          "testStrategy": "Test API endpoints with different user roles, verify serializer data integrity, test role-based view restrictions, and validate user search functionality."
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Design and Implement Core Task Models",
+      "description": "Create comprehensive task data models with relationships, categories, and status management",
+      "details": "1. Create Task model with fields: title, description, priority, due_date, status, created_by, assigned_to\n2. Create TaskCategory and TaskTag models for organization\n3. Create TaskDependency model for task prerequisites\n4. Create TaskComment model for threaded discussions\n5. Create TaskAttachment model for file management\n6. Create TaskStatusHistory model for audit trail\n7. Implement task status choices and validation\n8. Add model methods for status transitions and dependency checking\n9. Create database indexes for performance optimization",
+      "testStrategy": "Test model relationships, validate status transitions, test dependency constraints, verify audit trail functionality",
+      "priority": "high",
+      "dependencies": [
+        2
+      ],
+      "status": "in-progress",
+      "subtasks": []
+    },
+    {
+      "id": 4,
+      "title": "Build Task Management API Endpoints",
+      "description": "Implement RESTful API for task CRUD operations with proper permissions and filtering",
+      "details": "1. Create TaskViewSet with CRUD operations using DRF\n2. Implement custom permission classes based on user roles\n3. Create TaskSerializer with nested relationships for comments and attachments\n4. Implement filtering by status, priority, assignee, due_date using django-filter\n5. Add search functionality using DRF SearchFilter\n6. Create bulk operations endpoints for status updates and assignments\n7. Implement task assignment logic with notification triggers\n8. Add pagination and ordering for task lists\n9. Create API documentation using drf-spectacular",
+      "testStrategy": "Test CRUD operations with different user roles, verify filtering and search functionality, test bulk operations and permission enforcement",
+      "priority": "high",
+      "dependencies": [
+        3
+      ],
+      "status": "in-progress",
+      "subtasks": []
+    },
+    {
+      "id": 5,
+      "title": "Implement File Management and Attachment System",
+      "description": "Create secure file upload, storage, and access system for task attachments",
+      "details": "1. Configure Django file storage with secure file handling\n2. Create FileAttachment model with file validation and metadata\n3. Implement file upload API with size and type restrictions\n4. Create file access control based on task permissions\n5. Implement file versioning system\n6. Add file preview capabilities for common formats\n7. Create file download tracking and audit logs\n8. Implement secure file serving with proper headers\n9. Add file cleanup for deleted tasks",
+      "testStrategy": "Test file upload with various formats, verify access control, test file versioning and preview functionality",
+      "priority": "medium",
+      "dependencies": [
+        4
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 6,
+      "title": "Build Real-time Notification System",
+      "description": "Implement comprehensive notification system using Celery and WebSockets for real-time updates",
+      "details": "1. Setup Celery with Redis broker for background tasks\n2. Create Notification model with types and preferences\n3. Implement Django Channels for WebSocket connections\n4. Create notification consumers for real-time updates\n5. Implement email notification system using Django's email backend\n6. Create notification preference management\n7. Implement @mention functionality in comments\n8. Create notification aggregation and batching\n9. Add notification history and mark-as-read functionality",
+      "testStrategy": "Test real-time notifications, verify email delivery, test notification preferences and @mention functionality",
+      "priority": "medium",
+      "dependencies": [
+        4
+      ],
+      "status": "in-progress",
+      "subtasks": []
+    },
+    {
+      "id": 7,
+      "title": "Create Dashboard and Analytics Views",
+      "description": "Build personal and team dashboards with task metrics and reporting capabilities",
+      "details": "1. Create dashboard API endpoints with aggregated task data\n2. Implement personal dashboard with assigned tasks and metrics\n3. Create team dashboard with department-level analytics\n4. Implement task completion rate calculations\n5. Create workload distribution analysis\n6. Add trend analysis for task metrics over time\n7. Implement dashboard widgets for different data views\n8. Create export functionality for reports (PDF, Excel)\n9. Add caching for dashboard data to improve performance",
+      "testStrategy": "Test dashboard data accuracy, verify role-based data access, test report generation and export functionality",
+      "priority": "medium",
+      "dependencies": [
+        4,
+        6
+      ],
+      "status": "done",
+      "subtasks": []
+    },
+    {
+      "id": 8,
+      "title": "Implement Advanced Search and Filtering",
+      "description": "Build comprehensive search functionality with full-text search and advanced filtering options",
+      "details": "1. Implement full-text search using PostgreSQL's full-text search or Elasticsearch\n2. Create advanced filter forms with multiple criteria\n3. Implement saved search functionality\n4. Create search result ranking and relevance scoring\n5. Add search within comments and attachments\n6. Implement search autocomplete and suggestions\n7. Create search analytics and popular searches tracking\n8. Add search performance optimization with indexing\n9. Implement search result pagination and sorting",
+      "testStrategy": "Test search accuracy and performance, verify advanced filtering, test saved searches and autocomplete functionality",
+      "priority": "medium",
+      "dependencies": [
+        4
+      ],
+      "status": "in-progress",
+      "subtasks": []
+    },
+    {
+      "id": 9,
+      "title": "Develop Next.js Frontend with Azure AD Login",
+      "description": "Set up a Next.js application and implement Azure AD authentication, leveraging the existing backend setup (Task 1).",
+      "status": "pending",
+      "dependencies": [
+        1
+      ],
+      "priority": "high",
+      "details": "1. Initialize a new Next.js project with TypeScript\n2. Install necessary dependencies for Next.js Azure AD authentication (e.g., `next-auth`)\n3. Configure `next-auth` to use the Azure AD provider, using environment variables for client ID, tenant ID, etc. (these should align with your backend's .env configuration for Azure)\n4. Create basic login and logout pages/components\n5. Implement client-side logic to handle the authentication flow, including redirects and session management\n6. Display basic user information (e.g., username/email) on a protected page after successful login\n7. Ensure secure handling of tokens and session data on the client-side",
+      "testStrategy": "Verify successful Azure AD login and logout. Confirm user information is displayed correctly. Test session persistence and handling of unauthenticated access to protected routes.",
+      "subtasks": []
+    },
+    {
+      "id": 10,
+      "title": "Implement Workflow Management and Escalation",
+      "description": "Create task lifecycle management, approval workflows, and automatic escalation system",
+      "details": "1. Create WorkflowTemplate model for defining approval processes\n2. Implement task lifecycle state machine with validation\n3. Create escalation rules based on task priority and due dates\n4. Implement automatic escalation using Celery periodic tasks\n5. Create approval workflow with multi-level approvers\n6. Implement workflow history and audit trail\n7. Create workflow notification triggers\n8. Add manual escalation capabilities\n9. Implement workflow templates for common processes\n10. Create workflow analytics and bottleneck detection",
+      "testStrategy": "Test workflow state transitions, verify escalation triggers, test approval processes and workflow analytics",
+      "priority": "medium",
+      "dependencies": [
+        4,
+        6
+      ],
+      "status": "pending",
+      "subtasks": []
+    }
+  ]
+}

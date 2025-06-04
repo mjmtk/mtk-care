@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from django.contrib.auth.models import User, Group
+from .models import User, UserProfile, GroupRoleMapping, Role
 from .models import UserProfile, GroupRoleMapping, Role
 
 class UserProfileInline(admin.StackedInline):
@@ -14,7 +14,6 @@ class UserAdmin(BaseUserAdmin):
     inlines = (UserProfileInline,)
 
 # Re-register UserAdmin
-admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
 @admin.register(UserProfile)
@@ -40,4 +39,4 @@ class GroupRoleMappingAdmin(admin.ModelAdmin):
     readonly_fields = ['created_at', 'updated_at']
     
 # Hide the built-in Group model as we're using our custom Role model
-admin.site.unregister(Group)
+# admin.site.unregister(Group)

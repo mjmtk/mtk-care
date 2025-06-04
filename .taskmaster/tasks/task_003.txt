@@ -1,11 +1,11 @@
 # Task ID: 3
-# Title: Create and Run Database Migrations
+# Title: Create New Roles Router
 # Status: pending
 # Dependencies: 2
 # Priority: high
-# Description: Generate and apply database migrations for the Team model
+# Description: Create a new roles_router in apps/users/api.py specifically for role-related endpoints
 # Details:
-Run `python manage.py makemigrations teams` to create migration files for the Team model. Review the generated migration to ensure it correctly creates the table with all fields and relationships. Run `python manage.py migrate` to apply the migration to the database.
+In apps/users/api.py, create a new APIRouter instance named 'roles_router'. Configure it with appropriate tags=['roles'] and prefix settings. Initialize the router with: roles_router = APIRouter(tags=['roles']). Ensure proper imports for APIRouter from fastapi.
 
 # Test Strategy:
-Verify migration runs successfully without errors and that the teams_team table is created in the database with correct schema
+Verify the new router is properly instantiated and can be imported. Test that the router configuration is correct and doesn't conflict with existing routers.

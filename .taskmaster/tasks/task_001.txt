@@ -1,11 +1,11 @@
 # Task ID: 1
-# Title: Create Teams Django App
+# Title: Update config/urls.py for User Endpoints Standardization
 # Status: pending
 # Dependencies: None
 # Priority: high
-# Description: Set up the teams Django app structure with proper configuration
+# Description: Modify the main URL configuration to standardize user endpoints with /v1/users/ prefix
 # Details:
-Create a new Django app named 'teams' using `python manage.py startapp teams`. Add the app to INSTALLED_APPS in settings.py. Create the basic app structure with __init__.py, apps.py, models.py, views.py, admin.py, and tests.py files. Configure the app in apps.py with proper AppConfig.
+Update config/urls.py to include user endpoints under /v1/users/ prefix. Modify the urlpatterns to include: path('v1/users/', include('apps.users.api', namespace='users')). Ensure proper namespace configuration and verify that all existing user endpoints will be accessible under the new prefix structure.
 
 # Test Strategy:
-Verify app is properly installed by checking it appears in Django's app registry and can be imported without errors
+Verify URL routing works correctly by testing endpoint accessibility. Create unit tests to ensure all user endpoints respond correctly under the new /v1/users/ prefix. Test URL reverse lookups and namespace resolution.

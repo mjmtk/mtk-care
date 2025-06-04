@@ -8,9 +8,9 @@
 import { AxiosRequestConfig } from 'axios';
 import axiosInstance from '@/lib/axiosClient';
 import { getApiPath } from '@/lib/apiConfig';
-import type { paths, components } from '@/types/api'; // Adjusted import path for generated types
+import type { components } from '@/types/api'; // Adjusted import path for generated types
 
-export type ApiRequestOptions<RequestBody = any> = {
+export type ApiRequestOptions<RequestBody = unknown> = {
   /** Relative endpoint path (e.g., 'v1/users/me') - version included */
   url: string;
   /** HTTP method (default: 'get') */
@@ -35,7 +35,7 @@ export type ApiRequestOptions<RequestBody = any> = {
  * @returns Promise resolving to the response data
  * @throws Error if the request fails
  */
-export async function apiRequest<ResponseType = any, RequestBody = any>(
+export async function apiRequest<ResponseType = unknown, RequestBody = unknown>(
   options: ApiRequestOptions<RequestBody>
 ): Promise<ResponseType> {
   const {
@@ -70,13 +70,19 @@ export async function apiRequest<ResponseType = any, RequestBody = any>(
   try {
     const response = await instance.request<ResponseType>(config);
     return response.data;
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorData = error && typeof error === 'object' && 'response' in error 
+      ? {
+          status: (error as { response?: { status?: number } }).response?.status,
+          data: (error as { response?: { data?: unknown } }).response?.data,
+          message: (error as { message?: string }).message || 'Unknown error'
+        }
+      : { message: 'Unknown error' };
+
     console.error('API Request Error:', {
       url: fullPathForAxios,
       method,
-      status: error.response?.status,
-      responseData: error.response?.data,
-      errorMessage: error.message,
+      ...errorData
     });
     throw error;
   }

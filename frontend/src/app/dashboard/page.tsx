@@ -6,7 +6,7 @@ import { authOptions } from '@/lib/auth-options';
 import { usersApi } from '@/services/apiService';
 import type { components } from '@/types/api';
 import { ErrorBoundary } from '@/components/error-boundary';
-import { LoadingSpinner, LoadingSkeleton } from '@/components/loading';
+
 
 // Use the generated UserOut type for profile data
 type UserProfileData = components['schemas']['UserOut'];
@@ -175,7 +175,7 @@ export default async function DashboardPage() {
           <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-6">
             <h2 className="text-lg font-medium text-red-800 dark:text-red-200">Error Loading Dashboard</h2>
             <p className="mt-2 text-red-700 dark:text-red-300">
-              We couldn't load your dashboard. Please try refreshing the page or contact support if the problem persists.
+              We couldn&apos;t load your dashboard. Please try refreshing the page or contact support if the problem persists.
             </p>
             <div className="mt-4">
               <button

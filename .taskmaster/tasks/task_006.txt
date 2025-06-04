@@ -1,0 +1,11 @@
+# Task ID: 6
+# Title: Implement Team CRUD API Endpoints
+# Status: pending
+# Dependencies: 4
+# Priority: high
+# Description: Create Django Ninja API endpoints for team management operations
+# Details:
+Create teams/api.py with Django Ninja router. Implement endpoints: POST / (create team, admin only), GET / (list teams, authenticated users), GET /{team_id}/ (retrieve team, authenticated users), PUT /{team_id}/ (update team, admin or team manager), DELETE /{team_id}/ (soft delete via is_active=False, admin only). Use proper authentication decorators and permission checks.
+
+# Test Strategy:
+Write API tests for each endpoint covering success cases, permission checks, and error handling. Test with different user roles (admin, team manager, regular user)

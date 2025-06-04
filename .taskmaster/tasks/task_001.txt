@@ -1,0 +1,11 @@
+# Task ID: 1
+# Title: Create Teams Django App
+# Status: pending
+# Dependencies: None
+# Priority: high
+# Description: Set up the teams Django app structure with proper configuration
+# Details:
+Create a new Django app named 'teams' using `python manage.py startapp teams`. Add the app to INSTALLED_APPS in settings.py. Create the basic app structure with __init__.py, apps.py, models.py, views.py, admin.py, and tests.py files. Configure the app in apps.py with proper AppConfig.
+
+# Test Strategy:
+Verify app is properly installed by checking it appears in Django's app registry and can be imported without errors

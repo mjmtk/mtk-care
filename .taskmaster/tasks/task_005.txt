@@ -1,0 +1,11 @@
+# Task ID: 5
+# Title: Configure Django Admin for Teams
+# Status: pending
+# Dependencies: 3
+# Priority: medium
+# Description: Set up Django admin interface for Team model management
+# Details:
+In teams/admin.py, register Team model with custom admin configuration. Set list_display to show name, manager, member_count (custom method), and is_active. Add list_filter for is_active and search_fields for name and description. Create a custom method to display member count. Consider adding inline for members if needed.
+
+# Test Strategy:
+Access Django admin interface and verify Team model appears with correct display fields, filters work properly, and CRUD operations function correctly

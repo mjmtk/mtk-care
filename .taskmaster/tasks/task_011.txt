@@ -1,0 +1,11 @@
+# Task ID: 11
+# Title: Implement Team Permission System
+# Status: pending
+# Dependencies: 6
+# Priority: high
+# Description: Create permission classes and decorators for team-based access control
+# Details:
+Create teams/permissions.py with custom permission classes: IsAdminOrTeamManager (allows admin or manager of specific team), IsTeamMember (allows team members), IsAdminOnly (admin-only actions). Implement helper functions to check if user is team manager or member. Apply these permissions to appropriate API endpoints.
+
+# Test Strategy:
+Test permission classes with different user roles and team memberships, verify access is properly restricted, and test edge cases like inactive teams or removed members

@@ -1,0 +1,11 @@
+# Task ID: 3
+# Title: Create and Run Database Migrations
+# Status: pending
+# Dependencies: 2
+# Priority: high
+# Description: Generate and apply database migrations for the Team model
+# Details:
+Run `python manage.py makemigrations teams` to create migration files for the Team model. Review the generated migration to ensure it correctly creates the table with all fields and relationships. Run `python manage.py migrate` to apply the migration to the database.
+
+# Test Strategy:
+Verify migration runs successfully without errors and that the teams_team table is created in the database with correct schema

@@ -1,0 +1,11 @@
+# Task ID: 2
+# Title: Create Team Model with TimeStampedModel
+# Status: pending
+# Dependencies: 1
+# Priority: high
+# Description: Implement the Team model in teams/models.py with all required fields
+# Details:
+Create Team model inheriting from TimeStampedModel with fields: name (CharField, max_length=100, unique=True), description (TextField, blank=True, null=True), manager (ForeignKey to User, on_delete=models.SET_NULL, null=True, blank=True, related_name='managed_teams'), members (ManyToManyField to User, related_name='teams', blank=True), is_active (BooleanField, default=True). Import User model from django.contrib.auth.models.
+
+# Test Strategy:
+Create unit tests to verify model field constraints, relationships, and that the model can be instantiated with valid data

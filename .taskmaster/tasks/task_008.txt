@@ -1,0 +1,11 @@
+# Task ID: 8
+# Title: Modify Task Model for Team Assignment
+# Status: pending
+# Dependencies: 3
+# Priority: high
+# Description: Update the Task model to include team assignment functionality
+# Details:
+In apps/tasks/models.py, add assigned_team field as ForeignKey to Team model (on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks'). Import Team model from teams.models. Create and run migration for this change using makemigrations and migrate commands.
+
+# Test Strategy:
+Verify Task model can be created with assigned_team, test relationship works correctly, and migration applies without issues

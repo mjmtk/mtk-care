@@ -105,7 +105,7 @@ export const authOptions = {
     },
     async session({ session, token }) {
       // Send token to Django backend for validation
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/validate`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_DJANGO_API_URL}/api/auth/validate`, {
         headers: {
           'Authorization': `Bearer ${token.accessToken}`,
         },
@@ -234,8 +234,8 @@ def check_task_access(user: User, task: Task, action: str = 'view'):
         return True
     
     # Manager can manage department tasks
-    if user.groups.filter(name='Manager').exists():
-        return task.department in user.departments.all()
+    # if user.groups.filter(name='Manager').exists():
+    #     return task.department in user.departments.all()
     
     # Provider/Staff can only access assigned tasks
     if action == 'view':
@@ -247,7 +247,7 @@ def check_task_access(user: User, task: Task, action: str = 'view'):
 
 @router.get("/tasks", auth=auth)
 @paginate
-def list_tasks(request, status: str = None, department_id: int = None):
+def list_tasks(request, status: str = None):
     """List tasks based on user permissions."""
     user = request.auth
     queryset = Task.objects.all()
@@ -256,9 +256,9 @@ def list_tasks(request, status: str = None, department_id: int = None):
     if user.groups.filter(name='Administrator').exists():
         # Admin sees all tasks
         pass
-    elif user.groups.filter(name='Manager').exists():
-        # Manager sees department tasks
-        queryset = queryset.filter(department__in=user.departments.all())
+    # elif user.groups.filter(name='Manager').exists():
+    #     # Manager sees department tasks
+    #     queryset = queryset.filter(department__in=user.departments.all())
     else:
         # Provider/Staff see only assigned tasks
         queryset = queryset.filter(
@@ -269,8 +269,8 @@ def list_tasks(request, status: str = None, department_id: int = None):
     # Apply filters
     if status:
         queryset = queryset.filter(status=status)
-    if department_id:
-        queryset = queryset.filter(department_id=department_id)
+    # if department_id:
+    #     queryset = queryset.filter(department_id=department_id)
     
     return queryset
 
@@ -282,8 +282,8 @@ def create_task(request, task_data: TaskCreateSchema):
     
     # Check if user can create tasks in specified department
     if not user.groups.filter(name='Administrator').exists():
-        if task_data.department_id not in user.departments.values_list('id', flat=True):
-            return {"error": "Cannot create tasks in this department"}, 403
+        # if task_data.department_id not in user.departments.values_list('id', flat=True):
+        #     return {"error": "Cannot create tasks in this department"}, 403
     
     task = Task.objects.create(
         **task_data.dict(),
@@ -337,7 +337,7 @@ export function useAuth() {
   
   const canAccessTask = (task: any): boolean => {
     if (hasRole('Administrator')) return true
-    if (hasRole('Manager') && task.department_id === session?.user?.department_id) return true
+    // if (hasRole('Manager') && task.department_id === session?.user?.department_id) return true
     if (task.assigned_to === session?.user?.id) return true
     return false
   }
@@ -450,7 +450,7 @@ class TaskCreateSchema(Schema):
     title: str
     description: Optional[str] = ""
     priority: str = "medium"
-    department_id: int
+    # department_id: int
     assigned_to_id: Optional[int] = None
     due_date: Optional[datetime] = None
 

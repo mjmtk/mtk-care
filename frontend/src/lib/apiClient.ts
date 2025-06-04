@@ -2,9 +2,8 @@ import { getSession } from "next-auth/react";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_DJANGO_API_URL || "http://localhost:8000/api"; // Adjust if your Django API runs elsewhere or has a different base
 
-interface ApiClientOptions extends RequestInit {
-  // You can add custom options here if needed
-}
+// Extend RequestInit directly since we don't have custom options yet
+type ApiClientOptions = RequestInit;
 
 async function apiClient<T>(
   endpoint: string,

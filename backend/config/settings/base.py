@@ -3,10 +3,10 @@ from pathlib import Path
 import environ
 
 # Build paths
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 
 # Environment variables
-env = environ.Env(DEBUG=(bool, False))
+env = environ.Env(DJANGO_DEBUG=(bool, False))
 
 # Read .env file
 env_file = BASE_DIR / '.env'
@@ -14,9 +14,9 @@ if env_file.exists():
     environ.Env.read_env(env_file)
 
 # Security
-SECRET_KEY = env('SECRET_KEY', default='django-insecure-change-me-in-production-very-long-key')
-DEBUG = env('DEBUG', default=True)
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[
+SECRET_KEY = env('DJANGO_SECRET_KEY')
+DEBUG = env('DJANGO_DEBUG', default=True)
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=[
     'localhost', 
     '127.0.0.1', 
     '*.gitpod.io', 
@@ -45,7 +45,6 @@ LOCAL_APPS = [
     'apps.authentication', 
     'apps.users',
     'apps.tasks',
-    'apps.departments',
     'apps.notifications',
     'apps.audit',
 ]
@@ -63,6 +62,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'apps.audit.middleware.AuditTrailMiddleware',
+    'apps.authentication.middleware.JWTAuthenticationMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -85,13 +85,53 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# Database - SQLite for development
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Database Configuration
+DB_CONNECTION_TYPE = env('DB_CONNECTION_TYPE', default='local')
+
+if DB_CONNECTION_TYPE == 'azure':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': env('AZURE_POSTGRES_DB'),
+            'USER': env('AZURE_POSTGRES_USER'),
+            'PASSWORD': env('AZURE_POSTGRES_PASSWORD'),
+            'HOST': env('AZURE_POSTGRES_HOST'),
+            'PORT': env('AZURE_POSTGRES_PORT', default='5432'),
+            'OPTIONS': {
+                'sslmode': 'require',
+                'connect_timeout': 10, # Azure might need a bit longer
+            },
+        }
     }
-}
+elif DB_CONNECTION_TYPE == 'local':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': env('POSTGRES_DB', default='mtk_care'),
+            'USER': env('POSTGRES_USER', default='mj'),
+            'PASSWORD': env('POSTGRES_PASSWORD', default=''),
+            'HOST': env('POSTGRES_HOST', default='localhost'),
+            'PORT': env('POSTGRES_PORT', default='5432'),
+            'OPTIONS': {
+                'connect_timeout': 5,
+            },
+        }
+    }
+else:
+    # Default to local if DB_CONNECTION_TYPE is not 'azure' or 'local' or not set
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': env('POSTGRES_DB', default='mtk_care'),
+            'USER': env('POSTGRES_USER', default='mj'),
+            'PASSWORD': env('POSTGRES_PASSWORD', default=''),
+            'HOST': env('POSTGRES_HOST', default='localhost'), # Default for local Windows Postgres
+            'PORT': env('POSTGRES_PORT', default='5432'),     # Default for local Windows Postgres
+            'OPTIONS': {
+                'connect_timeout': 5,
+            },
+        }
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -138,6 +178,7 @@ CORS_ALLOW_ALL_ORIGINS = DEBUG  # Only in development
 # Authentication backends
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
+    'apps.authentication.backends.JWTAuthenticationBackend',
 ]
 
 # Azure AD Configuration
@@ -164,9 +205,9 @@ AUTHENTICATION_BACKENDS = [
 
 # Azure AD Configuration for JWT validation
 AZURE_AD = {
-     'TENANT_ID': env('AZURE_TENANT_ID', default=''),
-     'CLIENT_ID': env('AZURE_CLIENT_ID', default=''),
-     'CLIENT_SECRET': env('AZURE_CLIENT_SECRET', default=''),
+     'TENANT_ID': env('AZURE_AD_TENANT_ID', default=''),
+     'CLIENT_ID': env('AZURE_AD_CLIENT_ID', default=''),
+     'CLIENT_SECRET': env('AZURE_AD_CLIENT_SECRET', default=''),
 }
 # JWT Configuration  
 JWT_AUTH = {

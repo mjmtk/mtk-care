@@ -8,6 +8,7 @@ from ninja.security import HttpBearer
 from ninja.errors import AuthenticationError # Import for proper error handling
 import logging
 from datetime import timedelta # Import for leeway
+from django.http import JsonResponse
 
 # Assuming UserProfile is in the same app's models.py
 from .models import UserProfile 
@@ -47,7 +48,8 @@ class JWTAuth(HttpBearer):
             # raise AuthenticationError("Authorization credentials were not provided.")
             return None # Or let Ninja handle it based on endpoint config
 
-        logger.debug(f"Attempting to authenticate with token: {token[:30]}...")
+        # Commented out debug logging for token authentication
+        # logger.debug(f"Attempting to authenticate with token: {token[:30]}...")
         try:
             signing_key = self._jwks_client.get_signing_key_from_jwt(token).key
         except jwt.exceptions.PyJWKClientError as e:
@@ -61,7 +63,8 @@ class JWTAuth(HttpBearer):
             logger.error("No signing key could be retrieved for the token.")
             raise AuthenticationError("Invalid token: No signing key found.")
 
-        logger.debug(f"Using signing key for token.") # KID logging can be verbose
+        # Commented out debug logging for signing key usage
+        # logger.debug(f"Using signing key for token.") # KID logging can be verbose
 
         try:
             payload = jwt.decode(
@@ -74,7 +77,9 @@ class JWTAuth(HttpBearer):
             )
         except jwt.ExpiredSignatureError:
             logger.warning("Token has expired.")
-            raise AuthenticationError("Invalid token: Expired.") 
+            response = JsonResponse({"detail": "Token has expired"}, status=401)
+            response['WWW-Authenticate'] = 'Bearer error="invalid_token", error_description="The access token expired"'
+            return response
         except jwt.InvalidAudienceError as e: # Catch specifically
             # Log the expected and actual audience for easier debugging
             actual_audience = getattr(e, 'actual_audience', 'N/A') # PyJWT might add this attribute
@@ -157,30 +162,66 @@ class JWTAuth(HttpBearer):
                 UserProfile.objects.create(user=user, azure_oid=azure_oid)
                 logger.info(f"Created new Django User '{user.username}' and linked UserProfile with Azure OID {azure_oid}.")
         
-        # Group/Role Synchronization
-        # Check 'roles' first, then 'groups' as common claim names
-        token_groups_claim = payload.get('roles', payload.get('groups')) 
-        if token_groups_claim and isinstance(token_groups_claim, list):
-            current_user_group_names = set(user.groups.values_list('name', flat=True))
-            desired_group_names = set(str(g) for g in token_groups_claim) # Ensure all are strings
-
-            # Add groups user should be in but isn't
-            for group_name in desired_group_names - current_user_group_names:
-                group, created = Group.objects.get_or_create(name=group_name)
-                user.groups.add(group)
-                logger.info(f"User '{user.username}' added to group '{group_name}' (created: {created}).")
-
-            # Remove groups user is in but shouldn't be (optional, based on policy)
-            # If you want Azure AD to be the sole source of truth for these roles:
-            for group_name in current_user_group_names - desired_group_names:
-                try:
-                    group_to_remove = Group.objects.get(name=group_name)
-                    user.groups.remove(group_to_remove)
-                    logger.info(f"User '{user.username}' removed from group '{group_name}'.")
-                except Group.DoesNotExist:
-                    logger.warning(f"Tried to remove user from group '{group_name}' which does not exist in DB.")
-        elif token_groups_claim: # Claim exists but is not a list
-             logger.warning(f"Token 'roles'/'groups' claim is not a list: {token_groups_claim}. Skipping group sync.")
+        # Store Azure AD groups from token claims
+        # Azure AD v2.0 tokens use 'groups' claim, but we also check 'roles' for compatibility
+        azure_groups = []
+        
+        # Check for groups claim (Azure AD v2.0 tokens)
+        if 'groups' in payload:
+            if isinstance(payload['groups'], list):
+                azure_groups = [str(g) for g in payload['groups']]
+                logger.info(f"Found Azure AD groups in 'groups' claim: {azure_groups}")
+            else:
+                logger.warning(f"'groups' claim exists but is not a list: {payload['groups']}")
+        
+        # Check for roles claim (alternative location)
+        elif 'roles' in payload:
+            if isinstance(payload['roles'], list):
+                azure_groups = [str(r) for r in payload['roles']]
+                logger.info(f"Found Azure AD roles in 'roles' claim: {azure_groups}")
+            else:
+                logger.warning(f"'roles' claim exists but is not a list: {payload['roles']}")
+        
+        # If no groups found in standard claims, try to fetch them using Microsoft Graph
+        if not azure_groups and 'access_token' in payload:
+            try:
+                import requests
+                graph_url = 'https://graph.microsoft.com/v1.0/me/memberOf'
+                headers = {'Authorization': f'Bearer {payload["access_token"]}'}
+                response = requests.get(graph_url, headers=headers)
+                if response.status_code == 200:
+                    groups_data = response.json().get('value', [])
+                    azure_groups = [g['id'] for g in groups_data if 'id' in g]
+                    logger.info(f"Fetched {len(azure_groups)} groups from Microsoft Graph API")
+            except Exception as e:
+                logger.error(f"Failed to fetch groups from Microsoft Graph: {e}")
+        
+        # Store the Azure AD groups on the user object for later use in middleware
+        user.azure_ad_groups = azure_groups
+        logger.info(f"User {user.username} has Azure AD groups: {azure_groups}")
+        
+        # Sync with Django groups if needed (optional)
+        if azure_groups:
+            current_user_group_ids = set(user.groups.values_list('name', flat=True))
+            
+            # Add user to groups they should be in
+            for group_id in azure_groups:
+                if group_id not in current_user_group_ids:
+                    try:
+                        group, created = Group.objects.get_or_create(name=group_id)
+                        user.groups.add(group)
+                        logger.info(f"Added user '{user.username}' to group '{group_id}' (created: {created})")
+                    except Exception as e:
+                        logger.error(f"Failed to add user to group {group_id}: {e}")
+            
+            # Optionally remove from groups not in Azure AD (uncomment if needed)
+            # for group_id in current_user_group_ids - set(azure_groups):
+            #     try:
+            #         group = Group.objects.get(name=group_id)
+            #         user.groups.remove(group)
+            #         logger.info(f"Removed user '{user.username}' from group '{group_id}'")
+            #     except Group.DoesNotExist:
+            #         pass
 
         return user
 

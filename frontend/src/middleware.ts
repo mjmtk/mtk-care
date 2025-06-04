@@ -3,9 +3,9 @@ import { withAuth } from "next-auth/middleware";
 
 export default withAuth(
   // `withAuth` augments your `Request` with the user's token.
-  function middleware(req) {
+  function middleware() {
     // You can add custom logic here if needed, for example, role-based access control
-    // console.log("token: ", req.nextauth.token);
+    // The 'req' parameter was removed as it wasn't being used
   },
   {
     callbacks: {

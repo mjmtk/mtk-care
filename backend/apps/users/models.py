@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User, Permission
 from apps.common.models import TimeStampedModel
-from apps.departments.models import Department
 
 # Default preferences structure
 def get_default_preferences():
@@ -14,7 +13,6 @@ def get_default_preferences():
 class UserProfile(TimeStampedModel):
     """Extended user profile for additional information."""
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    departments = models.ManyToManyField(Department, blank=True, related_name='members')
     phone_number = models.CharField(max_length=20, blank=True, null=True)
     employee_id = models.CharField(max_length=50, blank=True, null=True)
     title = models.CharField(max_length=100, blank=True, null=True)

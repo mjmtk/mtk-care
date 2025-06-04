@@ -11,7 +11,6 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("departments", "__first__"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
@@ -56,12 +55,6 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.SET_NULL,
                         related_name="%(class)s_created",
                         to=settings.AUTH_USER_MODEL,
-                    ),
-                ),
-                (
-                    "departments",
-                    models.ManyToManyField(
-                        blank=True, related_name="members", to="departments.department"
                     ),
                 ),
                 (

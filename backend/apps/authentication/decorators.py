@@ -69,13 +69,13 @@ def check_task_access(user, task, action='view'):
         return True
     
     # Manager can manage department tasks
-    if user.groups.filter(name='Manager').exists():
-        try:
-            # Check if user manages this department
-            return hasattr(task, 'department') and task.department in user.profile.departments.all()
-        except AttributeError:
-            # Profile doesn't exist or doesn't have departments
-            return False
+    # if user.groups.filter(name='Manager').exists():
+    #     try:
+    #         # Check if user manages this department
+    #         return hasattr(task, 'department') and task.department in user.profile.departments.all()
+    #     except AttributeError:
+    #         # Profile doesn't exist or doesn't have departments
+    #         return False
     
     # Provider/Staff can only access assigned tasks
     if action == 'view':

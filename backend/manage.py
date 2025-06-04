@@ -14,3 +14,7 @@ if __name__ == '__main__':
             "forget to activate a virtual environment?"
         ) from exc
     execute_from_command_line(sys.argv)
+
+# check DB Connection
+# python manage.py check --database default
+# psql -U mj -d mtk_care -h 127.0.0.1 -W

@@ -1,0 +1,97 @@
+# Product Requirements Document: Teams Feature
+
+## 1. Introduction & Goals
+
+The Teams feature will replace the legacy "Departments" functionality, providing a more flexible and robust way to organize users and manage task assignments within the MTK Care application. 
+
+**Goals:**
+- Allow administrators to create and manage teams.
+- Enable users to be members of one or more teams.
+- Facilitate assignment of tasks to specific teams.
+- Provide clear visibility of team-related tasks and activities.
+- Ensure a smooth transition from the old department-based system.
+
+## 2. User Stories
+
+**As an Administrator:**
+- I want to create a new team with a name, description, and assign a team manager.
+- I want to add existing users as members to a team.
+- I want to remove users from a team.
+- I want to change the manager of a team.
+- I want to view a list of all teams and their members.
+- I want to edit the details of an existing team.
+- I want to deactivate or delete a team.
+
+**As a Team Manager:**
+- I want to view all tasks assigned to my team(s).
+- I want to see all members of my team(s).
+- I want to (potentially) add or remove members from my team (if permitted by admin).
+
+**As a User (Team Member):**
+- I want to see which team(s) I belong to.
+- I want to view tasks assigned to my team(s).
+
+## 3. Functional Requirements
+
+### 3.1. Team Model (Django)
+- **App Name**: `teams`
+- **Model Name**: `Team`
+  - `name`: CharField (max_length=100, unique=True)
+  - `description`: TextField (blank=True, null=True)
+  - `manager`: ForeignKey to `User` model (on_delete=models.SET_NULL, null=True, blank=True, related_name='managed_teams')
+  - `members`: ManyToManyField to `User` model (related_name='teams', blank=True)
+  - `is_active`: BooleanField (default=True)
+  - Inherit from `TimeStampedModel` (for `created_at`, `updated_at`)
+
+### 3.2. Pydantic Schemas (for Django Ninja)
+- `TeamSchema` (for response): Includes all fields from the Team model, potentially with nested User schemas for manager/members.
+- `TeamCreateSchema` (for input): `name`, `description` (optional), `manager_id` (optional).
+- `TeamUpdateSchema` (for input): `name` (optional), `description` (optional), `manager_id` (optional), `is_active` (optional).
+- `TeamMemberSchema` (for adding/removing members): `user_id`.
+
+### 3.3. API Endpoints (Django Ninja - `/api/teams/`)
+- **Create Team**: `POST /` (Admin only)
+  - Input: `TeamCreateSchema`
+  - Output: `TeamSchema`
+- **List Teams**: `GET /` (Authenticated users)
+  - Output: List of `TeamSchema`
+- **Retrieve Team**: `GET /{team_id}/` (Authenticated users)
+  - Output: `TeamSchema`
+- **Update Team**: `PUT /{team_id}/` (Admin or Team Manager of that team)
+  - Input: `TeamUpdateSchema`
+  - Output: `TeamSchema`
+- **Delete Team**: `DELETE /{team_id}/` (Admin only - consider soft delete via `is_active=False`)
+- **Add Team Member**: `POST /{team_id}/members/` (Admin or Team Manager)
+  - Input: `TeamMemberSchema` (user_id)
+  - Output: Success/Failure message or updated `TeamSchema`
+- **Remove Team Member**: `DELETE /{team_id}/members/{user_id}/` (Admin or Team Manager)
+  - Output: Success/Failure message or updated `TeamSchema`
+- **List Team Members**: `GET /{team_id}/members/` (Authenticated users)
+  - Output: List of User schemas.
+
+### 3.4. Task Integration
+- Modify `Task` model (`apps/tasks/models.py`):
+  - Add `assigned_team`: ForeignKey to `Team` model (on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks')
+- Update `Task` Pydantic schemas to include `assigned_team_id`.
+- Update Task API endpoints to allow filtering by `assigned_team`.
+- Update Task creation/update logic to handle `assigned_team`.
+
+### 3.5. Admin Interface (Django Admin)
+- Register `Team` model.
+- Customize display: `list_display` (name, manager, member_count, is_active), `list_filter` (is_active), `search_fields` (name, description).
+- Inline for members might be useful.
+
+### 3.6. Permissions
+- **Administrators**: Full CRUD on Teams and members.
+- **Team Managers**: Can update their team details, add/remove members from their team. View tasks assigned to their team.
+- **Authenticated Users**: Can list teams, retrieve team details. View tasks assigned to teams they are part of.
+
+## 4. Non-Functional Requirements
+- **Performance**: Efficient querying for teams and team members, especially for task filtering.
+- **Security**: Ensure only authorized users can perform management actions on teams.
+- **Scalability**: Design should accommodate a growing number of users and teams.
+
+## 5. Future Considerations (Out of Scope for MVP)
+- Team-specific dashboards.
+- Sub-teams or hierarchical team structures.
+- Notifications for team events (e.g., new member added, task assigned to team).

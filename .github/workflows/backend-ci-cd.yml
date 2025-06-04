@@ -4,6 +4,17 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'backend/**'  # Only trigger on changes within the backend directory
+      - '.github/workflows/backend-ci-cd.yml' # Also trigger if the workflow file itself changes
+  # If you also have pull_request triggers, add paths there too
+  # pull_request:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - 'backend/**'
+  #     - '.github/workflows/backend-ci-cd.yml'
+
   workflow_dispatch:
 
 permissions:

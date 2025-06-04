@@ -43,13 +43,25 @@ export async function apiRequest<ResponseType = unknown, RequestBody = unknown>(
     method = 'get',
     params,
     data,
-    headers = {},
+    headers: optionHeaders = {},
     accessToken,
     customAxios,
   } = options;
 
   const instance = customAxios || axiosInstance;
-  const requestHeaders: Record<string, string> = { ...headers };
+  const requestHeaders: Record<string, string> = {};
+  for (const key in optionHeaders) {
+    if (Object.prototype.hasOwnProperty.call(optionHeaders, key)) {
+      const value = optionHeaders[key]; // Value will be of type AxiosHeaderValue
+      if (typeof value === 'string') {
+        requestHeaders[key] = value;
+      }
+      // Note: AxiosHeaderValue can also be string[] | number | boolean | null.
+      // If headers can be string arrays and need specific handling (e.g., joining),
+      // further logic could be added here. For Record<string, string>,
+      // we strictly filter for string values.
+    }
+  }
 
   if (accessToken) {
     requestHeaders['Authorization'] = `Bearer ${accessToken}`;

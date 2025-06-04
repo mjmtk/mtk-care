@@ -27,6 +27,27 @@ const nextConfig = {
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
     AZURE_AD_CLIENT_SECRET: process.env.AZURE_AD_CLIENT_SECRET,
   },
+   // Disable static exports if you're using API routes
+   trailingSlash: false,
+  
+   // Configure for production deployment
+   compress: true,
+   
+   // Enable experimental features that help with deployment
+   experimental: {
+     // Helps with file tracing for standalone builds
+     outputFileTracingRoot: process.cwd(),
+   },
+   
+   // Configure redirects if needed
+   async redirects() {
+     return []
+   },
+   
+   // Configure rewrites if needed for API routes
+   async rewrites() {
+     return []
+   }
 }
 
 module.exports = nextConfig

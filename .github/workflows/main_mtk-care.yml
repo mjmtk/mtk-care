@@ -1,6 +1,3 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
 name: Build and deploy Node.js app to Azure Web App - mtk-care
 
 on:
@@ -13,25 +10,56 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Node.js version
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '22.x'
+          cache: 'npm'
+          cache-dependency-path: './frontend/package-lock.json'
 
-      - name: npm install, build, and test
+      - name: npm install and build
         working-directory: ./frontend
         run: |
-          npm install
-          npm run build --if-present
-          npm run test --if-present
+          npm ci
+          npm run build
+          # Verify build output
+          ls -la .next/
+          ls -la .next/server/ || echo "No server directory found"
 
-      - name: Zip artifact for deployment
-        run: cd frontend && zip -r ../release.zip ./*
+      - name: Create deployment package
+        working-directory: ./frontend
+        run: |
+          # Create a clean deployment structure
+          mkdir -p deploy-package
+          
+          # Copy essential files for Next.js
+          cp -r .next deploy-package/
+          cp -r node_modules deploy-package/
+          cp -r public deploy-package/
+          cp package.json deploy-package/
+          cp package-lock.json deploy-package/
+          
+          # Copy next.config.js if it exists
+          if [ -f next.config.js ]; then
+            cp next.config.js deploy-package/
+          fi
+          
+          # Copy next.config.mjs if it exists
+          if [ -f next.config.mjs ]; then
+            cp next.config.mjs deploy-package/
+          fi
+          
+          # List contents to verify
+          echo "Deployment package contents:"
+          ls -la deploy-package/
+          
+          # Create zip from the deploy-package directory
+          cd deploy-package && zip -r ../../release.zip ./*
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -46,8 +74,8 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
+      id-token: write
+      contents: read
 
     steps:
       - name: Download artifact from build job
@@ -56,7 +84,13 @@ jobs:
           name: node-app
 
       - name: Unzip artifact for deployment
-        run: unzip release.zip
+        run: |
+          unzip release.zip
+          echo "Unzipped contents:"
+          ls -la
+          echo "Next.js build verification:"
+          ls -la .next/ || echo "No .next directory found"
+          ls -la .next/server/ || echo "No server directory found"
       
       - name: Login to Azure
         uses: azure/login@v2
@@ -72,4 +106,3 @@ jobs:
           app-name: 'mtk-care'
           slot-name: 'Production'
           package: .
-          

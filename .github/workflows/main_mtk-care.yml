@@ -27,36 +27,74 @@ jobs:
         run: |
           npm ci
           npm run build
+          
           # Verify build output
+          echo "=== Build Output Verification ==="
           ls -la .next/
           ls -la .next/server/ || echo "No server directory found"
+          ls -la .next/standalone/ || echo "No standalone directory found"
+          
+          # Check if standalone server.js exists
+          if [ -f ".next/standalone/server.js" ]; then
+            echo "✅ Standalone server.js found"
+          else
+            echo "❌ Standalone server.js NOT found"
+          fi
 
       - name: Create deployment package
         working-directory: ./frontend
         run: |
-          # Create a clean deployment structure
-          mkdir -p deploy-package
-          
-          # Copy essential files for Next.js
-          cp -r .next deploy-package/
-          cp -r node_modules deploy-package/
-          cp -r public deploy-package/
-          cp package.json deploy-package/
-          cp package-lock.json deploy-package/
-          
-          # Copy next.config.js if it exists
-          if [ -f next.config.js ]; then
-            cp next.config.js deploy-package/
-          fi
-          
-          # Copy next.config.mjs if it exists
-          if [ -f next.config.mjs ]; then
-            cp next.config.mjs deploy-package/
+          # Check if standalone build exists
+          if [ -f ".next/standalone/server.js" ]; then
+            echo "=== Using Standalone Build ==="
+            mkdir -p deploy-package
+            
+            # Copy standalone files (this is the key!)
+            cp -r .next/standalone/* deploy-package/
+            
+            # Copy static files to the correct location
+            mkdir -p deploy-package/.next
+            cp -r .next/static deploy-package/.next/static
+            
+            # Copy public directory
+            cp -r public deploy-package/public
+            
+            echo "✅ Standalone deployment package created"
+            
+          else
+            echo "=== Using Regular Build ==="
+            mkdir -p deploy-package
+            
+            # Copy essential files for Next.js
+            cp -r .next deploy-package/
+            cp -r node_modules deploy-package/
+            cp -r public deploy-package/
+            cp package.json deploy-package/
+            cp package-lock.json deploy-package/
+            
+            # Copy next.config.js if it exists
+            if [ -f next.config.js ]; then
+              cp next.config.js deploy-package/
+            fi
+            
+            # Copy next.config.mjs if it exists
+            if [ -f next.config.mjs ]; then
+              cp next.config.mjs deploy-package/
+            fi
+            
+            echo "✅ Regular deployment package created"
           fi
           
           # List contents to verify
-          echo "Deployment package contents:"
+          echo "=== Deployment Package Contents ==="
           ls -la deploy-package/
+          
+          # Check for server.js in the package
+          if [ -f "deploy-package/server.js" ]; then
+            echo "✅ server.js found in deployment package"
+          else
+            echo "❌ server.js NOT found in deployment package"
+          fi
           
           # Create zip from the deploy-package directory
           cd deploy-package && zip -r ../../release.zip ./*

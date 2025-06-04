@@ -2,9 +2,9 @@
 const nextConfig = {
   output: 'standalone',
   reactStrictMode: true,
-  images: {
-    domains: ['localhost', 'mtk-care.azurewebsites.net', 'mtk-care-staging.azurewebsites.net'],
-  },
+  // images: {
+  //   domains: ['localhost', 'mtk-care.azurewebsites.net', 'mtk-care-staging.azurewebsites.net'],
+  // },
   async rewrites() {
     return [
       // Don't rewrite API routes
@@ -38,7 +38,10 @@ const nextConfig = {
      // Helps with file tracing for standalone builds
      outputFileTracingRoot: process.cwd(),
    },
-   
+    // Ensure images work correctly
+  images: {
+    unoptimized: true, // Required for standalone builds in some cases
+  },
    // Configure redirects if needed
    async redirects() {
      return []

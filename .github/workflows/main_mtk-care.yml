@@ -28,76 +28,96 @@ jobs:
           npm ci
           npm run build
           
-          # Verify build output
-          echo "=== Build Output Verification ==="
-          ls -la .next/
-          ls -la .next/server/ || echo "No server directory found"
-          ls -la .next/standalone/ || echo "No standalone directory found"
-          
-          # Check if standalone server.js exists
-          if [ -f ".next/standalone/server.js" ]; then
-            echo "✅ Standalone server.js found"
-          else
-            echo "❌ Standalone server.js NOT found"
+          # Verify standalone build was created
+          if [ ! -f ".next/standalone/server.js" ]; then
+            echo "❌ ERROR: Standalone build failed - server.js not found"
+            exit 1
           fi
+          
+          echo "✅ Standalone build successful"
+          ls -la .next/standalone/
 
-      - name: Create deployment package
+      - name: Create standalone deployment package
         working-directory: ./frontend
         run: |
-          # Check if standalone build exists
-          if [ -f ".next/standalone/server.js" ]; then
-            echo "=== Using Standalone Build ==="
-            mkdir -p deploy-package
-            
-            # Copy standalone files (this is the key!)
-            cp -r .next/standalone/* deploy-package/
-            
-            # Copy static files to the correct location
-            mkdir -p deploy-package/.next
-            cp -r .next/static deploy-package/.next/static
-            
-            # Copy public directory
-            cp -r public deploy-package/public
-            
-            echo "✅ Standalone deployment package created"
-            
-          else
-            echo "=== Using Regular Build ==="
-            mkdir -p deploy-package
-            
-            # Copy essential files for Next.js
-            cp -r .next deploy-package/
-            cp -r node_modules deploy-package/
-            cp -r public deploy-package/
-            cp package.json deploy-package/
-            cp package-lock.json deploy-package/
-            
-            # Copy next.config.js if it exists
-            if [ -f next.config.js ]; then
-              cp next.config.js deploy-package/
-            fi
-            
-            # Copy next.config.mjs if it exists
-            if [ -f next.config.mjs ]; then
-              cp next.config.mjs deploy-package/
-            fi
-            
-            echo "✅ Regular deployment package created"
+          # Detailed debugging of build output
+          echo "=== DEBUGGING BUILD OUTPUT ==="
+          echo "Contents of .next/:"
+          ls -la .next/
+          echo ""
+          echo "Contents of .next/standalone/:"
+          ls -la .next/standalone/ || echo "❌ No standalone directory"
+          echo ""
+          echo "Contents of .next/static/:"
+          ls -la .next/static/ || echo "❌ No static directory"
+          echo ""
+          
+          # Check if standalone was actually created
+          if [ ! -d ".next/standalone" ]; then
+            echo "❌ ERROR: Standalone build not created!"
+            echo "Current next.config.js content:"
+            cat next.config.js || echo "No next.config.js found"
+            echo "Attempting to find any .next directories:"
+            find . -name ".next" -type d
+            exit 1
           fi
           
-          # List contents to verify
-          echo "=== Deployment Package Contents ==="
-          ls -la deploy-package/
+          # Create deployment directory
+          mkdir -p deploy-standalone
           
-          # Check for server.js in the package
-          if [ -f "deploy-package/server.js" ]; then
-            echo "✅ server.js found in deployment package"
-          else
-            echo "❌ server.js NOT found in deployment package"
-          fi
+          # Copy standalone files with verbose output
+          echo "=== COPYING STANDALONE FILES ==="
+          cp -rv .next/standalone/* deploy-standalone/
           
-          # Create zip from the deploy-package directory
-          cd deploy-package && zip -r ../../release.zip ./*
+          # Copy static files to correct location
+          echo "=== COPYING STATIC FILES ==="
+          mkdir -p deploy-standalone/.next
+          cp -rv .next/static deploy-standalone/.next/static
+          
+          # Copy public directory
+          echo "=== COPYING PUBLIC FILES ==="
+          cp -rv public deploy-standalone/public
+          
+          # Create package.json for standalone
+          cat > deploy-standalone/package.json << 'EOF'
+          {
+            "name": "mtk-care-standalone",
+            "version": "1.0.0",
+            "scripts": {
+              "start": "node server.js"
+            },
+            "engines": {
+              "node": ">=18.0.0"
+            }
+          }
+          EOF
+          
+          # COMPREHENSIVE verification
+          echo "=== FINAL PACKAGE VERIFICATION ==="
+          echo "Top level files:"
+          ls -la deploy-standalone/
+          echo ""
+          echo "Check for server.js:"
+          ls -la deploy-standalone/server.js || echo "❌ server.js MISSING!"
+          echo ""
+          echo "Check for .next directory:"
+          ls -la deploy-standalone/.next/ || echo "❌ .next directory MISSING!"
+          echo ""
+          echo "Check for static files:"
+          ls -la deploy-standalone/.next/static/ || echo "❌ static directory MISSING!"
+          echo ""
+          echo "Check for public files:"
+          ls -la deploy-standalone/public/ || echo "❌ public directory MISSING!"
+          echo ""
+          
+          # Create zip with verbose output
+          echo "=== CREATING ZIP ==="
+          cd deploy-standalone 
+          ls -la
+          zip -r ../../release.zip ./*
+          cd ..
+          echo "Zip file size:"
+          ls -lh ../release.zip
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -124,11 +144,21 @@ jobs:
       - name: Unzip artifact for deployment
         run: |
           unzip release.zip
-          echo "Unzipped contents:"
+          echo "=== POST-UNZIP VERIFICATION ==="
+          echo "Current directory contents:"
           ls -la
-          echo "Next.js build verification:"
-          ls -la .next/ || echo "No .next directory found"
-          ls -la .next/server/ || echo "No server directory found"
+          echo ""
+          echo "Looking for server.js:"
+          find . -name "server.js" -type f || echo "❌ server.js not found anywhere!"
+          echo ""
+          echo "Looking for .next directories:"
+          find . -name ".next" -type d || echo "❌ No .next directories found!"
+          echo ""
+          echo "All files in current directory:"
+          find . -type f | head -20
+          echo ""
+          echo "Directory tree (first 3 levels):"
+          find . -maxdepth 3 -type d | sort
       
       - name: Login to Azure
         uses: azure/login@v2

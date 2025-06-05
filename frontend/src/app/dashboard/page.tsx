@@ -1,28 +1,48 @@
-// app/dashboard/page.tsx
-// This is now a Server Component
+'use client';
 
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/auth-options';
+import { useState, useEffect } from 'react';
 import { usersApi } from '@/services/apiService';
 import type { components } from '@/types/api';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { ErrorDisplay } from '@/components/error-display';
+import { useAuthBypassSession, useAccessToken } from '@/hooks/useAuthBypass';
 
 
 // Use the generated UserOut type for profile data
 type UserProfileData = components['schemas']['UserOut'];
 
-async function getProfileData(accessToken: string): Promise<UserProfileData> {
-  try {
-    const data = await usersApi.getCurrentUserProfile(accessToken);
-    if (!data) {
-      throw new Error('No profile data returned');
+function useProfileData(accessToken: string | null) {
+  const [profileData, setProfileData] = useState<UserProfileData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    if (!accessToken) {
+      setLoading(false);
+      return;
     }
-    return data;
-  } catch (error) {
-    console.error('Failed to fetch profile data:', error);
-    throw error; // Re-throw to be caught by the error boundary
-  }
+
+    async function fetchProfile() {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await usersApi.getCurrentUserProfile(accessToken!);
+        if (!data) {
+          throw new Error('No profile data returned');
+        }
+        setProfileData(data);
+      } catch (err) {
+        console.error('Failed to fetch profile data:', err);
+        setError(err instanceof Error ? err : new Error('Unknown error'));
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchProfile();
+  }, [accessToken]);
+
+  return { profileData, loading, error };
 }
 
 // Profile section component
@@ -126,10 +146,25 @@ function QuickActions({ userRole }: { userRole: components['schemas']['RoleOut']
   );
 }
 
-export default async function DashboardPage() {
-  const session = await getServerSession(authOptions);
+export default function DashboardPage() {
+  const { data: session, status, isAuthBypass } = useAuthBypassSession();
+  const accessToken = useAccessToken();
+  const { profileData, loading, error } = useProfileData(accessToken);
 
-  if (!session || !session.accessToken) {
+  // Show loading while session or profile is loading
+  if (status === 'loading' || loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-2 text-gray-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Check authentication
+  if (!session || (!accessToken && !isAuthBypass)) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <ErrorBoundary>
@@ -139,43 +174,12 @@ export default async function DashboardPage() {
     );
   }
 
-  try {
-    const profileData = await getProfileData(session.accessToken);
-    const userRole = profileData.roles?.reduce((highestRole, currentRole) => {
-      return (currentRole.level > (highestRole?.level ?? -1)) ? currentRole : highestRole;
-    }, undefined as components['schemas']['RoleOut'] | undefined);
-
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <ErrorBoundary>
-          <ProfileSection profileData={profileData} />
-          <QuickActions userRole={userRole} />
-          
-          {/* Debug section - can be removed in production */}
-          <div className="mt-8 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <details className="text-sm text-gray-500 dark:text-gray-400">
-              <summary className="cursor-pointer">Session Details</summary>
-              <pre className="mt-2 p-2 bg-gray-100 dark:bg-gray-700 rounded overflow-auto max-h-60">
-                {JSON.stringify(session, null, 2)}
-              </pre>
-            </details>
-            <details className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-              <summary className="cursor-pointer">Profile Data</summary>
-              <pre className="mt-2 p-2 bg-gray-100 dark:bg-gray-700 rounded overflow-auto max-h-60">
-                {JSON.stringify(profileData, null, 2)}
-              </pre>
-            </details>
-          </div>
-        </ErrorBoundary>
-      </div>
-    );
-  } catch (error) {
+  // Handle profile loading error
+  if (error) {
     console.error('Error loading dashboard:', error);
     let errorMessage = "We couldn't load your dashboard. Please try refreshing the page or contact support if the problem persists.";
     if (error instanceof Error) {
-      // Use the actual error message if available, otherwise fallback
       errorMessage = error.message || errorMessage;
-      // If the error is the Invalid URL TypeError, provide a more specific hint
       if (error.message.includes('Invalid URL') || (error instanceof TypeError && error.message.toLowerCase().includes('failed to parse url'))) {
         errorMessage = `API connection failed (Invalid URL: ${error.message}). Please ensure backend API URL is correctly configured for this environment.`;
       }
@@ -191,4 +195,58 @@ export default async function DashboardPage() {
       </div>
     );
   }
+
+  // Profile data not loaded yet
+  if (!profileData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-2 text-gray-600">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const userRole = profileData.roles?.reduce((highestRole, currentRole) => {
+    return (currentRole.level > (highestRole?.level ?? -1)) ? currentRole : highestRole;
+  }, undefined as components['schemas']['RoleOut'] | undefined);
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <ErrorBoundary>
+        {/* Show bypass mode indicator */}
+        {isAuthBypass && (
+          <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <div className="flex">
+              <div className="ml-3">
+                <p className="text-sm text-yellow-800">
+                  🚧 <strong>Auth Bypass Mode Active</strong> - You're logged in as a test user for development.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        <ProfileSection profileData={profileData} />
+        <QuickActions userRole={userRole} />
+        
+        {/* Debug section - can be removed in production */}
+        <div className="mt-8 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <details className="text-sm text-gray-500 dark:text-gray-400">
+            <summary className="cursor-pointer">Session Details</summary>
+            <pre className="mt-2 p-2 bg-gray-100 dark:bg-gray-700 rounded overflow-auto max-h-60">
+              {JSON.stringify(session, null, 2)}
+            </pre>
+          </details>
+          <details className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            <summary className="cursor-pointer">Profile Data</summary>
+            <pre className="mt-2 p-2 bg-gray-100 dark:bg-gray-700 rounded overflow-auto max-h-60">
+              {JSON.stringify(profileData, null, 2)}
+            </pre>
+          </details>
+        </div>
+      </ErrorBoundary>
+    </div>
+  );
 }

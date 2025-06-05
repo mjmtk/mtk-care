@@ -66,6 +66,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'apps.audit.middleware.AuditTrailMiddleware',
+    'apps.authentication.middleware_bypass.AuthBypassMiddleware',
     'apps.authentication.middleware.JWTAuthenticationMiddleware',
 ]
 
@@ -282,3 +283,6 @@ LOGGING = {
         },
     },
 }
+
+# Development Authentication Bypass
+AUTH_BYPASS_MODE = env.bool('AUTH_BYPASS_MODE', default=False)

@@ -1,0 +1,318 @@
+[
+  {
+    "model": "optionlists.optionlist",
+    "pk": 8,
+    "fields": {
+      "name": "Ethnicity",
+      "slug": "ethnicities",
+      "description": "Ethnic groupings (NZ and international)",
+      "is_active": true,
+      "created_at": "2025-05-20T08:45:27Z",
+      "updated_at": "2025-05-20T08:45:27Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 32,
+    "fields": {
+      "option_list": 8,
+      "name": "maori",
+      "label": "Māori",
+      "slug": "maori",
+      "description": "Māori ethnic group of New Zealand.",
+      "is_active": true,
+      "sort_order": 1,
+      "metadata": {},
+      "created_at": "2025-05-20T08:45:27Z",
+      "updated_at": "2025-05-20T08:45:27Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 33,
+    "fields": {
+      "option_list": 8,
+      "name": "new_zealand_european_pakeha",
+      "label": "New Zealand European/Pākehā",
+      "slug": "nz-european",
+      "description": "New Zealand European or Pākehā ethnic group.",
+      "is_active": true,
+      "sort_order": 2,
+      "metadata": {},
+      "created_at": "2025-05-20T08:45:27Z",
+      "updated_at": "2025-05-20T08:45:27Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 34,
+    "fields": {
+      "option_list": 8,
+      "name": "pacific_peoples",
+      "label": "Pacific Peoples",
+      "slug": "pacific-peoples",
+      "description": "General grouping for Pacific Peoples ethnicities.",
+      "is_active": true,
+      "sort_order": 3,
+      "metadata": {},
+      "created_at": "2025-05-20T08:45:27Z",
+      "updated_at": "2025-05-20T08:45:27Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 35,
+    "fields": {
+      "option_list": 8,
+      "name": "samoan",
+      "label": "Samoan",
+      "slug": "samoan",
+      "description": "Samoan, a Pacific Peoples group.",
+      "is_active": true,
+      "sort_order": 4,
+      "metadata": {},
+      "created_at": "2025-05-20T08:45:27Z",
+      "updated_at": "2025-05-20T08:45:27Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 36,
+    "fields": {
+      "option_list": 8,
+      "name": "tongan",
+      "label": "Tongan",
+      "slug": "tongan",
+      "description": "Tongan, a Pacific Peoples group.",
+      "is_active": true,
+      "sort_order": 5,
+      "metadata": {},
+      "created_at": "2025-05-20T08:45:27Z",
+      "updated_at": "2025-05-20T08:45:27Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 37,
+    "fields": {
+      "option_list": 8,
+      "name": "niuean",
+      "label": "Niuean",
+      "slug": "niuean",
+      "description": "Niuean, a Pacific Peoples group.",
+      "is_active": true,
+      "sort_order": 6,
+      "metadata": {},
+      "created_at": "2025-05-20T08:45:27Z",
+      "updated_at": "2025-05-20T08:45:27Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 38,
+    "fields": {
+      "option_list": 8,
+      "name": "cook_islands_maori",
+      "label": "Cook Islands Māori",
+      "slug": "cook-islands-maori",
+      "description": "Cook Islands Māori, a Pacific Peoples group.",
+      "is_active": true,
+      "sort_order": 7,
+      "metadata": {},
+      "created_at": "2025-05-20T08:45:27Z",
+      "updated_at": "2025-05-20T08:45:27Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 39,
+    "fields": {
+      "option_list": 8,
+      "name": "tokelauan",
+      "label": "Tokelauan",
+      "slug": "tokelauan",
+      "description": "Tokelauan, a Pacific Peoples group.",
+      "is_active": true,
+      "sort_order": 8,
+      "metadata": {},
+      "created_at": "2025-05-20T08:45:27Z",
+      "updated_at": "2025-05-20T08:45:27Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 40,
+    "fields": {
+      "option_list": 8,
+      "name": "fijian",
+      "label": "Fijian",
+      "slug": "fijian",
+      "description": "Fijian, a Pacific Peoples group.",
+      "is_active": true,
+      "sort_order": 9,
+      "metadata": {},
+      "created_at": "2025-05-20T08:45:27Z",
+      "updated_at": "2025-05-20T08:45:27Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 41,
+    "fields": {
+      "option_list": 8,
+      "name": "other_pacific_peoples",
+      "label": "Other Pacific Peoples",
+      "slug": "other-pacific",
+      "description": "Other Pacific Peoples ethnicity.",
+      "is_active": true,
+      "sort_order": 10,
+      "metadata": {},
+      "created_at": "2025-05-20T08:45:27Z",
+      "updated_at": "2025-05-20T08:45:27Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 42,
+    "fields": {
+      "option_list": 8,
+      "name": "korean",
+      "label": "Korean",
+      "slug": "korean",
+      "description": "Korean ethnic group.",
+      "is_active": true,
+      "sort_order": 11,
+      "metadata": {},
+      "created_at": "2025-05-20T08:45:27Z",
+      "updated_at": "2025-05-20T08:45:27Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 43,
+    "fields": {
+      "option_list": 8,
+      "name": "other_asian",
+      "label": "Other Asian",
+      "slug": "other-asian",
+      "description": "Other Asian ethnic group.",
+      "is_active": true,
+      "sort_order": 12,
+      "metadata": {},
+      "created_at": "2025-05-20T08:45:27Z",
+      "updated_at": "2025-05-20T08:45:27Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 44,
+    "fields": {
+      "option_list": 8,
+      "name": "middle_eastern",
+      "label": "Middle Eastern",
+      "slug": "middle-eastern",
+      "description": "Middle Eastern ethnic group.",
+      "is_active": true,
+      "sort_order": 13,
+      "metadata": {},
+      "created_at": "2025-05-20T08:45:27Z",
+      "updated_at": "2025-05-20T08:45:27Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 45,
+    "fields": {
+      "option_list": 8,
+      "name": "latin_american",
+      "label": "Latin American",
+      "slug": "latin-american",
+      "description": "Latin American ethnic group.",
+      "is_active": true,
+      "sort_order": 14,
+      "metadata": {},
+      "created_at": "2025-05-20T08:45:27Z",
+      "updated_at": "2025-05-20T08:45:27Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 46,
+    "fields": {
+      "option_list": 8,
+      "name": "african",
+      "label": "African",
+      "slug": "african",
+      "description": "African ethnic group.",
+      "is_active": true,
+      "sort_order": 15,
+      "metadata": {},
+      "created_at": "2025-05-20T08:45:27Z",
+      "updated_at": "2025-05-20T08:45:27Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 47,
+    "fields": {
+      "option_list": 8,
+      "name": "other_european",
+      "label": "Other European",
+      "slug": "other-european",
+      "description": "Other European ethnic group.",
+      "is_active": true,
+      "sort_order": 16,
+      "metadata": {},
+      "created_at": "2025-05-20T08:45:27Z",
+      "updated_at": "2025-05-20T08:45:27Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 48,
+    "fields": {
+      "option_list": 8,
+      "name": "other_ethnicity",
+      "label": "Other Ethnicity",
+      "slug": "other-ethnicity",
+      "description": "A general option for other ethnicities not listed.",
+      "is_active": true,
+      "sort_order": 17,
+      "metadata": {},
+      "created_at": "2025-05-20T08:45:27Z",
+      "updated_at": "2025-05-20T08:45:27Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 49,
+    "fields": {
+      "option_list": 8,
+      "name": "filipino",
+      "label": "Filipino",
+      "slug": "filipino",
+      "description": "Filipino ethnic group.",
+      "is_active": true,
+      "sort_order": 18,
+      "metadata": {},
+      "created_at": "2025-05-20T08:45:27Z",
+      "updated_at": "2025-05-20T08:45:27Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 50,
+    "fields": {
+      "option_list": 8,
+      "name": "prefer_not_to_say",
+      "label": "Prefer not to say",
+      "slug": "prefer-not-to-say",
+      "description": "User prefers not to disclose ethnicity.",
+      "is_active": true,
+      "sort_order": 19,
+      "metadata": {},
+      "created_at": "2025-05-20T08:45:27Z",
+      "updated_at": "2025-05-20T08:45:27Z"
+    }
+  }
+]

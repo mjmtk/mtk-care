@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
     const backendUrl = process.env.NEXT_PUBLIC_DJANGO_API_URL || 'http://localhost:8000/api'
     
     // Forward the request to the Django backend
-    const response = await fetch(`${backendUrl}/v1/users/`, {
+    const response = await fetch(`${backendUrl}/users/`, {
       headers: {
         'Content-Type': 'application/json',
         // Forward any authorization headers from the client request

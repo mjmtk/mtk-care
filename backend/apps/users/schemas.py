@@ -18,8 +18,8 @@ class UserProfileOut(Schema):
     employee_id: Optional[str] = None
     title: Optional[str] = None
     avatar: Optional[str] = None
-    preferences: dict
-    azure_ad_groups: list
+    preferences: dict = {}
+    azure_ad_groups: list = []
 
 class UserOut(Schema):
     id: UUID
@@ -28,8 +28,8 @@ class UserOut(Schema):
     is_active: bool
     first_name: Optional[str] = None
     last_name: Optional[str] = None
-    profile: UserProfileOut
-    roles: List[RoleOut]
+    profile: Optional[UserProfileOut] = None
+    roles: List[RoleOut] = []
 
 class UserCreate(Schema):
     username: str

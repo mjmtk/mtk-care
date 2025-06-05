@@ -1,0 +1,209 @@
+[
+    {
+        "model": "optionlists.optionlist",
+        "pk": 10,
+        "fields": {
+            "name": "Secondary Identity",
+            "slug": "secondary-identities",
+            "description": "Secondary identities and community groups",
+            "created_at": "2025-04-20T00:00:00Z",
+            "updated_at": "2025-04-20T00:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 63,
+        "fields": {
+            "option_list": 10,
+            "name": "Disabled/Person with Disability",
+            "label": "Disabled/Person with Disability",
+            "slug": "disabled",
+            "is_active": true,
+            "sort_order": 1,
+            "created_at": "2025-04-20T00:00:00Z",
+            "updated_at": "2025-04-20T00:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 64,
+        "fields": {
+            "option_list": 10,
+            "name": "LGBTQIA+",
+            "label": "LGBTQIA+",
+            "slug": "lgbtqia",
+            "is_active": true,
+            "sort_order": 2,
+            "created_at": "2025-04-20T00:00:00Z",
+            "updated_at": "2025-04-20T00:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 65,
+        "fields": {
+            "option_list": 10,
+            "name": "Wh\u0101nau (Family) Representative",
+            "label": "Wh\u0101nau (Family) Representative",
+            "slug": "whanau-rep",
+            "is_active": true,
+            "sort_order": 3,
+            "created_at": "2025-04-20T00:00:00Z",
+            "updated_at": "2025-04-20T00:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 66,
+        "fields": {
+            "option_list": 10,
+            "name": "Migrant",
+            "label": "Migrant",
+            "slug": "migrant",
+            "is_active": true,
+            "sort_order": 4,
+            "created_at": "2025-04-20T00:00:00Z",
+            "updated_at": "2025-04-20T00:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 67,
+        "fields": {
+            "option_list": 10,
+            "name": "Refugee Background",
+            "label": "Refugee Background",
+            "slug": "refugee-background",
+            "is_active": true,
+            "sort_order": 5,
+            "created_at": "2025-04-20T00:00:00Z",
+            "updated_at": "2025-04-20T00:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 68,
+        "fields": {
+            "option_list": 10,
+            "name": "Rural Community Member",
+            "label": "Rural Community Member",
+            "slug": "rural",
+            "is_active": true,
+            "sort_order": 6,
+            "created_at": "2025-04-20T00:00:00Z",
+            "updated_at": "2025-04-20T00:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 69,
+        "fields": {
+            "option_list": 10,
+            "name": "Youth (16-24)",
+            "label": "Youth (16-24)",
+            "slug": "youth",
+            "is_active": true,
+            "sort_order": 7,
+            "created_at": "2025-04-20T00:00:00Z",
+            "updated_at": "2025-04-20T00:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 70,
+        "fields": {
+            "option_list": 10,
+            "name": "Older Person (65+)",
+            "label": "Older Person (65+)",
+            "slug": "older-person",
+            "is_active": true,
+            "sort_order": 8,
+            "created_at": "2025-04-20T00:00:00Z",
+            "updated_at": "2025-04-20T00:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 71,
+        "fields": {
+            "option_list": 10,
+            "name": "Religious/Faith Community Member",
+            "label": "Religious/Faith Community Member",
+            "slug": "faith-community",
+            "is_active": true,
+            "sort_order": 9,
+            "created_at": "2025-04-20T00:00:00Z",
+            "updated_at": "2025-04-20T00:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 72,
+        "fields": {
+            "option_list": 10,
+            "name": "Tangata Whaiora (Mental Health Service User)",
+            "label": "Tangata Whaiora (Mental Health Service User)",
+            "slug": "tangata-whaiora",
+            "is_active": true,
+            "sort_order": 10,
+            "created_at": "2025-04-20T00:00:00Z",
+            "updated_at": "2025-04-20T00:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 73,
+        "fields": {
+            "option_list": 10,
+            "name": "Veteran/Ex-Service Member",
+            "label": "Veteran/Ex-Service Member",
+            "slug": "veteran",
+            "is_active": true,
+            "sort_order": 11,
+            "created_at": "2025-04-20T00:00:00Z",
+            "updated_at": "2025-04-20T00:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 74,
+        "fields": {
+            "option_list": 10,
+            "name": "Other (free text option)",
+            "label": "Other (free text option)",
+            "slug": "other",
+            "is_active": true,
+            "sort_order": 12,
+            "created_at": "2025-04-20T00:00:00Z",
+            "updated_at": "2025-04-20T00:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 75,
+        "fields": {
+            "option_list": 10,
+            "name": "None of the above",
+            "label": "None of the above",
+            "slug": "none",
+            "is_active": true,
+            "sort_order": 13,
+            "created_at": "2025-04-20T00:00:00Z",
+            "updated_at": "2025-04-20T00:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 76,
+        "fields": {
+            "option_list": 10,
+            "name": "Prefer not to say",
+            "label": "Prefer not to say",
+            "slug": "prefer-not-to-say",
+            "is_active": true,
+            "sort_order": 14,
+            "created_at": "2025-04-20T00:00:00Z",
+            "updated_at": "2025-04-20T00:00:00Z"
+        }
+    }
+]

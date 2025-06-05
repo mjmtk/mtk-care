@@ -21,7 +21,7 @@ class UserProfileAdmin(admin.ModelAdmin):
     list_display = ['user', 'title', 'employee_id'] # TODO: add 'email_notifications' back when implemented
     list_filter = [] # Removed departments, TODO: add 'email_notifications', 'theme_preference' back when implemented
     search_fields = ['user__username', 'user__first_name', 'user__last_name', 'employee_id']
-    readonly_fields = ['created_at', 'updated_at', 'created_by', 'updated_by']
+    readonly_fields = ['created_at', 'updated_at']
 
 @admin.register(Role)
 class RoleAdmin(admin.ModelAdmin):

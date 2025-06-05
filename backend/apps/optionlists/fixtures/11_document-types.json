@@ -1,0 +1,83 @@
+[
+    {
+    "model": "optionlists.optionlist",
+    "pk": 11,
+    "fields": {
+      "name": "Document Types",
+      "slug": "document-types",
+      "is_active": true,
+      "created_at": "2025-04-20T00:00:00Z",
+      "updated_at": "2025-04-20T00:00:00Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 80,
+    "fields": {
+      "option_list": 11,
+      "slug": "id",
+      "name": "ID Document",
+      "label": "ID Document",
+      "is_active": true,
+      "sort_order": 1,
+      "created_at": "2025-04-20T00:00:00Z",
+      "updated_at": "2025-04-20T00:00:00Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 81,
+    "fields": {
+      "option_list": 11,
+      "slug": "proof-of-address",
+      "name": "Proof of Address",
+      "label": "Proof of Address",
+      "is_active": true,
+      "sort_order": 2,
+      "created_at": "2025-04-20T00:00:00Z",
+      "updated_at": "2025-04-20T00:00:00Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 82,
+    "fields": {
+      "option_list": 11,
+      "slug": "birth-certificate",
+      "name": "Birth Certificate",
+      "label": "Birth Certificate",
+      "is_active": true,
+      "sort_order": 3,
+      "created_at": "2025-04-20T00:00:00Z",
+      "updated_at": "2025-04-20T00:00:00Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 83,
+    "fields": {
+      "option_list": 11,
+      "slug": "visa-permit",
+      "name": "Visa/Permit",
+      "label": "Visa/Permit",
+      "is_active": true,
+      "sort_order": 4,
+      "created_at": "2025-04-20T00:00:00Z",
+      "updated_at": "2025-04-20T00:00:00Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 84,
+    "fields": {
+      "option_list": 11,
+      "slug": "benefit-letter",
+      "name": "Benefit Letter",
+      "label": "Benefit Letter",
+      "is_active": true,
+      "sort_order": 5,
+      "created_at": "2025-04-20T00:00:00Z",
+      "updated_at": "2025-04-20T00:00:00Z"
+    }
+  }
+]

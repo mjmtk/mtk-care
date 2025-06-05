@@ -1,0 +1,11 @@
+[
+  {"model": "reference_data.country", "pk": 1, "fields": {"code": "NZL", "name": "New Zealand", "is_active": true}},
+  {"model": "reference_data.country", "pk": 2, "fields": {"code": "AUS", "name": "Australia", "is_active": true}},
+  {"model": "reference_data.country", "pk": 3, "fields": {"code": "FJI", "name": "Fiji", "is_active": true}},
+  {"model": "reference_data.country", "pk": 4, "fields": {"code": "TON", "name": "Tonga", "is_active": true}},
+  {"model": "reference_data.country", "pk": 5, "fields": {"code": "WSM", "name": "Samoa", "is_active": true}},
+  {"model": "reference_data.country", "pk": 6, "fields": {"code": "GBR", "name": "United Kingdom", "is_active": true}},
+  {"model": "reference_data.country", "pk": 7, "fields": {"code": "CHN", "name": "China", "is_active": true}},
+  {"model": "reference_data.country", "pk": 8, "fields": {"code": "IND", "name": "India", "is_active": true}},
+  {"model": "reference_data.country", "pk": 9, "fields": {"code": "USA", "name": "United States", "is_active": true}}
+]

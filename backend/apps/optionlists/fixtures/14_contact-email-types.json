@@ -1,0 +1,46 @@
+[
+    {
+        "model": "optionlists.optionlist",
+        "pk": 14,
+        "fields": {
+            "name": "Common Email Types",
+            "slug": "email-types",
+            "description": "Email types shared by all individuals and organisations",
+            "is_active": true,
+            "is_template": true,
+            "metadata": {},
+            "created_at": "2025-04-18T10:24:00Z",
+            "updated_at": "2025-04-18T10:24:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 14001,
+        "fields": {
+            "option_list": 14,
+            "slug": "work",
+            "name": "Work",
+            "label": "Work",
+            "is_active": true,
+            "sort_order": 1,
+            "metadata": {},
+            "created_at": "2025-04-18T10:24:00Z",
+            "updated_at": "2025-04-18T10:24:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 14002,
+        "fields": {
+            "option_list": 14,
+            "slug": "personal",
+            "name": "Personal",
+            "label": "Personal",
+            "is_active": true,
+            "sort_order": 2,
+            "metadata": {},
+            "created_at": "2025-04-18T10:24:00Z",
+            "updated_at": "2025-04-18T10:24:00Z"
+        }
+    }
+]

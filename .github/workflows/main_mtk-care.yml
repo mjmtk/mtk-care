@@ -114,7 +114,7 @@ jobs:
           echo "=== CREATING ZIP ==="
           cd deploy-standalone 
           ls -la
-          zip -r ../../release.zip ./*
+          zip -r ../../release.zip .
           cd ..
           echo "Zip file size:"
           ls -lh ../release.zip
@@ -124,6 +124,7 @@ jobs:
         with:
           name: node-app
           path: release.zip
+          if-no-files-found: error
 
   deploy:
     runs-on: ubuntu-latest

@@ -55,6 +55,7 @@ jobs:
           
           echo "=== COPYING CONFIG FILES ==="
           cp package.json deploy/
+          cp package-lock.json deploy/
           cp next.config.ts deploy/
           
           echo "=== CREATING CUSTOM SERVER ==="
@@ -63,9 +64,20 @@ jobs:
           const { parse } = require('url')
           const next = require('next')
           
+          // Environment validation
+          console.log('=== ENVIRONMENT CHECK ===')
+          console.log('NODE_ENV:', process.env.NODE_ENV)
+          console.log('PORT:', process.env.PORT)
+          console.log('HOSTNAME:', process.env.HOSTNAME)
+          console.log('Required env vars present:', {
+            NEXTAUTH_SECRET: !!process.env.NEXTAUTH_SECRET,
+            AZURE_AD_CLIENT_ID: !!process.env.AZURE_AD_CLIENT_ID,
+            AZURE_AD_CLIENT_SECRET: !!process.env.AZURE_AD_CLIENT_SECRET
+          })
+          
           const dev = process.env.NODE_ENV !== 'production'
-          const hostname = process.env.HOSTNAME || 'localhost'
-          const port = process.env.PORT || 3000
+          const hostname = process.env.HOSTNAME || '0.0.0.0'
+          const port = process.env.PORT || 8080
           
           // when using middleware `hostname` and `port` must be provided below
           const app = next({ dev, hostname, port })
@@ -199,6 +211,20 @@ jobs:
           echo ""
           echo "Directory tree (first 3 levels):"
           find . -maxdepth 3 -type d | sort
+
+      - name: Set up Node.js for deployment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          
+      - name: Install production dependencies
+        run: |
+          echo "=== INSTALLING PRODUCTION DEPENDENCIES ==="
+          npm ci --production --no-audit
+          echo "=== VERIFYING NODE_MODULES ==="
+          ls -la node_modules/ | head -10
+          echo "Checking for Next.js:"
+          ls -la node_modules/next/ || echo "❌ Next.js not found!"
       
       - name: Login to Azure
         uses: azure/login@v2
@@ -214,3 +240,22 @@ jobs:
           app-name: 'mtk-care'
           slot-name: 'Production'
           package: .
+
+      - name: 'Post-deployment health check'
+        run: |
+          echo "=== WAITING FOR APP TO START ==="
+          sleep 30
+          
+          echo "=== TESTING HEALTH ENDPOINT ==="
+          for i in {1..5}; do
+            if curl -f "${{ steps.deploy-to-webapp.outputs.webapp-url }}/api/health"; then
+              echo "✅ Health check passed!"
+              break
+            else
+              echo "❌ Health check failed, attempt $i/5"
+              sleep 10
+            fi
+          done
+          
+          echo "=== TESTING MAIN PAGE ==="
+          curl -I "${{ steps.deploy-to-webapp.outputs.webapp-url }}" || echo "❌ Main page not accessible"

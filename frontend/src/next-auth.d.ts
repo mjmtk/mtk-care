@@ -7,6 +7,7 @@ declare module "next-auth" {
   interface Session {
     accessToken?: string; // Add your custom property
     user: {
+      id?: string; // Add user ID for bypass mode
       roles?: string[]; // Add roles array for authorization
       // You can add other custom user properties here if needed
     } & DefaultSession["user"];

@@ -31,6 +31,10 @@ jobs:
           # Verify standalone build was created
           if [ ! -f ".next/standalone/server.js" ]; then
             echo "❌ ERROR: Standalone build failed - server.js not found"
+            echo "Available files in .next/:"
+            ls -la .next/ || echo "No .next directory found"
+            echo "Checking for next.config.js:"
+            cat next.config.js || cat next.config.ts || echo "No Next.js config found"
             exit 1
           fi
           
@@ -55,8 +59,10 @@ jobs:
           # Check if standalone was actually created
           if [ ! -d ".next/standalone" ]; then
             echo "❌ ERROR: Standalone build not created!"
+            echo "Current next.config.ts content:"
+            cat next.config.ts || echo "No next.config.ts found"
             echo "Current next.config.js content:"
-            cat next.config.js || echo "No next.config.js found"
+            cat next.config.js || echo "No next.config.js found" 
             echo "Attempting to find any .next directories:"
             find . -name ".next" -type d
             exit 1
@@ -69,28 +75,21 @@ jobs:
           echo "=== COPYING STANDALONE FILES ==="
           cp -rv .next/standalone/* deploy-standalone/
           
-          # Copy static files to correct location
+          # Copy static files to the deployed .next folder (crucial for Next.js)
           echo "=== COPYING STATIC FILES ==="
           mkdir -p deploy-standalone/.next
           cp -rv .next/static deploy-standalone/.next/static
           
-          # Copy public directory
+          # Copy public directory if it exists
           echo "=== COPYING PUBLIC FILES ==="
-          cp -rv public deploy-standalone/public
+          if [ -d "public" ]; then
+            cp -rv public deploy-standalone/public
+          else
+            echo "ℹ️ No public directory found"
+          fi
           
-          # Create package.json for standalone
-          cat > deploy-standalone/package.json << 'EOF'
-          {
-            "name": "mtk-care-standalone",
-            "version": "1.0.0",
-            "scripts": {
-              "start": "node server.js"
-            },
-            "engines": {
-              "node": ">=18.0.0"
-            }
-          }
-          EOF
+          # Ensure proper permissions on server.js
+          chmod +x deploy-standalone/server.js
           
           # COMPREHENSIVE verification
           echo "=== FINAL PACKAGE VERIFICATION ==="
@@ -107,7 +106,10 @@ jobs:
           ls -la deploy-standalone/.next/static/ || echo "❌ static directory MISSING!"
           echo ""
           echo "Check for public files:"
-          ls -la deploy-standalone/public/ || echo "❌ public directory MISSING!"
+          ls -la deploy-standalone/public/ || echo "ℹ️ No public directory"
+          echo ""
+          echo "Verify server.js content (first 10 lines):"
+          head -10 deploy-standalone/server.js || echo "❌ Cannot read server.js"
           echo ""
           
           # Create zip with verbose output

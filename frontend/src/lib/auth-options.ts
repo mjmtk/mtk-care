@@ -1,29 +1,9 @@
+import { NextAuthOptions, Account, Profile, Session } from "next-auth"; // Added Session import
 import { JWT } from "next-auth/jwt";
-import { Session, Account, Profile, NextAuthOptions } from "next-auth";
 import AzureADProvider from "next-auth/providers/azure-ad";
 
-// Removed: import getConfig from 'next/config';
-// Removed: const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
-
-interface Token extends JWT {
-  accessToken?: string;
-}
-
-interface SessionWithToken extends Session {
-  accessToken?: string;
-  // Removed: baseUrl?: string; // This is not a standard NextAuth session property and NEXTAUTH_URL is handled by NextAuth core
-}
-
-interface JWTParams {
-  token: Token;
-  account: Account | null;
-  profile?: Profile; // Profile can be undefined for some providers or flows
-}
-
-interface SessionParams {
-  session: SessionWithToken;
-  token: Token; // Token here is the processed JWT from the jwt callback
-}
+// Custom interfaces for JWT and Session params are no longer needed here,
+// as types are augmented in src/types/next-auth.d.ts
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -40,21 +20,38 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, account }: JWTParams): Promise<Token> {
+    async jwt({ token, account, profile }: { token: JWT; account: Account | null; profile?: Profile }): Promise<JWT> {
       // Persist the access_token to the token right after signin
       if (account?.access_token) {
         token.accessToken = account.access_token;
       }
+      // Add roles to the token from the profile object (populated by Azure AD provider from ID token claims)
+      // Ensure 'roles' is a claim in your Azure AD ID token and it's an array of strings.
+      // The 'profile' object and its 'roles' property are now typed via next-auth.d.ts
+      if (profile?.roles && Array.isArray(profile.roles)) {
+        token.roles = profile.roles.filter((role: string) => typeof role === 'string');
+      }
       return token;
     },
-    async session({ session, token }: SessionParams): Promise<SessionWithToken> {
-      // Send properties to the client, like an access_token from a provider.
-      // The token parameter here is the JWT returned from the `jwt` callback
-      if (token?.accessToken) {
-        session.accessToken = token.accessToken;
-      }
-      // Removed non-standard baseUrl assignment
-      return session;
+    async session({ session, token }: { session: Session; token: JWT }): Promise<Session> {
+      // The 'token' object (from the 'jwt' callback) contains 'accessToken' and 'roles'.
+      // The 'session' object initially contains 'user' (with name, email, image) and 'expires'.
+      // We need to return a new session object that merges these according to our augmented types.
+
+      const baseUser = session.user ?? {}; // Handle session.user potentially being undefined
+
+      const augmentedUser = {
+        ...baseUser, // Spread default user properties (name, email, image)
+        ...(token.roles && { roles: token.roles }), // Add roles if they exist on the token
+      };
+
+      const newSession: Session = {
+        expires: session.expires, // Preserve the original session expiration
+        user: augmentedUser,      // Set our augmented user object
+        ...(token.accessToken && { accessToken: token.accessToken }), // Add accessToken if it exists on the token
+      };
+      
+      return newSession;
     },
   },
   // It's good practice to explicitly set the session strategy if not default, though JWT is default for OAuth providers

@@ -28,6 +28,7 @@ export function AuthBypassProvider({ children }: AuthBypassProviderProps) {
       name: 'Test User',
       email: 'test.user@example.com',
       image: null,
+      roles: ['Superuser', 'admin'], // Add admin roles for bypass mode
     },
     accessToken: 'mock-access-token-for-bypass',
     expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 hours from now

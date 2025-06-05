@@ -221,7 +221,7 @@ export default function DashboardPage() {
             <div className="flex">
               <div className="ml-3">
                 <p className="text-sm text-yellow-800">
-                  🚧 <strong>Auth Bypass Mode Active</strong> - You're logged in as a test user for development.
+                  🚧 <strong>Auth Bypass Mode Active</strong> - You&apos;re logged in as a test user for development.
                 </p>
               </div>
             </div>

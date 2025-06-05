@@ -5,7 +5,12 @@ const nextConfig: NextConfig = {
   
   async rewrites() {
     return [
-      // Don't rewrite API routes
+      // Proxy API calls to Django backend
+      {
+        source: '/api/:path*',
+        destination: 'https://mtkcare-backend-abbffge3c9gqcqhr.newzealandnorth-01.azurewebsites.net/api/:path*',
+      },
+      // Don't rewrite NextAuth API routes
       {
         source: '/api/auth/:path*',
         destination: '/api/auth/:path*',

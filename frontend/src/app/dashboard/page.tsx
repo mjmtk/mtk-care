@@ -6,6 +6,7 @@ import { authOptions } from '@/lib/auth-options';
 import { usersApi } from '@/services/apiService';
 import type { components } from '@/types/api';
 import { ErrorBoundary } from '@/components/error-boundary';
+import { ErrorDisplay } from '@/components/error-display';
 
 
 // Use the generated UserOut type for profile data
@@ -170,23 +171,22 @@ export default async function DashboardPage() {
     );
   } catch (error) {
     console.error('Error loading dashboard:', error);
+    let errorMessage = "We couldn't load your dashboard. Please try refreshing the page or contact support if the problem persists.";
+    if (error instanceof Error) {
+      // Use the actual error message if available, otherwise fallback
+      errorMessage = error.message || errorMessage;
+      // If the error is the Invalid URL TypeError, provide a more specific hint
+      if (error.message.includes('Invalid URL') || (error instanceof TypeError && error.message.toLowerCase().includes('failed to parse url'))) {
+        errorMessage = `API connection failed (Invalid URL: ${error.message}). Please ensure backend API URL is correctly configured for this environment.`;
+      }
+    }
     return (
       <div className="container mx-auto px-4 py-8">
         <ErrorBoundary>
-          <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-6">
-            <h2 className="text-lg font-medium text-red-800 dark:text-red-200">Error Loading Dashboard</h2>
-            <p className="mt-2 text-red-700 dark:text-red-300">
-              We couldn&apos;t load your dashboard. Please try refreshing the page or contact support if the problem persists.
-            </p>
-            <div className="mt-4">
-              <button
-                onClick={() => window.location.reload()}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-              >
-                Refresh Page
-              </button>
-            </div>
-          </div>
+          <ErrorDisplay 
+            title="Error Loading Dashboard"
+            message={errorMessage}
+          />
         </ErrorBoundary>
       </div>
     );

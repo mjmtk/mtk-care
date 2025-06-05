@@ -115,6 +115,10 @@ class JWTAuthenticationMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
+        # Skip JWT authentication if auth bypass mode is enabled
+        if getattr(settings, 'AUTH_BYPASS_MODE', False):
+            return self.get_response(request)
+            
         # Skip JWT authentication for admin paths or if user is already authenticated via session
         if (request.path.startswith('/admin/') or 
             (hasattr(request, 'user') and request.user.is_authenticated)):

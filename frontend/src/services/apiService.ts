@@ -64,7 +64,11 @@ export async function apiRequest<ResponseType = unknown, RequestBody = unknown>(
   }
 
   if (accessToken) {
-    requestHeaders['Authorization'] = `Bearer ${accessToken}`;
+    // In auth bypass mode, use a mock token but still send Authorization header for backend compatibility
+    const tokenToUse = process.env.NEXT_PUBLIC_AUTH_BYPASS_MODE === 'true' 
+      ? 'mock-bypass-token' 
+      : accessToken;
+    requestHeaders['Authorization'] = `Bearer ${tokenToUse}`;
   }
 
   // The getApiPath function prepends /api/ to the url

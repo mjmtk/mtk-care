@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: 'standalone',
   reactStrictMode: true,
   
   async rewrites() {
@@ -35,12 +34,9 @@ const nextConfig: NextConfig = {
   // Configure for production deployment
   compress: true,
 
-  // Helps with file tracing for standalone builds
-  outputFileTracingRoot: process.cwd(),
-
   // Ensure images work correctly
   images: {
-    unoptimized: true, // Required for standalone builds in some cases
+    unoptimized: true,
   },
   
   // Configure redirects if needed

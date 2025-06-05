@@ -28,97 +28,95 @@ jobs:
           npm ci
           npm run build
           
-          # Verify standalone build was created
-          if [ ! -f ".next/standalone/server.js" ]; then
-            echo "❌ ERROR: Standalone build failed - server.js not found"
-            echo "Available files in .next/:"
-            ls -la .next/ || echo "No .next directory found"
-            echo "Checking for next.config.js:"
-            cat next.config.js || cat next.config.ts || echo "No Next.js config found"
+          # Verify Next.js build was created
+          if [ ! -d ".next" ]; then
+            echo "❌ ERROR: Next.js build failed - .next directory not found"
             exit 1
           fi
           
-          echo "✅ Standalone build successful"
-          ls -la .next/standalone/
+          echo "✅ Next.js build successful"
+          ls -la .next/
 
-      - name: Create standalone deployment package
+      - name: Create deployment package  
         working-directory: ./frontend
         run: |
-          # Detailed debugging of build output
-          echo "=== DEBUGGING BUILD OUTPUT ==="
-          echo "Contents of .next/:"
-          ls -la .next/
-          echo ""
-          echo "Contents of .next/standalone/:"
-          ls -la .next/standalone/ || echo "❌ No standalone directory"
-          echo ""
-          echo "Contents of .next/static/:"
-          ls -la .next/static/ || echo "❌ No static directory"
-          echo ""
-          
-          # Check if standalone was actually created
-          if [ ! -d ".next/standalone" ]; then
-            echo "❌ ERROR: Standalone build not created!"
-            echo "Current next.config.ts content:"
-            cat next.config.ts || echo "No next.config.ts found"
-            echo "Current next.config.js content:"
-            cat next.config.js || echo "No next.config.js found" 
-            echo "Attempting to find any .next directories:"
-            find . -name ".next" -type d
-            exit 1
-          fi
+          echo "=== CREATING DEPLOYMENT PACKAGE ==="
           
           # Create deployment directory
-          mkdir -p deploy-standalone
+          mkdir -p deploy
           
-          # Copy standalone files with verbose output
-          echo "=== COPYING STANDALONE FILES ==="
-          cp -rv .next/standalone/* deploy-standalone/
+          # Copy all necessary files for Next.js to work
+          echo "=== COPYING NEXT.JS BUILD ==="
+          cp -r .next deploy/
           
-          # Copy static files to the deployed .next folder (crucial for Next.js)
-          echo "=== COPYING STATIC FILES ==="
-          mkdir -p deploy-standalone/.next
-          cp -rv .next/static deploy-standalone/.next/static
+          echo "=== COPYING SOURCE FILES ==="
+          cp -r src deploy/
+          cp -r public deploy/ 2>/dev/null || echo "No public directory"
           
-          # Copy public directory if it exists
-          echo "=== COPYING PUBLIC FILES ==="
-          if [ -d "public" ]; then
-            cp -rv public deploy-standalone/public
-          else
-            echo "ℹ️ No public directory found"
-          fi
+          echo "=== COPYING CONFIG FILES ==="
+          cp package.json deploy/
+          cp next.config.ts deploy/
+          cp server.js deploy/
           
-          # Ensure proper permissions on server.js
-          chmod +x deploy-standalone/server.js
+          # Create production package.json
+          cat > deploy/package.json << 'EOF'
+          {
+            "name": "mtk-care-frontend",
+            "version": "1.0.0",
+            "scripts": {
+              "start": "node server.js"
+            },
+            "dependencies": {
+              "next": "15.3.3",
+              "react": "^18.2.0",
+              "react-dom": "^18.2.0",
+              "@hookform/resolvers": "^5.0.1",
+              "@radix-ui/react-alert-dialog": "^1.1.14",
+              "@radix-ui/react-avatar": "^1.1.10",
+              "@radix-ui/react-checkbox": "^1.3.2",
+              "@radix-ui/react-dialog": "^1.1.14",
+              "@radix-ui/react-dropdown-menu": "^2.1.15",
+              "@radix-ui/react-label": "^2.1.7",
+              "@radix-ui/react-navigation-menu": "^1.2.13",
+              "@radix-ui/react-radio-group": "^1.3.7",
+              "@radix-ui/react-select": "^2.2.5",
+              "@radix-ui/react-slot": "^1.2.3",
+              "@radix-ui/react-tabs": "^1.1.12",
+              "axios": "^1.9.0",
+              "class-variance-authority": "^0.7.1",
+              "clsx": "^2.1.1",
+              "lucide-react": "^0.511.0",
+              "next-auth": "^4.24.11",
+              "next-themes": "^0.4.6",
+              "react-hook-form": "^7.57.0",
+              "sonner": "^2.0.5",
+              "tailwind-merge": "^3.3.0",
+              "zod": "^3.25.48"
+            },
+            "engines": {
+              "node": ">=18.0.0"
+            }
+          }
+          EOF
           
-          # COMPREHENSIVE verification
-          echo "=== FINAL PACKAGE VERIFICATION ==="
+          # Verification
+          echo "=== DEPLOYMENT VERIFICATION ==="
           echo "Top level files:"
-          ls -la deploy-standalone/
-          echo ""
-          echo "Check for server.js:"
-          ls -la deploy-standalone/server.js || echo "❌ server.js MISSING!"
+          ls -la deploy/
           echo ""
           echo "Check for .next directory:"
-          ls -la deploy-standalone/.next/ || echo "❌ .next directory MISSING!"
+          ls -la deploy/.next/ || echo "❌ .next directory MISSING!"
           echo ""
-          echo "Check for static files:"
-          ls -la deploy-standalone/.next/static/ || echo "❌ static directory MISSING!"
-          echo ""
-          echo "Check for public files:"
-          ls -la deploy-standalone/public/ || echo "ℹ️ No public directory"
-          echo ""
-          echo "Verify server.js content (first 10 lines):"
-          head -10 deploy-standalone/server.js || echo "❌ Cannot read server.js"
+          echo "Check for server.js:"
+          ls -la deploy/server.js || echo "❌ server.js MISSING!"
           echo ""
           
-          # Create zip with verbose output
+          # Create zip
           echo "=== CREATING ZIP ==="
-          cd deploy-standalone 
-          ls -la
+          cd deploy
           zip -r ../../release.zip .
           cd ..
-          echo "Zip file size:"
+          echo "Zip created, size:"
           ls -lh ../release.zip
 
       - name: Upload artifact for deployment job

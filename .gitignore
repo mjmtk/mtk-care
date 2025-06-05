@@ -1,3 +1,9 @@
+.old_docker/
+.other_ignore/
+*[Dd]ocker*
+*[Dd]ockerfile*
+
+
 # Logs
 logs
 *.log

@@ -5,8 +5,8 @@
 ### 1.1 Backend Stack
 - **Framework**: Django 5.0+
 - **API Layer**: Django Ninja 1.0+
-- **Authentication**: django-auth-adfs 1.15+
-- **Database**: SQLite (development) / PostgreSQL (production)
+- **Authentication**: Azure AD JWT Token Validation
+- **Database**: PostgreSQL 14+
 - **Python Version**: 3.11+
 
 ### 1.2 Frontend Stack
@@ -16,9 +16,12 @@
 - **State Management**: TanStack Query (React Query)
 - **Authentication**: NextAuth.js 4+
 
-### 1.3 Development Tools
+### 1.3 Deployment & Infrastructure
+- **Hosting**: Azure Web Apps
+- **CI/CD**: GitHub Actions
 - **Containerization**: Docker (optional)
 - **Testing**: Pytest (backend), Jest (frontend)
+- **Monitoring**: Azure Application Insights
 - **Code Quality**: Black, isort, ESLint, Prettier
 - **Documentation**: OpenAPI/Swagger
 
@@ -170,7 +173,25 @@ def manager_or_admin_view(request):
     return {"message": "Manager or Admin access granted"}
 ```
 
-### 3.2 Django Ninja API with RBAC
+### 3.2 Authentication Flow
+
+1. **Frontend Authentication**
+   - Next.js frontend uses NextAuth.js with Azure AD provider
+   - Users authenticate via Azure AD
+   - Access token is stored in HTTP-only cookie
+
+2. **API Authentication**
+   - Frontend includes access token in `Authorization: Bearer` header
+   - Django backend validates JWT token from Azure AD
+   - Custom middleware enforces role-based access control
+
+3. **Environment Variables**
+   - `AZURE_AD_TENANT_ID`: Azure AD tenant ID
+   - `AZURE_AD_CLIENT_ID`: Frontend application client ID
+   - `AZURE_AD_CLIENT_SECRET`: Frontend application client secret
+   - `NEXT_PUBLIC_AZURE_AD_BACKEND_API_SCOPE`: Backend API scope (e.g., `api://<backend-app-id>/access_as_user`)
+
+### 3.3 Django Ninja API with RBAC
 
 ```python
 # api/v1/auth.py

@@ -1,0 +1,39 @@
+[
+    {
+        "model": "optionlists.optionlist",
+        "pk": 12,
+        "fields": {
+            "name": "Client Document Bypass Reasons",
+            "slug": "bypass-reasons",
+            "is_active": true,
+            "created_at": "2025-04-20T00:00:00Z",
+            "updated_at": "2025-04-20T00:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 86,
+        "fields": {
+            "option_list": 12,
+            "slug": "no-id-available",
+            "name": "No ID available",
+            "label": "No ID available",
+            "is_active": true,
+            "created_at": "2025-04-20T00:00:00Z",
+            "updated_at": "2025-04-20T00:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 87,
+        "fields": {
+            "option_list": 12,
+            "slug": "client-not-present",
+            "name": "Client not present",
+            "label": "Client not present",
+            "is_active": true,
+            "created_at": "2025-04-20T00:00:00Z",
+            "updated_at": "2025-04-20T00:00:00Z"
+        }
+    }
+]

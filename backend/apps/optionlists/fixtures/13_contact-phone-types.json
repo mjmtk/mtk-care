@@ -1,0 +1,62 @@
+[
+  {
+    "model": "optionlists.optionlist",
+    "pk": 13,
+    "fields": {
+      "name": "Common Phone Types",
+      "slug": "phone-types",
+      "description": "Phone types shared by all individuals and organisations",
+      "is_active": true,
+      "is_template": true,
+      "metadata": {},
+      "created_at": "2025-04-18T10:24:00Z",
+      "updated_at": "2025-04-18T10:24:00Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 13001,
+    "fields": {
+      "option_list": 13,
+      "slug": "work",
+      "name": "Work",
+      "label": "Work",
+      "is_active": true,
+      "sort_order": 1,
+      "metadata": {},
+      "created_at": "2025-04-18T10:24:00Z",
+      "updated_at": "2025-04-18T10:24:00Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 13002,
+    "fields": {
+      "option_list": 13,
+      "slug": "mobile",
+      "name": "Mobile",
+      "label": "Mobile",
+      "is_active": true,
+      "sort_order": 2,
+      "metadata": {},
+      "created_at": "2025-04-18T10:24:00Z",
+      "updated_at": "2025-04-18T10:24:00Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 13003,
+    "fields": {
+      "option_list": 13,
+      "slug": "home",
+      "name": "Home",
+      "label": "Home",
+      "is_active": true,
+      "sort_order": 3,
+      "metadata": {},
+      "created_at": "2025-04-18T10:24:00Z",
+      "updated_at": "2025-04-18T10:24:00Z"
+    }
+  }
+  
+]

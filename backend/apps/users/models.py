@@ -2,7 +2,7 @@ import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Permission
 from django.conf import settings
-from apps.common.models import TimeStampedModel
+
 
 # Default preferences structure
 def get_default_preferences():
@@ -19,8 +19,17 @@ class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # Add any additional fields here as needed
 
+# Base model for timestamped models within the users app
+class UserAppBaseModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
 # New Role model
-class Role(TimeStampedModel):
+class Role(UserAppBaseModel):
     """Application roles for users."""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100, unique=True)
@@ -38,7 +47,7 @@ class Role(TimeStampedModel):
     def __str__(self):
         return self.name
 
-class UserProfile(TimeStampedModel):
+class UserProfile(UserAppBaseModel):
     """Extended user profile for additional information."""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')
@@ -62,7 +71,7 @@ class UserProfile(TimeStampedModel):
         return self.user.get_full_name() or self.user.username
 
 # Model to map Azure AD group IDs/names to Django Role
-class GroupRoleMapping(TimeStampedModel):
+class GroupRoleMapping(UserAppBaseModel):
     """Maps an Azure AD group (by ID or name) to a Django Role."""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     azure_ad_group_id = models.CharField(max_length=128, help_text="Azure AD group object ID")

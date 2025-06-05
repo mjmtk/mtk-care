@@ -41,12 +41,13 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
-    'apps.common',
+    'apps.users',          # Defines AUTH_USER_MODEL
+    'apps.common',         # Depends on AUTH_USER_MODEL
     'apps.authentication', 
-    'apps.users',
     'apps.tasks',
     'apps.notifications',
     'apps.audit',
+    'apps.optionlists',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

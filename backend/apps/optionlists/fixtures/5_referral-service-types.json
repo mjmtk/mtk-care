@@ -1,0 +1,790 @@
+[
+    {
+        "model": "optionlists.optionlist",
+        "pk": 5,
+        "fields": {
+            "name": "Referral Service Categories",
+            "slug": "referral-service-categories",
+            "description": "Broad categories of service providers",
+            "is_active": true,
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 501,
+        "fields": {
+            "option_list": 5,
+            "name": "Government Agencies",
+            "slug": "government-agencies",
+            "label": "Government Agencies",
+            "description": "Government-related service providers",
+            "is_active": true,
+            "sort_order": 1,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 502,
+        "fields": {
+            "option_list": 5,
+            "name": "Education Providers",
+            "slug": "education-providers",
+            "label": "Education Providers",
+            "description": "Education and training service providers",
+            "is_active": true,
+            "sort_order": 2,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 503,
+        "fields": {
+            "option_list": 5,
+            "name": "Health Services",
+            "slug": "health-services",
+            "label": "Health Services",
+            "description": "Health and medical service providers",
+            "is_active": true,
+            "sort_order": 3,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 504,
+        "fields": {
+            "option_list": 5,
+            "name": "Community Support",
+            "slug": "community-support",
+            "label": "Community Support",
+            "description": "Community-based support services",
+            "is_active": true,
+            "sort_order": 4,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 505,
+        "fields": {
+            "option_list": 5,
+            "name": "Iwi and Cultural Services",
+            "slug": "iwi-cultural-services",
+            "label": "Iwi and Cultural Services",
+            "description": "Iwi and cultural service providers",
+            "is_active": true,
+            "sort_order": 5,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 506,
+        "fields": {
+            "option_list": 5,
+            "name": "Specialized Support",
+            "slug": "specialized-support",
+            "label": "Specialized Support",
+            "description": "Specialized support service providers",
+            "is_active": true,
+            "sort_order": 6,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50101,
+        "fields": {
+            "option_list": 5,
+            "parent": 501,
+            "name": "Oranga Tamariki",
+            "slug": "oranga-tamariki",
+            "label": "Oranga Tamariki",
+            "description": "Ministry for Children, responsible for child welfare and youth justice",
+            "is_active": true,
+            "sort_order": 1,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50102,
+        "fields": {
+            "option_list": 5,
+            "parent": 501,
+            "name": "Work and Income New Zealand",
+            "slug": "work-income-new-zealand",
+            "label": "Work and Income New Zealand",
+            "description": "Provides financial assistance and employment services",
+            "is_active": true,
+            "sort_order": 2,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50103,
+        "fields": {
+            "option_list": 5,
+            "parent": 501,
+            "name": "Kāinga Ora",
+            "slug": "kainga-ora",
+            "label": "Kāinga Ora",
+            "description": "Provides public housing and urban development",
+            "is_active": true,
+            "sort_order": 3,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50104,
+        "fields": {
+            "option_list": 5,
+            "parent": 501,
+            "name": "Ministry of Education",
+            "slug": "ministry-of-education",
+            "label": "Ministry of Education",
+            "description": "Oversees the education system in New Zealand",
+            "is_active": true,
+            "sort_order": 4,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50105,
+        "fields": {
+            "option_list": 5,
+            "parent": 501,
+            "name": "Ministry of Health",
+            "slug": "ministry-of-health",
+            "label": "Ministry of Health",
+            "description": "Oversees the health and disability system in New Zealand",
+            "is_active": true,
+            "sort_order": 5,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50106,
+        "fields": {
+            "option_list": 5,
+            "parent": 501,
+            "name": "New Zealand Police",
+            "slug": "new-zealand-police",
+            "label": "New Zealand Police",
+            "description": "National police service, responsible for law enforcement and community safety",
+            "is_active": true,
+            "sort_order": 6,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50107,
+        "fields": {
+            "option_list": 5,
+            "parent": 501,
+            "name": "Department of Corrections",
+            "slug": "department-of-corrections",
+            "label": "Department of Corrections",
+            "description": "Manages prisons and community-based sentences",
+            "is_active": true,
+            "sort_order": 7,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50201,
+        "fields": {
+            "option_list": 5,
+            "parent": 502,
+            "name": "Schools/Kura",
+            "slug": "schools-kura",
+            "label": "Schools/Kura",
+            "description": "Primary and Secondary Educational Institutions",
+            "is_active": true,
+            "sort_order": 1,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50202,
+        "fields": {
+            "option_list": 5,
+            "parent": 502,
+            "name": "Kōhanga Reo",
+            "slug": "kohanga-reo",
+            "label": "Kōhanga Reo",
+            "description": "Early Childhood Education (Māori language immersion)",
+            "is_active": true,
+            "sort_order": 2,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50203,
+        "fields": {
+            "option_list": 5,
+            "parent": 502,
+            "name": "Early Childhood Centers",
+            "slug": "early-childhood-centers",
+            "label": "Early Childhood Centers",
+            "description": "Preschools, kindergartens, and other early learning centers",
+            "is_active": true,
+            "sort_order": 3,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50204,
+        "fields": {
+            "option_list": 5,
+            "parent": 502,
+            "name": "Te Kura (Correspondence School)",
+            "slug": "te-kura",
+            "label": "Te Kura (Correspondence School)",
+            "description": "Distance Education Provider for early childhood to NCEA Level 3",
+            "is_active": true,
+            "sort_order": 4,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50205,
+        "fields": {
+            "option_list": 5,
+            "parent": 502,
+            "name": "Tertiary Education Providers",
+            "slug": "tertiary-education-providers",
+            "label": "Tertiary Education Providers",
+            "description": "Universities, Polytechnics, Wānanga, Private Training Establishments",
+            "is_active": true,
+            "sort_order": 5,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50301,
+        "fields": {
+            "option_list": 5,
+            "parent": 503,
+            "name": "General Practitioner Services",
+            "slug": "gp-services",
+            "label": "General Practitioner Services",
+            "description": "General medical practice services from family doctors",
+            "is_active": true,
+            "sort_order": 1,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50302,
+        "fields": {
+            "option_list": 5,
+            "parent": 503,
+            "name": "Child and Adolescent Mental Health Services (CAMHS)",
+            "slug": "camhs",
+            "label": "Child and Adolescent Mental Health Services (CAMHS)",
+            "description": "Specialist mental health services for children and adolescents",
+            "is_active": true,
+            "sort_order": 2,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50303,
+        "fields": {
+            "option_list": 5,
+            "parent": 503,
+            "name": "Plunket",
+            "slug": "plunket",
+            "label": "Plunket",
+            "description": "Well child Tamariki Ora health and development services for children under five",
+            "is_active": true,
+            "sort_order": 3,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50304,
+        "fields": {
+            "option_list": 5,
+            "parent": 503,
+            "name": "Public Health Nurses",
+            "slug": "public-health-nurses",
+            "label": "Public Health Nurses",
+            "description": "Nursing services focused on community health, often school-based",
+            "is_active": true,
+            "sort_order": 4,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50305,
+        "fields": {
+            "option_list": 5,
+            "parent": 503,
+            "name": "Primary Health Organizations (PHOs)",
+            "slug": "phos",
+            "label": "Primary Health Organizations (PHOs)",
+            "description": "Coordinate and support primary healthcare services within a community",
+            "is_active": true,
+            "sort_order": 5,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50306,
+        "fields": {
+            "option_list": 5,
+            "parent": 503,
+            "name": "Dental Care Services",
+            "slug": "dental-care-services",
+            "label": "Dental Care Services",
+            "description": "Dental and oral health services, including school dental services",
+            "is_active": true,
+            "sort_order": 6,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50307,
+        "fields": {
+            "option_list": 5,
+            "parent": 503,
+            "name": "Hospital Services",
+            "slug": "hospital-services",
+            "label": "Hospital Services",
+            "description": "Inpatient, outpatient, and emergency medical care provided by hospitals",
+            "is_active": true,
+            "sort_order": 7,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50308,
+        "fields": {
+            "option_list": 5,
+            "parent": 503,
+            "name": "Addiction Services",
+            "slug": "addiction-services",
+            "label": "Addiction Services",
+            "description": "Support and treatment for addiction (drugs, alcohol, gambling)",
+            "is_active": true,
+            "sort_order": 8,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50401,
+        "fields": {
+            "option_list": 5,
+            "parent": 504,
+            "name": "Whānau Ora Providers",
+            "slug": "whanau-ora-providers",
+            "label": "Whānau Ora Providers",
+            "description": "Holistic family-centered support services, often kaupapa Māori",
+            "is_active": true,
+            "sort_order": 1,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50402,
+        "fields": {
+            "option_list": 5,
+            "parent": 504,
+            "name": "Presbyterian Support",
+            "slug": "presbyterian-support",
+            "label": "Presbyterian Support",
+            "description": "Social and family support services, including aged care",
+            "is_active": true,
+            "sort_order": 2,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50403,
+        "fields": {
+            "option_list": 5,
+            "parent": 504,
+            "name": "Barnardos",
+            "slug": "barnardos",
+            "label": "Barnardos",
+            "description": "Child and family welfare, early learning, and support services",
+            "is_active": true,
+            "sort_order": 3,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50404,
+        "fields": {
+            "option_list": 5,
+            "parent": 504,
+            "name": "Family Works",
+            "slug": "family-works",
+            "label": "Family Works",
+            "description": "Family support, counseling, and social services",
+            "is_active": true,
+            "sort_order": 4,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50405,
+        "fields": {
+            "option_list": 5,
+            "parent": 504,
+            "name": "Youth One Stop Shops",
+            "slug": "youth-one-stop-shops",
+            "label": "Youth One Stop Shops",
+            "description": "Integrated health, social, and recreational services for youth",
+            "is_active": true,
+            "sort_order": 5,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50406,
+        "fields": {
+            "option_list": 5,
+            "parent": 504,
+            "name": "Food Banks and Pantries",
+            "slug": "food-banks-pantries",
+            "label": "Food Banks and Pantries",
+            "description": "Emergency food assistance for individuals and families in need",
+            "is_active": true,
+            "sort_order": 6,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50407,
+        "fields": {
+            "option_list": 5,
+            "parent": 504,
+            "name": "Housing and Shelter Services",
+            "slug": "housing-shelter-services",
+            "label": "Housing and Shelter Services",
+            "description": "Emergency, transitional, and supportive housing options",
+            "is_active": true,
+            "sort_order": 7,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50408,
+        "fields": {
+            "option_list": 5,
+            "parent": 504,
+            "name": "Citizens Advice Bureau",
+            "slug": "citizens-advice-bureau",
+            "label": "Citizens Advice Bureau",
+            "description": "Free information, advice, and support on a wide range of issues",
+            "is_active": true,
+            "sort_order": 8,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50501,
+        "fields": {
+            "option_list": 5,
+            "parent": 505,
+            "name": "Iwi Social Services",
+            "slug": "iwi-social-services",
+            "label": "Iwi Social Services",
+            "description": "Social, health, and wellbeing services provided by Māori tribal authorities",
+            "is_active": true,
+            "sort_order": 1,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50502,
+        "fields": {
+            "option_list": 5,
+            "parent": 505,
+            "name": "Pasifika Providers",
+            "slug": "pasifika-providers",
+            "label": "Pasifika Providers",
+            "description": "Health, social, and community services tailored for Pacific Island peoples",
+            "is_active": true,
+            "sort_order": 2,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50503,
+        "fields": {
+            "option_list": 5,
+            "parent": 505,
+            "name": "Regional Migrant Services",
+            "slug": "regional-migrant-services",
+            "label": "Regional Migrant Services",
+            "description": "Support services for new migrants and refugees, including settlement support",
+            "is_active": true,
+            "sort_order": 3,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50504,
+        "fields": {
+            "option_list": 5,
+            "parent": 505,
+            "name": "Urban Māori Authorities",
+            "slug": "urban-maori-authorities",
+            "label": "Urban Māori Authorities",
+            "description": "Services for Māori living in urban areas, often pan-tribal",
+            "is_active": true,
+            "sort_order": 4,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50505,
+        "fields": {
+            "option_list": 5,
+            "parent": 505,
+            "name": "Cultural Community Groups",
+            "slug": "cultural-community-groups",
+            "label": "Cultural Community Groups",
+            "description": "Support and services provided by various other ethnic and cultural community groups",
+            "is_active": true,
+            "sort_order": 5,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50601,
+        "fields": {
+            "option_list": 5,
+            "parent": 506,
+            "name": "Women's Refuge",
+            "slug": "womens-refuge",
+            "label": "Women's Refuge",
+            "description": "Support, advocacy, and safe housing for women and children experiencing family violence",
+            "is_active": true,
+            "sort_order": 1,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50602,
+        "fields": {
+            "option_list": 5,
+            "parent": 506,
+            "name": "Community Law Centers",
+            "slug": "community-law-centers",
+            "label": "Community Law Centers",
+            "description": "Free legal advice, assistance, and education",
+            "is_active": true,
+            "sort_order": 2,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50603,
+        "fields": {
+            "option_list": 5,
+            "parent": 506,
+            "name": "Strengthening Families",
+            "slug": "strengthening-families",
+            "label": "Strengthening Families",
+            "description": "Coordination services for families requiring support from multiple agencies",
+            "is_active": true,
+            "sort_order": 3,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50604,
+        "fields": {
+            "option_list": 5,
+            "parent": 506,
+            "name": "Family Start",
+            "slug": "family-start",
+            "label": "Family Start",
+            "description": "Early intervention home visiting program for families with young children facing challenges",
+            "is_active": true,
+            "sort_order": 4,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50605,
+        "fields": {
+            "option_list": 5,
+            "parent": 506,
+            "name": "Disability Support Services",
+            "slug": "disability-support-services",
+            "label": "Disability Support Services",
+            "description": "Services and support for people with physical, intellectual, or sensory disabilities",
+            "is_active": true,
+            "sort_order": 5,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50606,
+        "fields": {
+            "option_list": 5,
+            "parent": 506,
+            "name": "Refugee Support Services",
+            "slug": "refugee-support-services",
+            "label": "Refugee Support Services",
+            "description": "Settlement, orientation, and ongoing support services for refugees and asylum seekers",
+            "is_active": true,
+            "sort_order": 6,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 50607,
+        "fields": {
+            "option_list": 5,
+            "parent": 506,
+            "name": "Budgeting and Financial Mentoring",
+            "slug": "budgeting-financial-mentoring",
+            "label": "Budgeting and Financial Mentoring",
+            "description": "Services to help individuals and families manage their finances and reduce debt",
+            "is_active": true,
+            "sort_order": 7,
+            "metadata": {},
+            "created_at": "2025-05-20T09:00:00Z",
+            "updated_at": "2025-05-20T09:00:00Z"
+        }
+    }
+]

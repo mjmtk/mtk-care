@@ -39,3 +39,6 @@ tasks/
 
 # Added by Task Master AI
 .env
+
+backend/reference-projects/**
+frontend/reference-projects/**

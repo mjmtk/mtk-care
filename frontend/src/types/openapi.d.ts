@@ -4,15 +4,19 @@
  */
 
 export interface paths {
-    "/api/health": {
+    "/api/optionlists/{list_slug}/items/": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Health Check */
-        get: operations["config_urls_health_check"];
+        /**
+         * List all active items for a specific OptionList by its slug
+         * @description Retrieves all active items for a given OptionList slug (e.g., 'external-organisation-types').
+         *     Items are ordered by their predefined sort_order.
+         */
+        get: operations["apps_optionlists_api_list_option_list_items_by_slug"];
         put?: never;
         post?: never;
         delete?: never;
@@ -21,84 +25,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/auth/validate": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Validate Token
-         * @description Validate Azure AD token and return user data.
-         */
-        post: operations["config_urls_validate_token"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/profile": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get User Profile
-         * @description Get current user profile with detailed role information.
-         *
-         *     Returns:
-         *         dict: User profile with detailed role information including:
-         *             - id: User ID
-         *             - username: Username
-         *             - email: User email
-         *             - first_name: User's first name
-         *             - last_name: User's last name
-         *             - roles: List of role names (for backward compatibility)
-         *             - role_details: List of dictionaries with detailed role information
-         *             - highest_role: The highest-level role assigned to the user (based on level)
-         *             - permissions: List of all permissions
-         *             - is_staff: Boolean indicating staff status
-         *             - is_superuser: Boolean indicating superuser status
-         *             - date_joined: When the user account was created
-         *             - last_login: When the user last logged in
-         */
-        get: operations["config_urls_get_user_profile"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/auth/me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Current User
-         * @description Returns the current authenticated user's information and role.
-         *     Requires a valid JWT token in the Authorization header.
-         */
-        get: operations["apps_authentication_api_get_current_user"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users/me/": {
+    "/api/users/me/": {
         parameters: {
             query?: never;
             header?: never;
@@ -115,7 +42,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/users/": {
+    "/api/users/": {
         parameters: {
             query?: never;
             header?: never;
@@ -133,7 +60,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/users/{user_id}/": {
+    "/api/users/{user_id}/": {
         parameters: {
             query?: never;
             header?: never;
@@ -151,7 +78,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/users/{user_id}/activate/": {
+    "/api/users/{user_id}/activate/": {
         parameters: {
             query?: never;
             header?: never;
@@ -168,7 +95,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/users/{user_id}/deactivate/": {
+    "/api/users/{user_id}/deactivate/": {
         parameters: {
             query?: never;
             header?: never;
@@ -185,7 +112,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/users/{user_id}/roles/": {
+    "/api/users/{user_id}/roles/": {
         parameters: {
             query?: never;
             header?: never;
@@ -202,7 +129,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/roles/": {
+    "/api/roles/": {
         parameters: {
             query?: never;
             header?: never;
@@ -220,7 +147,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/roles/{role_id}/": {
+    "/api/roles/{role_id}/": {
         parameters: {
             query?: never;
             header?: never;
@@ -243,6 +170,21 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** OptionListItemSchemaOut */
+        OptionListItemSchemaOut: {
+            /** Id */
+            id: number;
+            /** Slug */
+            slug: string;
+            /** Name */
+            name: string;
+            /** Label */
+            label?: string | null;
+            /** Sort Order */
+            sort_order: number;
+            /** Is Active */
+            is_active: boolean;
+        };
         /** RoleOut */
         RoleOut: {
             /**
@@ -274,8 +216,11 @@ export interface components {
             first_name?: string | null;
             /** Last Name */
             last_name?: string | null;
-            profile: components["schemas"]["UserProfileOut"];
-            /** Roles */
+            profile?: components["schemas"]["UserProfileOut"] | null;
+            /**
+             * Roles
+             * @default []
+             */
             roles: components["schemas"]["RoleOut"][];
         };
         /** UserProfileOut */
@@ -293,11 +238,17 @@ export interface components {
             title?: string | null;
             /** Avatar */
             avatar?: string | null;
-            /** Preferences */
+            /**
+             * Preferences
+             * @default {}
+             */
             preferences: {
                 [key: string]: unknown;
             };
-            /** Azure Ad Groups */
+            /**
+             * Azure Ad Groups
+             * @default []
+             */
             azure_ad_groups: unknown[];
         };
         /** UserCreate */
@@ -350,29 +301,13 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    config_urls_health_check: {
+    apps_optionlists_api_list_option_list_items_by_slug: {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
+            path: {
+                list_slug: string;
             };
-        };
-    };
-    config_urls_validate_token: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
             cookie?: never;
         };
         requestBody?: never;
@@ -382,43 +317,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
-            };
-        };
-    };
-    config_urls_get_user_profile: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
+                content: {
+                    "application/json": components["schemas"]["OptionListItemSchemaOut"][];
                 };
-                content?: never;
-            };
-        };
-    };
-    apps_authentication_api_get_current_user: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
         };
     };

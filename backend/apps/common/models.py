@@ -210,6 +210,79 @@ class Organisation(UUIDPKBaseModel):
         verbose_name = _('Organisation')
         verbose_name_plural = _('Organisations')
 
-# The Document, ReminderType, TermTranslation models from reference core are omitted for now
-# as they are not direct dependencies for optionlists and might introduce other complexities.
-# We can add them later if needed.
+
+# ==========================================
+# DOCUMENT METADATA (SharePoint Integration)
+# ==========================================
+
+# from apps.client_management.models import Client
+from apps.optionlists.models import OptionListItem
+
+# TODO: Consider adding django-simple-history or django-reversion to this model for metadata/history tracking in the future.
+class Document(UUIDPKBaseModel):
+    """
+    Represents a document linked to a client, with metadata for SharePoint integration.
+    Utilises a UUID primary key and includes audit and soft delete features.
+    """
+    # client = models.ForeignKey(
+    #     'client_management.Client',
+    #     on_delete=models.CASCADE,
+    #     related_name='documents',
+    #     verbose_name=_("Client")
+    # )
+    file_name = models.CharField(max_length=255, verbose_name=_("File Name"))
+    sharepoint_id = models.CharField(
+        max_length=255,
+        help_text=_('SharePoint unique file ID or URL'),
+        verbose_name=_("SharePoint ID")
+    )
+    type = models.ForeignKey(
+        'optionlists.OptionListItem',
+        on_delete=models.PROTECT,
+        related_name='document_types',
+        limit_choices_to={'option_list__slug': 'document-types'},
+        verbose_name=_("Document Type")
+    )
+    status = models.ForeignKey(
+        'optionlists.OptionListItem',
+        on_delete=models.PROTECT,
+        related_name='document_statuses',
+        limit_choices_to={'option_list__slug': 'document-statuses'},
+        null=True,
+        blank=True,
+        verbose_name=_("Document Status")
+    )
+    metadata = models.JSONField(
+        blank=True,
+        null=True,
+        help_text=_('Flexible metadata for extensibility'),
+        verbose_name=_("Metadata")
+    )
+    # 'created_at' (formerly uploaded_at) and 'created_by' (formerly uploaded_by) are inherited from AuditSoftDeleteBaseModel.
+    # 'id', 'updated_at', 'updated_by', soft-delete fields, and 'last_synced_at' are also inherited.
+
+    class Meta:
+        verbose_name = _('Document')
+        verbose_name_plural = _('Documents')
+        ordering = ['-created_at']
+        app_label = 'core'
+
+    def __str__(self):
+        return f"{self.file_name} for {self.client}"
+
+# # ==========================================
+# # REFERENCE TABLES FOR CLIENT
+# # ==========================================
+
+
+# class ReminderType(models.Model):
+#     option_item = models.OneToOneField('optionlists.OptionListItem', on_delete=models.CASCADE, related_name='reminder_type')
+#     priority = models.CharField(max_length=16, choices=[('high', 'High'), ('medium', 'Medium'), ('low', 'Low')])
+
+# class TermTranslation(models.Model):
+#     term = models.CharField(max_length=128, unique=True)
+#     translation = models.CharField(max_length=256)
+#     context = models.CharField(max_length=128, blank=True)
+
+#     def __str__(self):
+#         return f"{self.term} ({self.context})"

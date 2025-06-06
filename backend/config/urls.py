@@ -138,9 +138,11 @@ from apps.authentication.api import router as auth_router
 # Import routers directly from their source file to avoid circular imports
 from apps.users.api import users_router, roles_router
 from apps.optionlists.api import get_router as optionlists_router
+from apps.common.api import router as common_router
 
 # Include API routers
 # api.add_router("/auth/", auth_router)
+api.add_router("/common/", common_router)
 
 # Other routers
 # api.add_router("/tasks/", "apps.tasks.api.router")

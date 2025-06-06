@@ -4,7 +4,44 @@
  */
 
 export interface paths {
-    "/api/optionlists/{list_slug}/items/": {
+    "/api/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Health Check */
+        get: operations["config_urls_health_check"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/validate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Validate Token
+         * @description Validate Azure AD token and return user data.
+         */
+        post: operations["config_urls_validate_token"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/profile": {
         parameters: {
             query?: never;
             header?: never;
@@ -12,14 +49,66 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * List all active items for a specific OptionList by its slug
-         * @description Retrieves all active items for a given OptionList slug (e.g., 'external-organisation-types').
-         *     Items are ordered by their predefined sort_order.
+         * Get User Profile
+         * @description Get current user profile with detailed role information.
+         *
+         *     Returns:
+         *         dict: User profile with detailed role information including:
+         *             - id: User ID
+         *             - username: Username
+         *             - email: User email
+         *             - first_name: User's first name
+         *             - last_name: User's last name
+         *             - roles: List of role names (for backward compatibility)
+         *             - role_details: List of dictionaries with detailed role information
+         *             - highest_role: The highest-level role assigned to the user (based on level)
+         *             - permissions: List of all permissions
+         *             - is_staff: Boolean indicating staff status
+         *             - is_superuser: Boolean indicating superuser status
+         *             - date_joined: When the user account was created
+         *             - last_login: When the user last logged in
          */
-        get: operations["apps_optionlists_api_list_option_list_items_by_slug"];
+        get: operations["config_urls_get_user_profile"];
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/documents/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Documents */
+        get: operations["apps_common_api_list_documents"];
+        put?: never;
+        /** Create Document */
+        post: operations["apps_common_api_create_document"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/documents/{doc_id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Document */
+        get: operations["apps_common_api_get_document"];
+        /** Update Document */
+        put: operations["apps_common_api_update_document"];
+        post?: never;
+        /** Delete Document */
+        delete: operations["apps_common_api_delete_document"];
         options?: never;
         head?: never;
         patch?: never;
@@ -166,24 +255,82 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/optionlists/{list_slug}/items/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List all active items for a specific OptionList by its slug
+         * @description Retrieves all active items for a given OptionList slug (e.g., 'external-organisation-types').
+         *     Items are ordered by their predefined sort_order.
+         */
+        get: operations["apps_optionlists_api_list_option_list_items_by_slug"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /** OptionListItemSchemaOut */
-        OptionListItemSchemaOut: {
-            /** Id */
-            id: number;
-            /** Slug */
-            slug: string;
-            /** Name */
-            name: string;
-            /** Label */
-            label?: string | null;
-            /** Sort Order */
-            sort_order: number;
-            /** Is Active */
-            is_active: boolean;
+        /** DocumentSchema */
+        DocumentSchema: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** File Name */
+            file_name: string;
+            /** Sharepoint Id */
+            sharepoint_id: string;
+            /** Type Id */
+            type_id?: number | null;
+            /** Status Id */
+            status_id?: number | null;
+            /** Metadata */
+            metadata?: unknown | null;
+            /** Created At */
+            created_at?: string | null;
+            /** Created By */
+            created_by?: string | null;
+            /** Updated At */
+            updated_at?: string | null;
+            /** Updated By */
+            updated_by?: string | null;
+        };
+        /** DocumentCreateSchema */
+        DocumentCreateSchema: {
+            /** File Name */
+            file_name: string;
+            /** Sharepoint Id */
+            sharepoint_id: string;
+            /** Type Id */
+            type_id?: number | null;
+            /** Status Id */
+            status_id?: number | null;
+            /** Metadata */
+            metadata?: unknown | null;
+        };
+        /** DocumentUpdateSchema */
+        DocumentUpdateSchema: {
+            /** File Name */
+            file_name?: string | null;
+            /** Sharepoint Id */
+            sharepoint_id?: string | null;
+            /** Type Id */
+            type_id?: number | null;
+            /** Status Id */
+            status_id?: number | null;
+            /** Metadata */
+            metadata?: unknown | null;
         };
         /** RoleOut */
         RoleOut: {
@@ -292,6 +439,21 @@ export interface components {
             /** Level */
             level: number | null;
         };
+        /** OptionListItemSchemaOut */
+        OptionListItemSchemaOut: {
+            /** Id */
+            id: number;
+            /** Slug */
+            slug: string;
+            /** Name */
+            name: string;
+            /** Label */
+            label?: string | null;
+            /** Sort Order */
+            sort_order: number;
+            /** Is Active */
+            is_active: boolean;
+        };
     };
     responses: never;
     parameters: never;
@@ -301,12 +463,112 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    apps_optionlists_api_list_option_list_items_by_slug: {
+    config_urls_health_check: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    config_urls_validate_token: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    config_urls_get_user_profile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    apps_common_api_list_documents: {
+        parameters: {
+            query?: {
+                client_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentSchema"][];
+                };
+            };
+        };
+    };
+    apps_common_api_create_document: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DocumentCreateSchema"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentSchema"];
+                };
+            };
+        };
+    };
+    apps_common_api_get_document: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                list_slug: string;
+                doc_id: string;
             };
             cookie?: never;
         };
@@ -318,8 +580,54 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OptionListItemSchemaOut"][];
+                    "application/json": components["schemas"]["DocumentSchema"];
                 };
+            };
+        };
+    };
+    apps_common_api_update_document: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                doc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DocumentUpdateSchema"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentSchema"];
+                };
+            };
+        };
+    };
+    apps_common_api_delete_document: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                doc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -617,6 +925,28 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    apps_optionlists_api_list_option_list_items_by_slug: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                list_slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OptionListItemSchemaOut"][];
+                };
             };
         };
     };

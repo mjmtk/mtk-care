@@ -1,25 +1,24 @@
 from ninja import Schema
 from typing import Optional, Any
 from uuid import UUID
+import datetime
 
 class DocumentSchema(Schema):
     id: UUID
-    client_id: UUID
     file_name: str
     sharepoint_id: str
-    type_id: int
+    type_id: Optional[int] = None
     status_id: Optional[int] = None
     metadata: Optional[Any] = None
-    created_at: Optional[str] = None
+    created_at: Optional[datetime.datetime] = None
     created_by: Optional[str] = None
-    updated_at: Optional[str] = None
+    updated_at: Optional[datetime.datetime] = None
     updated_by: Optional[str] = None
 
 class DocumentCreateSchema(Schema):
-    client_id: UUID
     file_name: str
     sharepoint_id: str
-    type_id: int
+    type_id: Optional[int] = None
     status_id: Optional[int] = None
     metadata: Optional[Any] = None
 

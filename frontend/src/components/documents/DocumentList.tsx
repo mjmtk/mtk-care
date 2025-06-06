@@ -4,19 +4,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
-interface Document {
-  id: string;
-  client_id: string;
-  file_name: string;
-  sharepoint_id: string;
-  type_id: number;
-  status_id?: number;
-  metadata?: any;
-  created_at?: string;
-  created_by?: string;
-  updated_at?: string;
-  updated_by?: string;
-}
+import type { components } from "@/types/openapi";
+type Document = components["schemas"]["DocumentSchema"];
 
 export default function DocumentList() {
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -28,15 +17,27 @@ export default function DocumentList() {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetch("/api/common/documents/")
-      .then((res) => (res.ok ? res.json() : Promise.reject(res)))
-      .then(setDocuments)
-      .catch(() => setError("Failed to fetch documents."))
+    fetch("/api/documents/")
+      .then((res) => {
+        if (!res.ok) {
+          console.error("Documents API error:", res.status, res.statusText);
+          return Promise.reject(new Error(`API error: ${res.status}`));
+        }
+        return res.json();
+      })
+      .then(data => {
+        console.log("Documents fetched:", data);
+        setDocuments(Array.isArray(data) ? data : []);
+      })
+      .catch((err) => {
+        console.error("Documents fetch error:", err);
+        setError(`Failed to fetch documents: ${err.message}`);
+      })
       .finally(() => setLoading(false));
   }, []);
 
   const handleDelete = (id: string) => {
-    fetch(`/api/common/documents/${id}/`, { method: "DELETE" })
+    fetch(`/api/documents/${id}/`, { method: "DELETE" })
       .then((res) => {
         if (res.ok) setDocuments((docs) => docs.filter((d) => d.id !== id));
         else setError("Failed to delete document.");

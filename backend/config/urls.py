@@ -137,23 +137,23 @@ def get_user_profile(request):
 from apps.authentication.api import router as auth_router
 # Import routers directly from their source file to avoid circular imports
 from apps.users.api import users_router, roles_router
-from apps.optionlists.api import get_router as optionlists_router
-from apps.common.api import router as common_router
+from apps.optionlists.api import optionlists_router
 
 # Include API routers
 # api.add_router("/auth/", auth_router)
-api.add_router("/common/", common_router)
+from apps.common.api import documents_router
+api.add_router("/documents", documents_router)
 
-# Other routers
+# Other routers - now active
 # api.add_router("/tasks/", "apps.tasks.api.router")
 # api.add_router("/departments/", "apps.departments.api.router")
-# api.add_router("/users/", users_router)
-# api.add_router("/roles/", roles_router)
-# api.add_router("/optionlists/", optionlists_router)
+api.add_router("/users/", users_router)
+api.add_router("/roles/", roles_router)
+api.add_router("/optionlists/", optionlists_router)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('api.urls')),
+    path('api/', api.urls),
 ]
 
 # Serve media files in development

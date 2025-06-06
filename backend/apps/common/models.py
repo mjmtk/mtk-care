@@ -215,21 +215,16 @@ class Organisation(UUIDPKBaseModel):
 # DOCUMENT METADATA (SharePoint Integration)
 # ==========================================
 
-# from apps.client_management.models import Client
 from apps.optionlists.models import OptionListItem
 
 # TODO: Consider adding django-simple-history or django-reversion to this model for metadata/history tracking in the future.
 class Document(UUIDPKBaseModel):
     """
-    Represents a document linked to a client, with metadata for SharePoint integration.
+    Represents a document with metadata for SharePoint integration.
     Utilises a UUID primary key and includes audit and soft delete features.
     """
-    # client = models.ForeignKey(
-    #     'client_management.Client',
-    #     on_delete=models.CASCADE,
-    #     related_name='documents',
-    #     verbose_name=_("Client")
-    # )
+    # Note: Client relationship removed temporarily to enable migrations
+    # Will be added back in a future migration when client_management app is available
     file_name = models.CharField(max_length=255, verbose_name=_("File Name"))
     sharepoint_id = models.CharField(
         max_length=255,
@@ -241,6 +236,8 @@ class Document(UUIDPKBaseModel):
         on_delete=models.PROTECT,
         related_name='document_types',
         limit_choices_to={'option_list__slug': 'document-types'},
+        null=True,
+        blank=True,
         verbose_name=_("Document Type")
     )
     status = models.ForeignKey(
@@ -265,10 +262,10 @@ class Document(UUIDPKBaseModel):
         verbose_name = _('Document')
         verbose_name_plural = _('Documents')
         ordering = ['-created_at']
-        app_label = 'core'
+        app_label = 'common'
 
     def __str__(self):
-        return f"{self.file_name} for {self.client}"
+        return f"{self.file_name}"
 
 # # ==========================================
 # # REFERENCE TABLES FOR CLIENT

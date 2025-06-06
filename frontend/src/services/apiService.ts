@@ -112,11 +112,11 @@ export async function apiRequest<ResponseType = unknown, RequestBody = unknown>(
 export const usersApi = {
   /**
    * Fetches the current authenticated user's profile.
-   * GET /api/v1/users/me/
+   * GET /api/users/me/
    */
   getCurrentUserProfile: async (accessToken: string): Promise<components['schemas']['UserOut']> => {
     return apiRequest<components['schemas']['UserOut']>({
-      url: 'v1/users/me/',
+      url: 'users/me/',
       method: 'get',
       accessToken,
     });
@@ -124,11 +124,11 @@ export const usersApi = {
 
   /**
    * Fetches a user by ID
-   * GET /api/v1/users/{user_id}/
+   * GET /api/users/{user_id}/
    */
   getUserById: async (userId: string, accessToken: string): Promise<components['schemas']['UserOut']> => {
     return apiRequest<components['schemas']['UserOut']>({
-      url: `v1/users/${userId}/`,
+      url: `users/${userId}/`,
       method: 'get',
       accessToken,
     });

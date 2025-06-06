@@ -5,6 +5,7 @@ from ninja.security import SessionAuth
 # from apps.referral_management.api import router as referral_router
 from apps.optionlists.api import router as optionlists_router
 from apps.users.api import users_router, roles_router
+from apps.common.api import documents_router
 # from apps.external_organisation_management.api_external_organisation_crud import external_org_router as external_org_management_api_router
 # from apps.external_organisation_management.api.contact_api import contacts_router as contacts_router_eom
 # from apps.external_organisation_management.api.email_api import emails_router as emails_router_eom
@@ -45,6 +46,7 @@ api.add_router("/roles", roles_router, tags=["Roles"])
 # api.add_router("/roles", roles_router, tags=["Roles"])  # New roles endpoints
 # api.add_router("/users", get_user_router(), tags=["Users"])  # New: User management endpoints (Ninja)
 
+api.add_router("/documents", documents_router, tags=["Documents"])
 print(f"DEBUG: api/ninja.py: Finished adding all routers. api._routers after adding: {api._routers}")
 
 # The 'api' instance is now directly used by api/urls.py

@@ -11,25 +11,36 @@ import { Client } from '@/types/client';
 import { mockClientService } from '@/services/mock-client-service';
 
 interface ClientDashboardPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default function ClientDashboardPage({ params }: ClientDashboardPageProps) {
   const [client, setClient] = useState<Client | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [clientId, setClientId] = useState<string>('');
 
   useEffect(() => {
-    loadClient();
-  }, [params.id]);
+    const getParams = async () => {
+      const resolvedParams = await params;
+      setClientId(resolvedParams.id);
+    };
+    getParams();
+  }, [params]);
+
+  useEffect(() => {
+    if (clientId) {
+      loadClient();
+    }
+  }, [clientId]);
 
   const loadClient = async () => {
     try {
       setLoading(true);
       setError(null);
-      const clientData = await mockClientService.getClient(params.id);
+      const clientData = await mockClientService.getClient(clientId);
       setClient(clientData);
     } catch (err) {
       console.error('Error loading client:', err);
@@ -40,12 +51,12 @@ export default function ClientDashboardPage({ params }: ClientDashboardPageProps
   };
 
   const handleGenealogyClick = () => {
-    console.log('Genealogy clicked for client:', params.id);
+    console.log('Genealogy clicked for client:', clientId);
     // TODO: Implement genealogy functionality
   };
 
   const handleOutcomeMeasuresClick = () => {
-    console.log('Outcome measures clicked for client:', params.id);
+    console.log('Outcome measures clicked for client:', clientId);
     // TODO: Implement outcome measures functionality
   };
 
@@ -139,9 +150,9 @@ export default function ClientDashboardPage({ params }: ClientDashboardPageProps
 
       {/* Client Tabs Section */}
       <ClientTabsSection
-        clientId={params.id}
+        clientId={clientId}
         canEditClient={true}
-        activeEpisodeId={client.activeEpisodeId}
+        activeEpisodeId={undefined}
       />
     </div>
   );

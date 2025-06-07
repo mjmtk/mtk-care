@@ -19,6 +19,7 @@ if DEBUG:
     # Debug Toolbar Configuration
     DEBUG_TOOLBAR_CONFIG = {
         'SHOW_TOOLBAR_CALLBACK': lambda request: DEBUG,
+        'IS_RUNNING_TESTS': False,  # Fix for test running
     }
 
 # Simplified logging for development

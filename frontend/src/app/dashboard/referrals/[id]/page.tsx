@@ -104,7 +104,7 @@ export default function ReferralDetailPage() {
     try {
       setIsDeleting(true);
       await ReferralService.deleteReferral(referral.id);
-      router.push('/referrals');
+      router.push('/dashboard/referrals');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete referral');
     } finally {
@@ -113,7 +113,7 @@ export default function ReferralDetailPage() {
   };
 
   const handleEdit = () => {
-    router.push(`/referrals/${referralId}/edit`);
+    router.push(`/dashboard/referrals/${referralId}/edit`);
   };
 
   const handleStatusUpdate = async (newStatusId: number) => {
@@ -149,7 +149,7 @@ export default function ReferralDetailPage() {
       <div className="container mx-auto py-10">
         <div className="max-w-4xl mx-auto">
           <ErrorDisplay error={error} />
-          <Button onClick={() => router.push('/referrals')} className="mt-4">
+          <Button onClick={() => router.push('/dashboard/referrals')} className="mt-4">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Referrals
           </Button>
@@ -165,7 +165,7 @@ export default function ReferralDetailPage() {
           <div className="text-center">
             <h2 className="text-2xl font-bold">Referral not found</h2>
             <p className="text-muted-foreground mt-2">The referral you're looking for doesn't exist or has been deleted.</p>
-            <Button onClick={() => router.push('/referrals')} className="mt-4">
+            <Button onClick={() => router.push('/dashboard/referrals')} className="mt-4">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Referrals
             </Button>
@@ -184,7 +184,7 @@ export default function ReferralDetailPage() {
             <div className="flex items-center space-x-4">
               <Button 
                 variant="ghost" 
-                onClick={() => router.push('/referrals')}
+                onClick={() => router.push('/dashboard/referrals')}
                 className="p-2"
               >
                 <ArrowLeft className="h-4 w-4" />

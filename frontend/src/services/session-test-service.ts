@@ -11,7 +11,7 @@ export class SessionTestService {
     
     try {
       // Make a simple request to a Django endpoint that should create a session
-      const response = await fetch('http://localhost:8000/api/auth/msal/login/', {
+      const response = await fetch('http://localhost:8000/api/v1/auth/msal/login/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

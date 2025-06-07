@@ -75,7 +75,7 @@ export default function NewClientPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-gray-600 dark:text-gray-300">
-              Before creating a new client, search to make sure they don't already exist in the system.
+              Before creating a new client, search to make sure they don&apos;t already exist in the system.
             </p>
             
             <ClientSearchDialog
@@ -112,7 +112,7 @@ export default function NewClientPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-gray-600 dark:text-gray-300">
-              If you're certain the client doesn't exist, you can create a new record directly.
+              If you&apos;re certain the client doesn&apos;t exist, you can create a new record directly.
             </p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

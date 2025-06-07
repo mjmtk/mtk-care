@@ -140,7 +140,7 @@ export default function NewReferralPage() {
       setError(null);
       
       const createdReferral = await ReferralService.createReferral(formData);
-      router.push(`/referrals/${createdReferral.id}`);
+      router.push(`/dashboard/referrals/${createdReferral.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create referral');
     } finally {
@@ -149,7 +149,7 @@ export default function NewReferralPage() {
   };
 
   const handleCancel = () => {
-    router.push('/referrals');
+    router.push('/dashboard/referrals');
   };
 
   if (isLoading) {
@@ -175,7 +175,7 @@ export default function NewReferralPage() {
       <div className="container mx-auto py-10">
         <div className="max-w-4xl mx-auto">
           <ErrorDisplay error={error} />
-          <Button onClick={() => router.push('/referrals')} className="mt-4">
+          <Button onClick={() => router.push('/dashboard/referrals')} className="mt-4">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Referrals
           </Button>
@@ -191,7 +191,7 @@ export default function NewReferralPage() {
           <div className="text-center">
             <h2 className="text-2xl font-bold">Unable to load form</h2>
             <p className="text-muted-foreground mt-2">Required data could not be loaded.</p>
-            <Button onClick={() => router.push('/referrals')} className="mt-4">
+            <Button onClick={() => router.push('/dashboard/referrals')} className="mt-4">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Referrals
             </Button>

@@ -281,13 +281,13 @@ export const columns: ColumnDef<Referral>[] = [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem
-                onClick={() => window.location.href = `/referrals/${referral.id}`}
+                onClick={() => window.location.href = `/dashboard/referrals/${referral.id}`}
               >
                 <Eye className="mr-2 h-4 w-4" />
                 View Details
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => window.location.href = `/referrals/${referral.id}/edit`}
+                onClick={() => window.location.href = `/dashboard/referrals/${referral.id}/edit`}
               >
                 <Edit className="mr-2 h-4 w-4" />
                 Edit

@@ -19,7 +19,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { href: "/dashboard", label: "Overview", icon: Home },
   { href: "/dashboard/clients", label: "Clients", icon: Users },
-  { href: "/referrals", label: "Referrals", icon: GitBranch },
+  { href: "/dashboard/referrals", label: "Referrals", icon: GitBranch },
   { href: "/dashboard/external-organisations", label: "External Organisations", icon: Building },
   { href: "/dashboard/documents", label: "Documents", icon: FileText },
   { 

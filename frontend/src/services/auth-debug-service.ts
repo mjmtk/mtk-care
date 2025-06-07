@@ -18,7 +18,7 @@ export class AuthDebugService {
     // Test with a simple fetch to see raw headers
     console.log('[AuthDebugService] Testing with raw fetch...');
     try {
-      const response = await fetch('http://localhost:8000/api/users/me/', {
+      const response = await fetch('http://localhost:8000/api/v1/users/me/', {
         method: 'GET',
         credentials: 'include',
         headers: {

@@ -96,7 +96,7 @@ export default function EditReferralPage() {
       ) as ReferralUpdate;
       
       await ReferralService.updateReferral(referral.id, updateData);
-      router.push(`/referrals/${referral.id}`);
+      router.push(`/dashboard/referrals/${referral.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update referral');
     } finally {
@@ -105,7 +105,7 @@ export default function EditReferralPage() {
   };
 
   const handleCancel = () => {
-    router.push(`/referrals/${referralId}`);
+    router.push(`/dashboard/referrals/${referralId}`);
   };
 
   if (isLoading) {
@@ -131,7 +131,7 @@ export default function EditReferralPage() {
       <div className="container mx-auto py-10">
         <div className="max-w-4xl mx-auto">
           <ErrorDisplay error={error} />
-          <Button onClick={() => router.push('/referrals')} className="mt-4">
+          <Button onClick={() => router.push('/dashboard/referrals')} className="mt-4">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Referrals
           </Button>
@@ -147,7 +147,7 @@ export default function EditReferralPage() {
           <div className="text-center">
             <h2 className="text-2xl font-bold">Referral not found</h2>
             <p className="text-muted-foreground mt-2">The referral you're trying to edit doesn't exist.</p>
-            <Button onClick={() => router.push('/referrals')} className="mt-4">
+            <Button onClick={() => router.push('/dashboard/referrals')} className="mt-4">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Referrals
             </Button>

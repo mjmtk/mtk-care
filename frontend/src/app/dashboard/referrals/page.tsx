@@ -140,7 +140,7 @@ export default function ReferralsPage() {
             <Filter className="mr-2 h-4 w-4" />
             Filter
           </Button>
-          <Button size="sm" onClick={() => router.push('/referrals/new')}>
+          <Button size="sm" onClick={() => router.push('/dashboard/referrals/new')}>
             <Plus className="mr-2 h-4 w-4" />
             New Referral
           </Button>

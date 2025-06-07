@@ -38,7 +38,7 @@ tasks.json
 tasks/
 
 # Added by Task Master AI
-.env
+# .env
 
-backend/reference-projects/**
-frontend/reference-projects/**
+/backend/reference-projects/**
+/frontend/reference-projects/**

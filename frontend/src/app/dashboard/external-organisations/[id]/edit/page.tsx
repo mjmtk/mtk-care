@@ -40,7 +40,7 @@ import {
 } from '@/components/ui/alert-dialog';
 
 type ExternalOrganisation = components['schemas']['ExternalOrganisationSchemaOut'];
-type OrganisationType = components['schemas']['OptionListItemSchemaOut'];
+type OrganisationType = components['schemas']['ExtOrgDropdownItemOut'];
 
 function useEditOrganisation(orgId: string, accessToken: string | null) {
   const [organisation, setOrganisation] = useState<ExternalOrganisation | null>(null);

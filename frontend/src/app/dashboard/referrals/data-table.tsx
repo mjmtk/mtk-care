@@ -143,11 +143,6 @@ export function ReferralsDataTable({
       </div>
       <DataTablePagination 
         table={table} 
-        showSelectedCount={true}
-        // Pass custom pagination props if server-side pagination is used
-        totalCount={totalCount}
-        currentPage={currentPage}
-        onPageChange={onPageChange}
       />
     </div>
   )

@@ -56,12 +56,7 @@ interface ClientCreateFormProps {
   onCancel?: () => void;
 }
 
-interface OptionListItem {
-  id: string;
-  label: string;
-  name: string;
-  slug: string;
-}
+import { OptionListItem } from '@/types/option-list';
 
 export function ClientCreateForm({
   open,
@@ -100,23 +95,23 @@ export function ClientCreateForm({
       setLoadingOptions(true);
       try {
         const [statusesData, languagesData] = await Promise.all([
-          OptionListService.getOptionsBySlug('client-statuses'),
-          OptionListService.getOptionsBySlug('languages'),
+          OptionListService.fetchOptionList('client-statuses'),
+          OptionListService.fetchOptionList('languages'),
         ]);
         
         setStatuses(statusesData || []);
         setLanguages(languagesData || []);
         
         // Set default status to "active" if available
-        const activeStatus = statusesData?.find(s => s.slug === 'active' || s.name.toLowerCase() === 'active');
+        const activeStatus = statusesData?.find(s => s.slug === 'active' || s.label.toLowerCase() === 'active');
         if (activeStatus) {
-          setValue('status_id', activeStatus.id);
+          setValue('status_id', String(activeStatus.id));
         }
         
         // Set default language to English if available
-        const englishLanguage = languagesData?.find(l => l.slug === 'english' || l.name.toLowerCase() === 'english');
+        const englishLanguage = languagesData?.find(l => l.slug === 'english' || l.label.toLowerCase() === 'english');
         if (englishLanguage) {
-          setValue('primary_language_id', englishLanguage.id);
+          setValue('primary_language_id', String(englishLanguage.id));
         }
       } catch (error) {
         console.error('Failed to load option lists:', error);
@@ -337,8 +332,8 @@ export function ClientCreateForm({
                         <SelectItem value="" disabled>Loading statuses...</SelectItem>
                       ) : (
                         statuses.map((status) => (
-                          <SelectItem key={status.id} value={status.id}>
-                            {status.label || status.name}
+                          <SelectItem key={status.id} value={String(status.id)}>
+                            {status.label}
                           </SelectItem>
                         ))
                       )}
@@ -363,8 +358,8 @@ export function ClientCreateForm({
                         <SelectItem value="" disabled>Loading languages...</SelectItem>
                       ) : (
                         languages.map((language) => (
-                          <SelectItem key={language.id} value={language.id}>
-                            {language.label || language.name}
+                          <SelectItem key={language.id} value={String(language.id)}>
+                            {language.label}
                           </SelectItem>
                         ))
                       )}

@@ -242,7 +242,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           // Attempt interactive token acquisition as fallback
           const response = await msalInstance.acquireTokenRedirect({
             ...loginRequest,
-            account: msalInstance.getActiveAccount()
+            account: msalInstance.getActiveAccount() || undefined
           });
           // This will cause a redirect, so we won't reach here
           return null;

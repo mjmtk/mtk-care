@@ -1,7 +1,10 @@
 // NOTE: Django session-protected endpoints must NOT be called with an Authorization header.
 // Use axiosInstance with session cookies only.
 import { apiRequest } from './api-request';
-import { isApiError } from '@/types/manual/common/api';
+// Simple type guard for API errors
+const isApiError = (error: any): error is { response?: { data?: { detail?: string } } } => {
+  return error && error.response && error.response.data;
+};
 
 // Define OrganisationContact locally if not available globally.
 // Ideally, this would be in a shared types file (e.g., src/types/external-organisations.ts)

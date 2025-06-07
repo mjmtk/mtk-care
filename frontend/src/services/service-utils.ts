@@ -4,7 +4,7 @@
  * Returns the API base URL from environment variables, with fallback for dev.
  */
 export function getApiBaseUrl(): string {
-  return import.meta.env.VITE_API_BASE_URL as string || 'http://localhost:8000/api';
+  return process.env.NEXT_PUBLIC_API_BASE_URL as string || 'http://localhost:8000/api';
 }
 
 /**

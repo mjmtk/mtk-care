@@ -1244,12 +1244,12 @@ export interface components {
             external_organisation_contact_id?: string | null;
             /**
              * Created At
-             * Format: date
+             * Format: date-time
              */
             created_at: string;
             /**
              * Updated At
-             * Format: date
+             * Format: date-time
              */
             updated_at: string;
             created_by: components["schemas"]["UserAuditSchema"];

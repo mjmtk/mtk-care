@@ -50,7 +50,7 @@ import {
 } from '@/components/ui/select';
 
 type ExternalOrganisation = components['schemas']['ExternalOrganisationSchemaOut'];
-type OrganisationType = components['schemas']['OptionListItemSchemaOut'];
+type OrganisationType = components['schemas']['ExtOrgDropdownItemOut'];
 
 function useExternalOrganisations(accessToken: string | null) {
   const [organisations, setOrganisations] = useState<ExternalOrganisation[]>([]);

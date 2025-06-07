@@ -4,7 +4,7 @@ import { loginRequest } from "@/auth/auth-config";
 // import { UserService } from "../../services/user-service";
 // import { AuthService } from "../../services/auth-service";
 import { AuthDebugService } from "../../services/auth-debug-service";
-import { CurrentUser } from "@/types/user";
+import { CurrentUser } from "@/types/users";
 import { AppRoles } from "../auth-config";
 import { AbilityContext } from "../ability-context";
 import { defineRulesForUser, AppAbility } from "../ability";
@@ -64,7 +64,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
       setGroups(user.groups || []);
       setPermissions(user.permissions || []);
       // Optionally, map Django groups to AppRoles if needed for legacy code:
-      const backendRoles = (user.groups || []).map(g => g.name as AppRoles).filter(Boolean);
+      const backendRoles = (user.groups || []).map((g: { id: number; name: string }) => g.name as AppRoles).filter(Boolean);
       setUserRoles(backendRoles);
 
       // Ensure id is string for ability context

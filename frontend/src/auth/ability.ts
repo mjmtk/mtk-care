@@ -1,4 +1,4 @@
-import { AbilityBuilder, createMongoAbility } from "@casl/ability";
+import { AbilityBuilder, createMongoAbility, MongoAbility } from "@casl/ability";
 import { AppRoles } from "@/types/auth";
 
 // Define subject types for our application
@@ -20,7 +20,7 @@ interface UserContext {
 
 // Define rules for user based on their roles
 export function defineRulesForUser(user: UserContext) {
-  const { can, cannot, build } = new AbilityBuilder(createMongoAbility<[Actions, Subjects]>);
+  const { can, cannot, build } = new AbilityBuilder<MongoAbility<[Actions, Subjects]>>(createMongoAbility);
 
   // Default: no permissions
   cannot('manage', 'all');
@@ -47,7 +47,7 @@ export function defineRulesForUser(user: UserContext) {
     
     // Program-specific permissions
     if (user.programIds && user.programIds.length > 0) {
-      can(['update'], 'Programme', { id: { $in: user.programIds } });
+      can(['update'], 'Programme', { id: { $in: user.programIds } } as any);
     }
   }
 
@@ -59,7 +59,7 @@ export function defineRulesForUser(user: UserContext) {
     
     // Practice-specific permissions
     if (user.practiceId) {
-      can(['update'], 'Staff', { practiceId: user.practiceId });
+      can(['update'], 'Staff', { practiceId: user.practiceId } as any);
     }
   }
 

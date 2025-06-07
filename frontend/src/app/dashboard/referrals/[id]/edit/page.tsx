@@ -130,7 +130,7 @@ export default function EditReferralPage() {
     return (
       <div className="container mx-auto py-10">
         <div className="max-w-4xl mx-auto">
-          <ErrorDisplay error={error} />
+          <ErrorDisplay message={error} />
           <Button onClick={() => router.push('/dashboard/referrals')} className="mt-4">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Referrals
@@ -181,7 +181,7 @@ export default function EditReferralPage() {
           </div>
 
           {error && (
-            <ErrorDisplay error={error} />
+            <ErrorDisplay message={error} />
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">

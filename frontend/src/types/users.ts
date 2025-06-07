@@ -45,6 +45,13 @@ export type User = z.infer<typeof userSchema>
 export const userListSchema = z.array(userSchema)
 export type UserList = z.infer<typeof userListSchema>
 
+// Extended user type for current authenticated user context
+const currentUserSchema = userSchema.extend({
+  groups: z.array(z.object({ id: z.number(), name: z.string() })).default([]),
+  permissions: z.array(z.string()).default([]),
+})
+export type CurrentUser = z.infer<typeof currentUserSchema>
+
 // Helper function to get user's display name
 export function getUserDisplayName(user: User): string {
   if (user.first_name && user.last_name) {

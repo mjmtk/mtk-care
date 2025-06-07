@@ -107,7 +107,8 @@ export default function DocumentList() {
         if (tempIndex !== -1) {
           // Replace the temp document at the same position
           const newList = [...prev];
-          newList[tempIndex] = { ...newDoc, tempId: undefined }; // Remove tempId from final doc
+          const { tempId, ...finalDoc } = newDoc as any; // Remove tempId from final doc
+          newList[tempIndex] = finalDoc;
           return newList;
         }
       }
@@ -337,7 +338,7 @@ export default function DocumentList() {
           open={showCreateDialog} 
           onOpenChange={setShowCreateDialog}
           onDocumentCreated={addDocument}
-          onDocumentUploading={setDocumentUploading}
+          onDocumentUploading={(doc, uploading) => setDocumentUploading(doc.id, uploading)}
         />
     </div>
   );

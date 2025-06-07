@@ -17,3 +17,13 @@ export enum AppRoles {
 export type RoleMapping = {
   [key: string]: AppRoles;
 };
+
+/**
+ * User profile type for authentication
+ */
+export interface UserProfile {
+  roles: AppRoles[];
+  displayName: string;
+  email: string;
+  isFallback?: boolean;
+}

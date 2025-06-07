@@ -2,20 +2,13 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from ninja import NinjaAPI
-from ninja.security import HttpBearer
-from django.contrib.auth.models import User
+# Import the shared NinjaAPI instance from api.ninja
+from api.ninja import api
+from ninja.security import HttpBearer # HttpBearer might be used by JWTAuth or other parts, keep for now
+from django.contrib.auth.models import User # Keep if used by JWTAuth or other parts
 from apps.authentication.jwt_auth import JWTAuth
 
-# Create the main API instance
-api = NinjaAPI(
-    title="MTK-Care API",
-    description="Healthcare Task Manager API with Azure AD Authentication",
-    version="1.0.0",
-    docs_url="/docs" if settings.DEBUG else None,
-)
-
-# Authentication instance
+# Authentication instance (used by @api.get decorators below for auth=auth)
 auth = JWTAuth()
 
 # Health check endpoint (no auth required)
@@ -134,24 +127,10 @@ def get_user_profile(request):
     }
 
 # Include API routers
-from apps.authentication.api import router as auth_router
-# Import routers directly from their source file to avoid circular imports
-from apps.users.api import users_router, roles_router
-from apps.optionlists.api import get_router as optionlists_router
-
-# Include API routers
-# api.add_router("/auth/", auth_router)
-
-# Other routers
-# api.add_router("/tasks/", "apps.tasks.api.router")
-# api.add_router("/departments/", "apps.departments.api.router")
-# api.add_router("/users/", users_router)
-# api.add_router("/roles/", roles_router)
-# api.add_router("/optionlists/", optionlists_router)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('api.urls')),
+    path('api/', api.urls),
 ]
 
 # Serve media files in development

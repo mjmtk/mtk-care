@@ -2,17 +2,24 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  trailingSlash: true,
   
   async rewrites() {
+    // Use local backend in development mode, production backend otherwise
+    const isProduction = process.env.NODE_ENV === 'production';
+    const backendUrl = isProduction 
+      ? 'https://mtkcare-backend-abbffge3c9gqcqhr.newzealandnorth-01.azurewebsites.net' 
+      : 'http://localhost:8000';
+      
     return [
-      // Proxy API calls to Django backend, EXCLUDING /api/auth paths
+      // Original generic proxy rule
       {
         // This regex source means:
         // - Starts with /api/
         // - Followed by any characters (:path*)
         // - BUT the path part must NOT start with 'auth/'
         source: '/api/:path((?!auth/).*)',
-        destination: 'https://mtkcare-backend-abbffge3c9gqcqhr.newzealandnorth-01.azurewebsites.net/api/:path*',
+        destination: `${backendUrl}/api/:path`,
       },
       // By excluding /api/auth/* from the proxy rule above,
       // Next.js's App Router will handle /api/auth/[...nextauth]/route.ts locally by default.
@@ -34,7 +41,6 @@ const nextConfig: NextConfig = {
   // },
   
   // Disable static exports if you're using API routes
-  trailingSlash: false,
 
   // Configure for production deployment
   compress: true,

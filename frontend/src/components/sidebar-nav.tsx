@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Home, Users, UserCog } from "lucide-react";
+import { Home, Users, UserCog, FileText } from "lucide-react";
 import { useAuthBypassSession } from "@/hooks/useAuthBypass";
 
 // Define the structure for navigation items
@@ -19,6 +19,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { href: "/dashboard", label: "Overview", icon: Home },
   { href: "/dashboard/clients", label: "Clients", icon: Users },
+  { href: "/dashboard/documents", label: "Documents", icon: FileText },
   { 
     href: "/users", 
     label: "User Management", 

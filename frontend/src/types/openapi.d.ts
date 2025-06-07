@@ -77,28 +77,44 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/auth/me": {
+    "/api/documents/": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /**
-         * Get Current User
-         * @description Returns the current authenticated user's information and role.
-         *     Requires a valid JWT token in the Authorization header.
-         */
-        get: operations["apps_authentication_api_get_current_user"];
+        /** List Documents */
+        get: operations["apps_common_api_list_documents"];
         put?: never;
-        post?: never;
+        /** Create Document */
+        post: operations["apps_common_api_create_document"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/users/me/": {
+    "/api/documents/{doc_id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Document */
+        get: operations["apps_common_api_get_document"];
+        /** Update Document */
+        put: operations["apps_common_api_update_document"];
+        post?: never;
+        /** Delete Document */
+        delete: operations["apps_common_api_delete_document"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/users/me/": {
         parameters: {
             query?: never;
             header?: never;
@@ -115,7 +131,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/users/": {
+    "/api/users/": {
         parameters: {
             query?: never;
             header?: never;
@@ -133,7 +149,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/users/{user_id}/": {
+    "/api/users/{user_id}/": {
         parameters: {
             query?: never;
             header?: never;
@@ -151,7 +167,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/users/{user_id}/activate/": {
+    "/api/users/{user_id}/activate/": {
         parameters: {
             query?: never;
             header?: never;
@@ -168,7 +184,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/users/{user_id}/deactivate/": {
+    "/api/users/{user_id}/deactivate/": {
         parameters: {
             query?: never;
             header?: never;
@@ -185,7 +201,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/users/{user_id}/roles/": {
+    "/api/users/{user_id}/roles/": {
         parameters: {
             query?: never;
             header?: never;
@@ -202,7 +218,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/roles/": {
+    "/api/roles/": {
         parameters: {
             query?: never;
             header?: never;
@@ -220,7 +236,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/roles/{role_id}/": {
+    "/api/roles/{role_id}/": {
         parameters: {
             query?: never;
             header?: never;
@@ -239,10 +255,83 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/optionlists/{list_slug}/items/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List all active items for a specific OptionList by its slug
+         * @description Retrieves all active items for a given OptionList slug (e.g., 'external-organisation-types').
+         *     Items are ordered by their predefined sort_order.
+         */
+        get: operations["apps_optionlists_api_list_option_list_items_by_slug"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** DocumentSchema */
+        DocumentSchema: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** File Name */
+            file_name: string;
+            /** Sharepoint Id */
+            sharepoint_id: string;
+            /** Type Id */
+            type_id?: number | null;
+            /** Status Id */
+            status_id?: number | null;
+            /** Metadata */
+            metadata?: unknown | null;
+            /** Created At */
+            created_at?: string | null;
+            /** Created By */
+            created_by?: string | null;
+            /** Updated At */
+            updated_at?: string | null;
+            /** Updated By */
+            updated_by?: string | null;
+        };
+        /** DocumentCreateSchema */
+        DocumentCreateSchema: {
+            /** File Name */
+            file_name: string;
+            /** Sharepoint Id */
+            sharepoint_id: string;
+            /** Type Id */
+            type_id?: number | null;
+            /** Status Id */
+            status_id?: number | null;
+            /** Metadata */
+            metadata?: unknown | null;
+        };
+        /** DocumentUpdateSchema */
+        DocumentUpdateSchema: {
+            /** File Name */
+            file_name?: string | null;
+            /** Sharepoint Id */
+            sharepoint_id?: string | null;
+            /** Type Id */
+            type_id?: number | null;
+            /** Status Id */
+            status_id?: number | null;
+            /** Metadata */
+            metadata?: unknown | null;
+        };
         /** RoleOut */
         RoleOut: {
             /**
@@ -274,8 +363,11 @@ export interface components {
             first_name?: string | null;
             /** Last Name */
             last_name?: string | null;
-            profile: components["schemas"]["UserProfileOut"];
-            /** Roles */
+            profile?: components["schemas"]["UserProfileOut"] | null;
+            /**
+             * Roles
+             * @default []
+             */
             roles: components["schemas"]["RoleOut"][];
         };
         /** UserProfileOut */
@@ -293,11 +385,17 @@ export interface components {
             title?: string | null;
             /** Avatar */
             avatar?: string | null;
-            /** Preferences */
+            /**
+             * Preferences
+             * @default {}
+             */
             preferences: {
                 [key: string]: unknown;
             };
-            /** Azure Ad Groups */
+            /**
+             * Azure Ad Groups
+             * @default []
+             */
             azure_ad_groups: unknown[];
         };
         /** UserCreate */
@@ -340,6 +438,21 @@ export interface components {
             description: string | null;
             /** Level */
             level: number | null;
+        };
+        /** OptionListItemSchemaOut */
+        OptionListItemSchemaOut: {
+            /** Id */
+            id: number;
+            /** Slug */
+            slug: string;
+            /** Name */
+            name: string;
+            /** Label */
+            label?: string | null;
+            /** Sort Order */
+            sort_order: number;
+            /** Is Active */
+            is_active: boolean;
         };
     };
     responses: never;
@@ -404,11 +517,107 @@ export interface operations {
             };
         };
     };
-    apps_authentication_api_get_current_user: {
+    apps_common_api_list_documents: {
+        parameters: {
+            query?: {
+                client_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentSchema"][];
+                };
+            };
+        };
+    };
+    apps_common_api_create_document: {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DocumentCreateSchema"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentSchema"];
+                };
+            };
+        };
+    };
+    apps_common_api_get_document: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                doc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentSchema"];
+                };
+            };
+        };
+    };
+    apps_common_api_update_document: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                doc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DocumentUpdateSchema"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentSchema"];
+                };
+            };
+        };
+    };
+    apps_common_api_delete_document: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                doc_id: string;
+            };
             cookie?: never;
         };
         requestBody?: never;
@@ -716,6 +925,28 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    apps_optionlists_api_list_option_list_items_by_slug: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                list_slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OptionListItemSchemaOut"][];
+                };
             };
         };
     };

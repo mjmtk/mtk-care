@@ -130,7 +130,7 @@ def get_user_profile(request):
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', api.urls),
+    path('api/v1/', api.urls),  # API v1 - all endpoints now use /api/v1/ prefix
 ]
 
 # Serve media files in development

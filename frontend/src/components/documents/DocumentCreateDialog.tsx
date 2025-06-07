@@ -5,6 +5,8 @@ import { Label } from "@/components/ui/label";
 import { useState, useRef } from "react";
 import { usePnP } from "@/providers/PnpSharePointProvider";
 import { components } from "@/types/openapi";
+import axiosInstance from "@/lib/axiosClient";
+import { getApiPath } from "@/lib/apiConfig";
 
 type DocumentCreateSchema = components['schemas']['DocumentCreateSchema'];
 
@@ -14,12 +16,16 @@ interface DocumentFormData extends Partial<DocumentCreateSchema> {
   description?: string;
 }
 
+type Document = components["schemas"]["DocumentSchema"];
+
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onDocumentCreated?: (doc: Document) => void;
+  onDocumentUploading?: (doc: Document, uploading: boolean) => void;
 }
 
-export default function DocumentCreateDialog({ open, onOpenChange }: Props) {
+export default function DocumentCreateDialog({ open, onOpenChange, onDocumentCreated, onDocumentUploading }: Props) {
   const sp = usePnP();
   const [form, setForm] = useState<DocumentFormData>({});
   const [file, setFile] = useState<File | null>(null);
@@ -57,11 +63,24 @@ export default function DocumentCreateDialog({ open, onOpenChange }: Props) {
       
       // 1. Upload the file to SharePoint (if not in bypass mode)
       if (!isAuthBypassMode && sp) {
-        console.log("Uploading file to SharePoint:", fileName);
+        console.log("=== SHAREPOINT UPLOAD START ===");
+        console.log("File:", fileName);
+        console.log("File size:", file.size);
+        console.log("File type:", file.type);
+        
         const folderUrl = "/sites/client_docs/Shared Documents";
+        console.log("Target folder:", folderUrl);
+        
         const uploadResult = await sp.web.getFolderByServerRelativePath(folderUrl).files.addChunked(fileName, file, { Overwrite: true });
+        
+        console.log("Raw upload result:", uploadResult);
+        console.log("ServerRelativeUrl from upload:", uploadResult?.ServerRelativeUrl);
+        
+        // Store the ServerRelativeUrl as-is (don't convert to full URL yet)
         sharepointUrl = uploadResult?.ServerRelativeUrl || '';
-        console.log("SharePoint upload successful, URL:", sharepointUrl);
+        
+        console.log("=== SHAREPOINT UPLOAD COMPLETE ===");
+        console.log("Stored SharePoint URL:", sharepointUrl);
       } else {
         // In bypass mode, use a mock SharePoint URL
         console.log("Auth bypass mode: Using mock SharePoint URL");
@@ -83,23 +102,43 @@ export default function DocumentCreateDialog({ open, onOpenChange }: Props) {
       };
       
       console.log("Sending document data to API:", payload);
-      const res = await fetch("/api/documents/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
       
-      if (!res.ok) {
-        const errorText = await res.text().catch(() => 'Unknown error');
-        console.error("API error:", res.status, errorText);
-        throw new Error(`Failed to create document record: ${res.status} ${errorText}`);
+      // Create optimistic document for immediate feedback
+      const tempId = `temp-${Date.now()}`;
+      const tempDoc = {
+        id: tempId,
+        file_name: fileName,
+        sharepoint_id: sharepointUrl,
+        type_id: form.type_id || null,
+        status_id: null,
+        metadata: payload.metadata
+      };
+      
+      // Add temporary document and mark as uploading
+      onDocumentCreated?.(tempDoc);
+      onDocumentUploading?.(tempDoc, true);
+      
+      try {
+        const res = await axiosInstance.post(getApiPath("v1/documents/"), payload);
+        console.log("API response:", res.data);
+        
+        // Stop uploading state for temp document
+        onDocumentUploading?.(tempDoc, false);
+        
+        // Replace temp document with real one (same position in list)
+        const realDoc = { ...res.data, tempId }; // Include tempId for replacement logic
+        onDocumentCreated?.(realDoc);
+        
+        console.log("Document created successfully");
+        setForm({});
+        setFile(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        onOpenChange(false);
+      } catch (apiError) {
+        // Remove the temporary document on failure
+        onDocumentUploading?.(tempDoc, false);
+        throw apiError; // Re-throw to be caught by outer catch
       }
-      
-      console.log("Document created successfully");
-      setForm({});
-      setFile(null);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-      onOpenChange(false);
     } catch (err: any) {
       console.error("Document creation error:", err);
       setError(err.message || "Upload failed");

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Home, Users, UserCog, FileText } from "lucide-react";
+import { Home, Users, UserCog, FileText, Building, GitBranch } from "lucide-react";
 import { useAuthBypassSession } from "@/hooks/useAuthBypass";
 
 // Define the structure for navigation items
@@ -19,6 +19,8 @@ interface NavItem {
 const navItems: NavItem[] = [
   { href: "/dashboard", label: "Overview", icon: Home },
   { href: "/dashboard/clients", label: "Clients", icon: Users },
+  { href: "/referrals", label: "Referrals", icon: GitBranch },
+  { href: "/dashboard/external-organisations", label: "External Organisations", icon: Building },
   { href: "/dashboard/documents", label: "Documents", icon: FileText },
   { 
     href: "/users", 
@@ -45,6 +47,7 @@ export function SidebarNav({ className, ...props }: React.HTMLAttributes<HTMLEle
   
   // Get user roles from session
   const userRoles = session?.user?.roles as string[] | undefined;
+  
   
   // Filter nav items based on user roles
   const visibleNavItems = navItems.filter(item => 

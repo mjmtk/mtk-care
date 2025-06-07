@@ -48,6 +48,11 @@ LOCAL_APPS = [
     'apps.notifications',
     'apps.audit',
     'apps.optionlists',
+    'apps.reference_data',
+    'apps.programs',
+    'apps.external_organisation_management',
+    'apps.referral_management',
+    'apps.client_management',  # Client management system
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

@@ -9,7 +9,7 @@ from django.conf import settings
 # from apps.reference_data.models import Region, OutreachLocation
 # from apps.assessment.models import AssessmentForm
 
-from apps.core.models import UUIDPKBaseModel # Changed from FactTableBaseModel
+from apps.common.models import UUIDPKBaseModel # Changed from FactTableBaseModel
 from apps.optionlists.models import OptionListItem # Added import
 
 class Program(UUIDPKBaseModel):
@@ -51,7 +51,7 @@ class Program(UUIDPKBaseModel):
         related_name='program_funding_agencies',
         limit_choices_to={'option_list__slug': 'programs-funding_agencies'}
     )
-    cultural_groups = models.ManyToManyField('cultural_groups.CulturalGroup', through='ProgramCulturalGroup')
+    # cultural_groups = models.ManyToManyField('cultural_groups.CulturalGroup', through='ProgramCulturalGroup')
     assigned_staff = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         through='ProgramAssignedStaff',
@@ -61,14 +61,14 @@ class Program(UUIDPKBaseModel):
     delivery_modes = models.ManyToManyField('optionlists.OptionListItem', related_name='program_delivery_modes', limit_choices_to={'option_list__slug': 'programs-delivery_modes'})
     locations = models.ManyToManyField('optionlists.OptionListItem', related_name='program_locations', limit_choices_to={'option_list__slug': 'programs-locations'})
     enrolment_schema = models.JSONField(blank=True, null=True)
-    assessment_forms = models.ManyToManyField('assessment_forms.AssessmentForm', through='ProgramAssessmentForm')
+    # assessment_forms = models.ManyToManyField('assessment_forms.AssessmentForm', through='ProgramAssessmentForm')
     extra_data = models.JSONField(blank=True, null=True)
 
     def __str__(self):
         return self.name
 
 class Enrolment(UUIDPKBaseModel):
-    client = models.ForeignKey('client_management.Client', on_delete=models.CASCADE)
+    # client = models.ForeignKey('client_management.Client', on_delete=models.CASCADE)
     program = models.ForeignKey(Program, on_delete=models.CASCADE)
     responsible_staff = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='program_enrolment_responsible_staff')
     
@@ -84,11 +84,11 @@ class Enrolment(UUIDPKBaseModel):
     
     referral = models.ForeignKey('referral_management.Referral', on_delete=models.SET_NULL, null=True, blank=True)
     episode_number = models.CharField(max_length=32, blank=True)
-    documents = models.ManyToManyField('core.Document', blank=True)
+    documents = models.ManyToManyField('common.Document', blank=True)
     extra_data = models.JSONField(blank=True, null=True)
 
     def __str__(self):
-        return f"{self.client} in {self.program} ({self.start_date})"
+        return f"Enrolment in {self.program} ({self.start_date})"
 
 
 
@@ -105,9 +105,9 @@ class ProgramFunding(models.Model):
     end_date = models.DateField(null=True, blank=True)
     amount = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
 
-class ProgramCulturalGroup(models.Model):
-    program = models.ForeignKey(Program, on_delete=models.CASCADE)
-    cultural_group = models.ForeignKey('cultural_groups.CulturalGroup', on_delete=models.CASCADE)
+# class ProgramCulturalGroup(models.Model):
+#     program = models.ForeignKey(Program, on_delete=models.CASCADE)
+#     cultural_group = models.ForeignKey('cultural_groups.CulturalGroup', on_delete=models.CASCADE)
 
 class ProgramAssignedStaff(UUIDPKBaseModel):
     program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name='staff')
@@ -118,11 +118,11 @@ class ProgramAssignedStaff(UUIDPKBaseModel):
     start_date = models.DateField()
     end_date = models.DateField(null=True, blank=True)
 
-class ProgramAssessmentForm(models.Model):
-    program = models.ForeignKey(Program, on_delete=models.CASCADE)
-    assessment_form = models.ForeignKey('assessment_forms.AssessmentForm', on_delete=models.CASCADE)
-    version = models.CharField(max_length=32)
-    is_required = models.BooleanField(default=False)
+# class ProgramAssessmentForm(models.Model):
+#     program = models.ForeignKey(Program, on_delete=models.CASCADE)
+#     assessment_form = models.ForeignKey('assessment_forms.AssessmentForm', on_delete=models.CASCADE)
+#     version = models.CharField(max_length=32)
+#     is_required = models.BooleanField(default=False)
 
 class ProgramRegion(models.Model):
     program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name='region_links')

@@ -1,6 +1,8 @@
 // frontend/src/app/dashboard/layout.tsx
 import { SidebarNav } from "@/components/sidebar-nav";
 import { UserNav } from "@/components/user-nav";
+import { AuthGuard } from "@/components/auth/AuthGuard";
+import { SessionManager } from "@/components/auth/SessionManager";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
@@ -11,7 +13,8 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
-    <div className="flex h-screen bg-background">
+    <AuthGuard>
+      <div className="flex h-screen bg-background">
       {/* Sidebar: Hidden on mobile (md:flex) */}
       <aside className="hidden md:flex md:flex-col md:w-64 border-r">
         <div className="p-4 border-b h-16 flex items-center">
@@ -59,6 +62,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           {children}
         </main>
       </div>
+      
+      {/* Session Management */}
+      <SessionManager warningThresholdMinutes={5} />
     </div>
+    </AuthGuard>
   );
 }

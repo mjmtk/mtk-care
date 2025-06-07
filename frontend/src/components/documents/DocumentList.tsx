@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
-import axiosInstance from "@/lib/axiosClient";
+import axiosInstance from "@/services/axios-client";
 import { getApiPath } from "@/lib/apiConfig";
 import { FileText, ExternalLink, Edit, Trash2, Plus } from "lucide-react";
 import DocumentCreateDialog from "./DocumentCreateDialog";

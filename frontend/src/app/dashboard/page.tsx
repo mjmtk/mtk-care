@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { usersApi } from '@/services/apiService';
-import type { components } from '@/types/api';
+import type { components } from '@/types/openapi';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { ErrorDisplay } from '@/components/error-display';
 import { useAuthBypassSession, useAccessToken } from '@/hooks/useAuthBypass';
+import { TokenStatus } from '@/components/auth/TokenStatus';
 
 
 // Use the generated UserOut type for profile data
@@ -163,12 +164,16 @@ export default function DashboardPage() {
     );
   }
 
-  // Check authentication
+  // Check authentication - AuthGuard handles this at layout level
+  // This is a fallback for API token issues
   if (!session || (!accessToken && !isAuthBypass)) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="container mx-auto px-4 py-8">
         <ErrorBoundary>
-          <p className="text-red-500">Please sign in to access the dashboard</p>
+          <ErrorDisplay 
+            title="Authentication Issue"
+            message="Unable to verify your authentication token. Please try refreshing the page or signing in again."
+          />
         </ErrorBoundary>
       </div>
     );
@@ -229,6 +234,17 @@ export default function DashboardPage() {
         )}
         
         <ProfileSection profileData={profileData} />
+        
+        {/* Token Status Component - helpful for debugging auth issues */}
+        {!isAuthBypass && (
+          <div className="mt-8">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              Authentication Status
+            </h2>
+            <TokenStatus />
+          </div>
+        )}
+        
         <QuickActions userRole={userRole} />
         
         {/* Debug section - can be removed in production */}

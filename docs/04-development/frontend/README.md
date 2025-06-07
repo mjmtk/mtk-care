@@ -30,16 +30,40 @@ Guide for using the ShadCN UI component library in the project.
 ### [OpenAPI Type Generation](./openapi-type-generation.md)
 How to generate TypeScript types from the backend's OpenAPI schema.
 
+### [UX Design Guidelines](./ux-design-guidelines.md)
+Comprehensive UX principles and design patterns for consistent user experiences.
+
 **Key topics:**
-- Generation scripts
-- Type usage in components
-- Keeping types synchronized
-- Custom type extensions
+- Design system principles
+- User interface patterns
+- Accessibility guidelines
+- Healthcare-specific UX requirements
+
+### [Session Management](./session-management.md)
+Healthcare-compliant session management with automatic token refresh and security timeouts.
+
+**Key topics:**
+- Automatic token refresh (every 5 minutes)
+- Session timeout warnings and countdown
+- Idle detection and security logout (30 minutes)
+- Maximum session duration (8 hours)
+- HIPAA compliance considerations
+
+### [Authentication UI Components](../authentication/frontend-session-management.md)
+Professional authentication guards and session timeout handling for excellent user experience.
+
+**Key topics:**
+- AuthGuard component for route protection
+- SessionManager for proactive timeout warnings
+- Professional loading and error states
+- Session expiry vs. unauthenticated detection
+- One-click session extension
 
 ## Related Documentation
 
 - [Frontend Deployment Guide](../../../frontend/DEPLOYMENT_AND_LOCAL_TESTING.md) - Deployment procedures
 - [Authentication Overview](../authentication/overview.md) - Frontend auth integration
+- [Frontend Session Management](../authentication/frontend-session-management.md) - AuthGuard and SessionManager components
 
 ## Key Technologies
 

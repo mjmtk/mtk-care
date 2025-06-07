@@ -1,0 +1,77 @@
+[
+  {
+    "model": "referral_management.serviceprovider",
+    "pk": 1,
+    "fields": {
+      "name": "Ministry of Social Development",
+      "provider_type": "Government",
+      "contact_name": "",
+      "contact_email": "",
+      "contact_phone": "",
+      "address": "",
+      "is_active": true,
+      "created_at": "2025-04-01T09:00:00Z",
+      "updated_at": "2025-04-01T09:00:00Z"
+    }
+  },
+  {
+    "model": "referral_management.serviceprovider",
+    "pk": 2,
+    "fields": {
+      "name": "Oranga Tamariki",
+      "provider_type": "Government",
+      "contact_name": "",
+      "contact_email": "",
+      "contact_phone": "",
+      "address": "",
+      "is_active": true,
+      "created_at": "2025-04-01T09:00:00Z",
+      "updated_at": "2025-04-01T09:00:00Z"
+    }
+  },
+  {
+    "model": "referral_management.serviceprovider",
+    "pk": 3,
+    "fields": {
+      "name": "New Zealand Police",
+      "provider_type": "Government",
+      "contact_name": "",
+      "contact_email": "",
+      "contact_phone": "",
+      "address": "",
+      "is_active": true,
+      "created_at": "2025-04-01T09:00:00Z",
+      "updated_at": "2025-04-01T09:00:00Z"
+    }
+  },
+  {
+    "model": "referral_management.serviceprovider",
+    "pk": 4,
+    "fields": {
+      "name": "Ministry of Business, Innovation and Employment",
+      "provider_type": "Government",
+      "contact_name": "",
+      "contact_email": "",
+      "contact_phone": "",
+      "address": "",
+      "is_active": true,
+      "created_at": "2025-04-01T09:00:00Z",
+      "updated_at": "2025-04-01T09:00:00Z"
+    }
+  },
+  {
+    "model": "referral_management.serviceprovider",
+    "pk": 5,
+    "fields": {
+      "name": "Work and Income",
+      "provider_type": "Government",
+      "contact_name": "",
+      "contact_email": "",
+      "contact_phone": "",
+      "address": "",
+      "is_active": true,
+      "created_at": "2025-04-01T09:00:00Z",
+      "updated_at": "2025-04-01T09:00:00Z"
+    }
+  }
+]

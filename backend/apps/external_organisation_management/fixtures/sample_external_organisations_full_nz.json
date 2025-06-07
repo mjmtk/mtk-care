@@ -1,0 +1,164 @@
+[
+  {
+    "model": "external_organisation_management.externalorganisation",
+    "pk": "45ea0362-c8a1-4cf4-8572-2eca2b682027",
+    "fields": {
+      "name": "Oranga Tamariki",
+      "type": 101,
+      "phone": "+64 4 123 4567",
+      "email": "info@ot.govt.nz",
+      "address": "PO Box 546, Wellington 6011, New Zealand",
+      "is_active": true,
+      "created_at": "2025-04-18T00:00:00Z",
+      "updated_at": "2025-04-18T00:00:00Z",
+      "created_by": null,
+      "updated_by": null
+    }
+  },
+  {
+    "model": "external_organisation_management.externalorganisationcontact",
+    "pk": "c47e4000-0456-4032-b4a0-8ce89cf4f65f",
+    "fields": {
+      "organisation": "45ea0362-c8a1-4cf4-8572-2eca2b682027",
+      "first_name": "Jane",
+      "last_name": "Smith",
+      "job_title": "Regional Manager",
+      "notes": "Main Wellington contact.",
+      "is_active": true,
+      "created_at": "2025-04-18T00:00:00Z",
+      "updated_at": "2025-04-18T00:00:00Z"
+    }
+  },
+  {
+    "model": "external_organisation_management.externalorganisation",
+    "pk": "716a0452-3928-47d5-8d47-efd0071390b1",
+    "fields": {
+      "name": "Barnardos",
+      "type": 101,
+      "phone": "+64 4 567 8901",
+      "email": "info@barnardos.org.nz",
+      "address": "85 Ghuznee St, Wellington 6011, New Zealand",
+      "is_active": true,
+      "created_at": "2025-04-18T00:00:00Z",
+      "updated_at": "2025-04-18T00:00:00Z",
+      "created_by": null,
+      "updated_by": null
+    }
+  },
+  {
+    "model": "external_organisation_management.externalorganisationcontact",
+    "pk": "700c836f-c109-4a5e-b3fa-0de0d081eabe",
+    "fields": {
+      "organisation": "716a0452-3928-47d5-8d47-efd0071390b1",
+      "first_name": "Mere",
+      "last_name": "Ngata",
+      "job_title": "Programme Lead",
+      "notes": "Barnardos main contact.",
+      "is_active": true,
+      "created_at": "2025-04-18T00:00:00Z",
+      "updated_at": "2025-04-18T00:00:00Z"
+    }
+  },
+  {
+    "model": "external_organisation_management.externalorganisation",
+    "pk": "3d5b7e43-d7e5-4302-ba6b-d5bb5d9c50c2",
+    "fields": {
+      "name": "MSD",
+      "type": 102,
+      "phone": "+64 4 222 3344",
+      "email": "contact@msd.govt.nz",
+      "address": "56 The Terrace, Wellington 6011, New Zealand",
+      "is_active": true,
+      "created_at": "2025-04-18T00:00:00Z",
+      "updated_at": "2025-04-18T00:00:00Z",
+      "created_by": null,
+      "updated_by": null
+    }
+  },
+  {
+    "model": "external_organisation_management.externalorganisationcontact",
+    "pk": "0070366c-c642-409f-ac29-f0b2c78d4db3",
+    "fields": {
+      "organisation": "3d5b7e43-d7e5-4302-ba6b-d5bb5d9c50c2",
+      "first_name": "Sam",
+      "last_name": "Kumar",
+      "job_title": "Funding Manager",
+      "notes": "Main MSD contact.",
+      "is_active": true,
+      "created_at": "2025-04-18T00:00:00Z",
+      "updated_at": "2025-04-18T00:00:00Z"
+    }
+  },
+  {
+    "model": "external_organisation_management.externalorganisationcontact",
+    "pk": "45bf20bb-7225-4090-bf01-e13bd4b1525c",
+    "fields": {
+      "organisation": "45ea0362-c8a1-4cf4-8572-2eca2b682027",
+      "first_name": "Jane",
+      "last_name": "Smith",
+      "job_title": "Regional Manager",
+      "notes": "Main Oranga Tamariki contact.",
+      "is_active": true,
+      "created_at": "2025-04-18T00:00:00Z",
+      "updated_at": "2025-04-18T00:00:00Z"
+    }
+  },
+  {
+    "model": "external_organisation_management.externalorganisationcontact",
+    "pk": "557747ef-6654-4bae-a328-01cebe8f20bb",
+    "fields": {
+      "organisation": "45ea0362-c8a1-4cf4-8572-2eca2b682027",
+      "first_name": "Aroha",
+      "last_name": "Ngata",
+      "job_title": "Social Worker",
+      "notes": "Secondary Oranga Tamariki contact.",
+      "is_active": true,
+      "created_at": "2025-04-18T00:00:00Z",
+      "updated_at": "2025-04-18T00:00:00Z"
+    }
+  },
+  {
+    "model": "external_organisation_management.externalorganisation",
+    "pk": "ab5fdc71-2c23-4cf2-885e-5b423c351c1b",
+    "fields": {
+      "name": "NZ Police",
+      "type": 101,
+      "phone": "+64 4 987 6543",
+      "email": "info@police.govt.nz",
+      "address": "40 Victoria St, Wellington 6011, New Zealand",
+      "is_active": true,
+      "created_at": "2025-04-18T00:00:00Z",
+      "updated_at": "2025-04-18T00:00:00Z",
+      "created_by": null,
+      "updated_by": null
+    }
+  },
+  {
+    "model": "external_organisation_management.externalorganisationcontact",
+    "pk": "4e9c5e75-8f37-4689-9942-3d0dd5b623ee",
+    "fields": {
+      "organisation": "ab5fdc71-2c23-4cf2-885e-5b423c351c1b",
+      "first_name": "John",
+      "last_name": "Doe",
+      "job_title": "Sergeant",
+      "notes": "Wellington Police contact.",
+      "is_active": true,
+      "created_at": "2025-04-18T00:00:00Z",
+      "updated_at": "2025-04-18T00:00:00Z"
+    }
+  },
+  {
+    "model": "external_organisation_management.externalorganisationcontact",
+    "pk": "66f198dc-eeb4-4635-b31e-77c3bd99283e",
+    "fields": {
+      "organisation": "ab5fdc71-2c23-4cf2-885e-5b423c351c1b",
+      "first_name": "Hana",
+      "last_name": "Williams",
+      "job_title": "Community Liaison",
+      "notes": "Secondary NZ Police contact.",
+      "is_active": true,
+      "created_at": "2025-04-18T00:00:00Z",
+      "updated_at": "2025-04-18T00:00:00Z"
+    }
+  }
+]

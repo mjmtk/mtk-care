@@ -7,6 +7,7 @@ This section contains guides and solutions for common or complex issues encounte
 ### API and Backend Issues
 - [Django Ninja Router Registration Issues](./api-issues/router-setup.md) - Resolve `ConfigError: Router ... has already been attached` errors
 - [API Redirect Loops (Ninja/Next.js)](./api-issues/redirect-loops.md) - Fix infinite redirects between frontend and API
+- [Session Management Issues](./api-issues/session-management-issues.md) - Fix authentication UI and session timeout problems
 
 ### Deployment Issues
 - [Azure Deployment Issues](./deployment-issues/azure-issues.md) - Common Azure deployment problems and solutions
@@ -17,7 +18,14 @@ This section contains guides and solutions for common or complex issues encounte
 Issues related to local development setup, environment configuration, and development tools.
 
 ### Authentication & Authorization
-Problems with Azure AD integration, authentication flows, and permission management.
+Problems with Azure AD integration, authentication flows, session management, and permission management.
+
+**Common Issues:**
+- Session timeout handling and user experience
+- AuthGuard component not protecting routes properly
+- Session warnings not appearing or functioning
+- Redirect loops after authentication
+- "Please sign in" messages with visible UI shell
 
 ### API Integration
 Issues with Django Ninja API setup, endpoint configuration, and frontend-backend communication.

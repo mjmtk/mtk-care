@@ -1,1 +1,1 @@
-npx openapi-typescript http://127.0.0.1:8000/api/openapi.json --output frontend/src/types/openapi.d.ts
+npx openapi-typescript http://127.0.0.1:8000/api/v1/openapi.json --output frontend/src/types/openapi.d.ts

@@ -1,4 +1,4 @@
-import { AppRoles } from '../auth-config';
+import { AppRoles } from '@/types/auth';
 
 /**
  * Returns the effective roles for a user, considering impersonation.

@@ -1,0 +1,61 @@
+[
+  {
+    "model": "optionlists.optionlist",
+    "pk": 1,
+    "fields": {
+      "name": "External Organisation Types",
+      "slug": "external_organisation-types",
+      "description": "Types of external organisations (Service Provider, Funder, Peak Body Organisation)",
+      "is_active": true,
+      "is_template": true,
+      "metadata": {},
+      "created_at": "2025-04-18T10:24:00Z",
+      "updated_at": "2025-04-18T10:24:00Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 101,
+    "fields": {
+      "option_list": 1,
+      "slug": "service-provider",
+      "name": "Service Provider",
+      "label": "Service Provider",
+      "is_active": true,
+      "sort_order": 1,
+      "metadata": {},
+       "created_at": "2025-04-18T10:24:00Z",
+      "updated_at": "2025-04-18T10:24:00Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 102,
+    "fields": {
+      "option_list": 1,
+      "slug": "funder",
+      "name": "Funder",
+      "label": "Funder",
+      "is_active": true,
+      "sort_order": 2,
+      "metadata": {},
+       "created_at": "2025-04-18T10:24:00Z",
+      "updated_at": "2025-04-18T10:24:00Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 103,
+    "fields": {
+      "option_list": 1,
+      "slug": "peak-body-organisation",
+      "name": "Peak Body Organisation",
+      "label": "Peak Body Organisation",
+      "is_active": true,
+      "sort_order": 3,
+      "metadata": {},
+       "created_at": "2025-04-18T10:24:00Z",
+      "updated_at": "2025-04-18T10:24:00Z"
+    }
+  }
+]

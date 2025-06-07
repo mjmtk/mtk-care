@@ -1,0 +1,64 @@
+[
+  {
+    "model": "optionlists.optionlist",
+    "pk": 99,
+    "fields": {
+      "name": "Languages",
+      "slug": "languages",
+      "description": "Available language options for clients",
+      "organization": null,
+      "is_active": true,
+      "is_template": false,
+      "global_option_list": true,
+      "metadata": {}
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 99,
+    "fields": {
+      "option_list": 99,
+      "slug": "english",
+      "name": "English",
+      "label": "English",
+      "code": "en",
+      "description": "English language",
+      "region": null,
+      "global_option": true,
+      "is_active": true,
+      "sort_order": 1
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 100,
+    "fields": {
+      "option_list": 99,
+      "slug": "maori",
+      "name": "Te Reo Māori",
+      "label": "Te Reo Māori",
+      "code": "mi",
+      "description": "Māori language",
+      "region": "NZ",
+      "global_option": false,
+      "is_active": true,
+      "sort_order": 2
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 101,
+    "fields": {
+      "option_list": 99,
+      "slug": "mandarin",
+      "name": "Mandarin",
+      "label": "Mandarin",
+      "code": "zh",
+      "description": "Mandarin Chinese",
+      "region": null,
+      "global_option": true,
+      "is_active": true,
+      "sort_order": 3
+    }
+  }
+]

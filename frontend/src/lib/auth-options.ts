@@ -34,21 +34,44 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }: { session: Session; token: JWT }): Promise<Session> {
-      // The 'token' object (from the 'jwt' callback) contains 'accessToken' and 'roles'.
-      // The 'session' object initially contains 'user' (with name, email, image) and 'expires'.
-      // We need to return a new session object that merges these according to our augmented types.
+      const baseUser = session.user ?? {};
 
-      const baseUser = session.user ?? {}; // Handle session.user potentially being undefined
+      // Try to fetch user roles from the Django backend
+      let userRoles: string[] = [];
+      if (token.accessToken) {
+        try {
+          // Use the Django API to get current user with roles
+          const response = await fetch(`${process.env.NEXT_PUBLIC_DJANGO_API_URL}/v1/users/me/`, {
+            headers: {
+              'Authorization': `Bearer ${token.accessToken}`,
+              'Content-Type': 'application/json',
+            },
+          });
+          
+          if (response.ok) {
+            const userData = await response.json();
+            // Extract role names from the user data
+            if (userData.roles && Array.isArray(userData.roles)) {
+              userRoles = userData.roles.map((role: any) => role.name || role).filter(Boolean);
+            }
+            console.log('Fetched user roles from backend:', userRoles);
+          } else {
+            console.warn('Failed to fetch user roles from backend:', response.status);
+          }
+        } catch (error) {
+          console.error('Error fetching user roles from backend:', error);
+        }
+      }
 
       const augmentedUser = {
-        ...baseUser, // Spread default user properties (name, email, image)
-        ...(token.roles && { roles: token.roles }), // Add roles if they exist on the token
+        ...baseUser,
+        roles: userRoles.length > 0 ? userRoles : (token.roles || []), // Use backend roles or fallback to token roles
       };
 
       const newSession: Session = {
-        expires: session.expires, // Preserve the original session expiration
-        user: augmentedUser,      // Set our augmented user object
-        ...(token.accessToken && { accessToken: token.accessToken }), // Add accessToken if it exists on the token
+        expires: session.expires,
+        user: augmentedUser,
+        ...(token.accessToken && { accessToken: token.accessToken }),
       };
       
       return newSession;

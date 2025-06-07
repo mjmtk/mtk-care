@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-    "/api/health": {
+    "/api/v1/health": {
         parameters: {
             query?: never;
             header?: never;
@@ -21,7 +21,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/auth/validate": {
+    "/api/v1/auth/validate": {
         parameters: {
             query?: never;
             header?: never;
@@ -41,7 +41,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/profile": {
+    "/api/v1/profile": {
         parameters: {
             query?: never;
             header?: never;
@@ -77,185 +77,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/documents/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List Documents */
-        get: operations["apps_common_api_list_documents"];
-        put?: never;
-        /** Create Document */
-        post: operations["apps_common_api_create_document"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/documents/{doc_id}/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get Document */
-        get: operations["apps_common_api_get_document"];
-        /** Update Document */
-        put: operations["apps_common_api_update_document"];
-        post?: never;
-        /** Delete Document */
-        delete: operations["apps_common_api_delete_document"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/users/me/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get Current User */
-        get: operations["apps_users_api_get_current_user"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/users/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List Users */
-        get: operations["apps_users_api_list_users"];
-        put?: never;
-        /** Create User */
-        post: operations["apps_users_api_create_user"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/users/{user_id}/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get User */
-        get: operations["apps_users_api_get_user"];
-        /** Update User */
-        put: operations["apps_users_api_update_user"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/users/{user_id}/activate/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Activate User */
-        post: operations["apps_users_api_activate_user"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/users/{user_id}/deactivate/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Deactivate User */
-        post: operations["apps_users_api_deactivate_user"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/users/{user_id}/roles/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Assign Roles */
-        post: operations["apps_users_api_assign_roles"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/roles/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List Roles */
-        get: operations["apps_users_api_list_roles"];
-        put?: never;
-        /** Create Role */
-        post: operations["apps_users_api_create_role"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/roles/{role_id}/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get Role */
-        get: operations["apps_users_api_get_role"];
-        /** Update Role */
-        put: operations["apps_users_api_update_role"];
-        post?: never;
-        /** Delete Role */
-        delete: operations["apps_users_api_delete_role"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/optionlists/{list_slug}/items/": {
+    "/api/v1/optionlists/{list_slug}/items/": {
         parameters: {
             query?: never;
             header?: never;
@@ -276,61 +98,653 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/users/me/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Current User */
+        get: operations["apps_users_api_get_current_user"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Users */
+        get: operations["apps_users_api_list_users"];
+        put?: never;
+        /** Create User */
+        post: operations["apps_users_api_create_user"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/{user_id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get User */
+        get: operations["apps_users_api_get_user"];
+        /** Update User */
+        put: operations["apps_users_api_update_user"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/{user_id}/activate/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Activate User */
+        post: operations["apps_users_api_activate_user"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/{user_id}/deactivate/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Deactivate User */
+        post: operations["apps_users_api_deactivate_user"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/{user_id}/roles/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Assign Roles */
+        post: operations["apps_users_api_assign_roles"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/roles/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Roles */
+        get: operations["apps_users_api_list_roles"];
+        put?: never;
+        /** Create Role */
+        post: operations["apps_users_api_create_role"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/roles/{role_id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Role */
+        get: operations["apps_users_api_get_role"];
+        /** Update Role */
+        put: operations["apps_users_api_update_role"];
+        post?: never;
+        /** Delete Role */
+        delete: operations["apps_users_api_delete_role"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/documents/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Documents */
+        get: operations["apps_common_api_list_documents"];
+        put?: never;
+        /** Create Document */
+        post: operations["apps_common_api_create_document"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/documents/{doc_id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Document */
+        get: operations["apps_common_api_get_document"];
+        /** Update Document */
+        put: operations["apps_common_api_update_document"];
+        post?: never;
+        /** Delete Document */
+        delete: operations["apps_common_api_delete_document"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Current User
+         * @description Returns the current authenticated user's information and role.
+         *     Requires a valid JWT token in the Authorization header.
+         */
+        get: operations["apps_authentication_api_get_current_user"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/external-organisations/batch-dropdowns/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Batch Dropdowns for External Organisations
+         * @description Provides a batch of all dropdown options required for the External Organisation management UI.
+         *     Currently includes: external_organisation_types.
+         */
+        get: operations["apps_external_organisation_management_api_external_organisation_crud_batch_dropdowns_external_org"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/external-organisations/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List External Organisations
+         * @description Retrieve a list of all external organisations.
+         *     Supports filtering by query parameters (e.g., ?type__slug=service-provider&name__icontains=test).
+         */
+        get: operations["apps_external_organisation_management_api_external_organisation_crud_list_external_organisations"];
+        put?: never;
+        /**
+         * Create External Organisation
+         * @description Create a new external organisation.
+         */
+        post: operations["apps_external_organisation_management_api_external_organisation_crud_create_external_organisation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/external-organisations/{org_id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Retrieve an External Organisation by ID */
+        get: operations["apps_external_organisation_management_api_external_organisation_crud_get_external_organisation_by_id"];
+        /** Update an External Organisation by ID */
+        put: operations["apps_external_organisation_management_api_external_organisation_crud_update_external_organisation"];
+        post?: never;
+        /** Delete an External Organisation by ID */
+        delete: operations["apps_external_organisation_management_api_external_organisation_crud_delete_external_organisation"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/external-organisation-contacts/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List contacts */
+        get: operations["apps_external_organisation_management_api_contact_api_list_external_organisation_contacts"];
+        put?: never;
+        /** Create a new contact for an external organisation */
+        post: operations["apps_external_organisation_management_api_contact_api_create_external_organisation_contact"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/external-organisation-contacts/{contact_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Retrieve a specific contact */
+        get: operations["apps_external_organisation_management_api_contact_api_get_external_organisation_contact"];
+        /** Update a contact */
+        put: operations["apps_external_organisation_management_api_contact_api_update_external_organisation_contact"];
+        post?: never;
+        /** Delete a contact */
+        delete: operations["apps_external_organisation_management_api_contact_api_delete_external_organisation_contact"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/external-organisation-emails/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List email addresses */
+        get: operations["apps_external_organisation_management_api_email_api_list_email_addresses"];
+        put?: never;
+        /** Create a new email address */
+        post: operations["apps_external_organisation_management_api_email_api_create_email_address"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/external-organisation-emails/{email_address_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Retrieve a specific email address */
+        get: operations["apps_external_organisation_management_api_email_api_get_email_address"];
+        /** Update an email address */
+        put: operations["apps_external_organisation_management_api_email_api_update_email_address"];
+        post?: never;
+        /** Delete an email address */
+        delete: operations["apps_external_organisation_management_api_email_api_delete_email_address"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/external-organisation-phones/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List phone numbers */
+        get: operations["apps_external_organisation_management_api_phone_api_list_phone_numbers"];
+        put?: never;
+        /** Create a new phone number */
+        post: operations["apps_external_organisation_management_api_phone_api_create_phone_number"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/external-organisation-phones/{phone_number_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Retrieve a specific phone number */
+        get: operations["apps_external_organisation_management_api_phone_api_get_phone_number"];
+        /** Update a phone number */
+        put: operations["apps_external_organisation_management_api_phone_api_update_phone_number"];
+        post?: never;
+        /** Delete a phone number */
+        delete: operations["apps_external_organisation_management_api_phone_api_delete_phone_number"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/referrals/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Referrals
+         * @description List all referrals with pagination and optional filtering.
+         */
+        get: operations["apps_referral_management_api_list_referrals"];
+        put?: never;
+        /**
+         * Create Referral
+         * @description Create a new referral.
+         */
+        post: operations["apps_referral_management_api_create_referral"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/referrals/{referral_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Referral
+         * @description Get a specific referral by ID.
+         */
+        get: operations["apps_referral_management_api_get_referral"];
+        /**
+         * Update Referral
+         * @description Update a referral.
+         */
+        put: operations["apps_referral_management_api_update_referral"];
+        post?: never;
+        /**
+         * Delete Referral
+         * @description Delete a referral.
+         */
+        delete: operations["apps_referral_management_api_delete_referral"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/referrals/{referral_id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Referral Status
+         * @description Update only the status of a referral.
+         */
+        patch: operations["apps_referral_management_api_update_referral_status"];
+        trace?: never;
+    };
+    "/api/v1/referrals/batch-dropdowns/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Batch Dropdowns
+         * @description Get all dropdown options needed for referral forms.
+         */
+        get: operations["apps_referral_management_api_get_batch_dropdowns"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/clients/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List clients
+         * @description List clients with optional filtering and pagination.
+         *
+         *     Supports filtering by:
+         *     - Text search (name, email, phone)
+         *     - Status, risk level, language
+         *     - Age range
+         *     - Boolean flags (interpreter needed, consent required, etc.)
+         */
+        get: operations["apps_client_management_api_list_clients"];
+        put?: never;
+        /**
+         * Create client
+         * @description Create a new client.
+         *
+         *     Required fields:
+         *     - first_name, last_name, date_of_birth, status_id
+         *
+         *     Optional fields:
+         *     - All other client fields
+         */
+        post: operations["apps_client_management_api_create_client"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/clients/{client_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get client details
+         * @description Get detailed information about a specific client.
+         */
+        get: operations["apps_client_management_api_get_client"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete client
+         * @description Soft delete a client.
+         *
+         *     This marks the client as inactive rather than permanently deleting the record
+         *     to preserve data integrity and audit trails.
+         */
+        delete: operations["apps_client_management_api_delete_client"];
+        options?: never;
+        head?: never;
+        /**
+         * Update client
+         * @description Update an existing client.
+         *
+         *     All fields are optional - only provided fields will be updated.
+         */
+        patch: operations["apps_client_management_api_update_client"];
+        trace?: never;
+    };
+    "/api/v1/clients/stats/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get client statistics
+         * @description Get comprehensive client statistics for dashboard and reporting.
+         *
+         *     Returns:
+         *     - Total counts (all clients, active, high-risk, etc.)
+         *     - Age distribution
+         *     - Language distribution
+         *     - Risk level distribution
+         */
+        get: operations["apps_client_management_api_get_client_stats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/clients/{client_id}/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get client summary
+         * @description Get a summary view of a client (lighter than full details).
+         *
+         *     Useful for references in other parts of the application
+         *     like referral forms or quick lookups.
+         */
+        get: operations["apps_client_management_api_get_client_summary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/clients/validate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Validate client data
+         * @description Validate client data without creating a record.
+         *
+         *     Useful for form validation on the frontend before submission.
+         */
+        post: operations["apps_client_management_api_validate_client_data"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/clients/search/suggestions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get search suggestions
+         * @description Get search suggestions for client names.
+         *
+         *     Returns a list of matching client names for autocomplete functionality.
+         */
+        get: operations["apps_client_management_api_get_search_suggestions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /** DocumentSchema */
-        DocumentSchema: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** File Name */
-            file_name: string;
-            /** Sharepoint Id */
-            sharepoint_id: string;
-            /** Type Id */
-            type_id?: number | null;
-            /** Status Id */
-            status_id?: number | null;
-            /** Metadata */
-            metadata?: unknown | null;
-            /** Created At */
-            created_at?: string | null;
-            /** Created By */
-            created_by?: string | null;
-            /** Updated At */
-            updated_at?: string | null;
-            /** Updated By */
-            updated_by?: string | null;
-        };
-        /** DocumentCreateSchema */
-        DocumentCreateSchema: {
-            /** File Name */
-            file_name: string;
-            /** Sharepoint Id */
-            sharepoint_id: string;
-            /** Type Id */
-            type_id?: number | null;
-            /** Status Id */
-            status_id?: number | null;
-            /** Metadata */
-            metadata?: unknown | null;
-        };
-        /** DocumentUpdateSchema */
-        DocumentUpdateSchema: {
-            /** File Name */
-            file_name?: string | null;
-            /** Sharepoint Id */
-            sharepoint_id?: string | null;
-            /** Type Id */
-            type_id?: number | null;
-            /** Status Id */
-            status_id?: number | null;
-            /** Metadata */
-            metadata?: unknown | null;
+        /** OptionListItemSchemaOut */
+        OptionListItemSchemaOut: {
+            /** Id */
+            id: number;
+            /** Slug */
+            slug: string;
+            /** Name */
+            name: string;
+            /** Label */
+            label?: string | null;
+            /** Sort Order */
+            sort_order: number;
+            /** Is Active */
+            is_active: boolean;
         };
         /** RoleOut */
         RoleOut: {
@@ -439,8 +853,65 @@ export interface components {
             /** Level */
             level: number | null;
         };
-        /** OptionListItemSchemaOut */
-        OptionListItemSchemaOut: {
+        /** DocumentSchema */
+        DocumentSchema: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** File Name */
+            file_name: string;
+            /** Sharepoint Id */
+            sharepoint_id: string;
+            /** Type Id */
+            type_id?: number | null;
+            /** Status Id */
+            status_id?: number | null;
+            /** Metadata */
+            metadata?: unknown | null;
+            /** Created At */
+            created_at?: string | null;
+            /** Created By */
+            created_by?: string | null;
+            /** Updated At */
+            updated_at?: string | null;
+            /** Updated By */
+            updated_by?: string | null;
+        };
+        /** DocumentCreateSchema */
+        DocumentCreateSchema: {
+            /** File Name */
+            file_name: string;
+            /** Sharepoint Id */
+            sharepoint_id: string;
+            /** Type Id */
+            type_id?: number | null;
+            /** Status Id */
+            status_id?: number | null;
+            /** Metadata */
+            metadata?: unknown | null;
+        };
+        /** DocumentUpdateSchema */
+        DocumentUpdateSchema: {
+            /** File Name */
+            file_name?: string | null;
+            /** Sharepoint Id */
+            sharepoint_id?: string | null;
+            /** Type Id */
+            type_id?: number | null;
+            /** Status Id */
+            status_id?: number | null;
+            /** Metadata */
+            metadata?: unknown | null;
+        };
+        /** ErrorSchema */
+        ErrorSchema: {
+            /** Detail */
+            detail: string;
+        };
+        /** ExtOrgDropdownItemOut */
+        ExtOrgDropdownItemOut: {
             /** Id */
             id: number;
             /** Slug */
@@ -449,10 +920,814 @@ export interface components {
             name: string;
             /** Label */
             label?: string | null;
-            /** Sort Order */
-            sort_order: number;
+        };
+        /** ExternalOrganisationBatchDropdownsOut */
+        ExternalOrganisationBatchDropdownsOut: {
+            /** External Organisation Types */
+            external_organisation_types: components["schemas"]["ExtOrgDropdownItemOut"][];
+        };
+        /** EmailAddressSchemaOut */
+        EmailAddressSchemaOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+            type: components["schemas"]["OptionListItemSchemaOut"];
             /** Is Active */
             is_active: boolean;
+            /**
+             * Is Primary
+             * @default false
+             */
+            is_primary: boolean | null;
+            /** Contact Id */
+            contact_id?: string | null;
+            /** Organisation Id */
+            organisation_id?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            created_by?: components["schemas"]["UserAuditSchema"] | null;
+            updated_by?: components["schemas"]["UserAuditSchema"] | null;
+        };
+        /** ExternalOrganisationContactSchemaOut */
+        ExternalOrganisationContactSchemaOut: Record<string, never>;
+        /** ExternalOrganisationSchemaOut */
+        ExternalOrganisationSchemaOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            type: components["schemas"]["OptionListItemSchemaOut"];
+            /** Phone */
+            phone?: string | null;
+            /** Email */
+            email?: string | null;
+            /** Address */
+            address?: string | null;
+            /** Is Active */
+            is_active: boolean;
+            /**
+             * Contacts
+             * @default []
+             */
+            contacts: components["schemas"]["apps__external_organisation_management__schemas__ExternalOrganisationContactSchemaOut__1"][];
+            /**
+             * Phones
+             * @default []
+             */
+            phones: components["schemas"]["PhoneNumberSchemaOut"][];
+            /**
+             * Emails
+             * @default []
+             */
+            emails: components["schemas"]["EmailAddressSchemaOut"][];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            created_by?: components["schemas"]["UserAuditSchema"] | null;
+            updated_by?: components["schemas"]["UserAuditSchema"] | null;
+        };
+        /** PhoneNumberSchemaOut */
+        PhoneNumberSchemaOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Number */
+            number: string;
+            type: components["schemas"]["OptionListItemSchemaOut"];
+            /** Is Active */
+            is_active: boolean;
+            /**
+             * Is Primary
+             * @default false
+             */
+            is_primary: boolean | null;
+            /** Contact Id */
+            contact_id?: string | null;
+            /** Organisation Id */
+            organisation_id?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            created_by?: components["schemas"]["UserAuditSchema"] | null;
+            updated_by?: components["schemas"]["UserAuditSchema"] | null;
+        };
+        /** UserAuditSchema */
+        UserAuditSchema: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Username */
+            username: string;
+        };
+        /** ExternalOrganisationSchemaIn */
+        ExternalOrganisationSchemaIn: {
+            /** Name */
+            name: string;
+            /** Type Id */
+            type_id: number;
+            /** Phone */
+            phone?: string | null;
+            /** Email */
+            email?: string | null;
+            /** Address */
+            address?: string | null;
+            /**
+             * Is Active
+             * @default true
+             */
+            is_active: boolean | null;
+        };
+        /** ExternalOrganisationFilterSchema */
+        ExternalOrganisationFilterSchema: {
+            /** Type  Slug */
+            type__slug?: string | null;
+            /** Name  Icontains */
+            name__icontains?: string | null;
+            /** Is Active */
+            is_active?: boolean | null;
+        };
+        /** ExternalOrganisationContactSchemaOut */
+        apps__external_organisation_management__schemas__ExternalOrganisationContactSchemaOut__1: Record<string, never>;
+        /** ExternalOrganisationContactSchemaOut */
+        apps__external_organisation_management__schemas__ExternalOrganisationContactSchemaOut__2: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            organisation: components["schemas"]["ExternalOrganisationSchemaOut"];
+            /** First Name */
+            first_name: string;
+            /** Last Name */
+            last_name: string;
+            /** Job Title */
+            job_title?: string | null;
+            /** Is Active */
+            is_active: boolean;
+            /** Notes */
+            notes?: string | null;
+            /**
+             * Phones
+             * @default []
+             */
+            phones: components["schemas"]["PhoneNumberSchemaOut"][];
+            /**
+             * Emails
+             * @default []
+             */
+            emails: components["schemas"]["EmailAddressSchemaOut"][];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            created_by?: components["schemas"]["UserAuditSchema"] | null;
+            updated_by?: components["schemas"]["UserAuditSchema"] | null;
+        };
+        /** ExternalOrganisationContactSchemaIn */
+        ExternalOrganisationContactSchemaIn: {
+            /**
+             * Organisation Id
+             * Format: uuid
+             */
+            organisation_id: string;
+            /** First Name */
+            first_name: string;
+            /** Last Name */
+            last_name: string;
+            /** Job Title */
+            job_title?: string | null;
+            /**
+             * Is Active
+             * @default true
+             */
+            is_active: boolean | null;
+            /** Notes */
+            notes?: string | null;
+        };
+        /** EmailAddressSchemaIn */
+        EmailAddressSchemaIn: {
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+            /** Type Id */
+            type_id: number;
+            /**
+             * Is Primary
+             * @default false
+             */
+            is_primary: boolean | null;
+            /**
+             * Is Active
+             * @default true
+             */
+            is_active: boolean | null;
+            /** Contact Id */
+            contact_id?: string | null;
+            /** Organisation Id */
+            organisation_id?: string | null;
+        };
+        /** PhoneNumberSchemaIn */
+        PhoneNumberSchemaIn: {
+            /** Number */
+            number: string;
+            /** Type Id */
+            type_id: number;
+            /**
+             * Is Primary
+             * @default false
+             */
+            is_primary: boolean | null;
+            /**
+             * Is Active
+             * @default true
+             */
+            is_active: boolean | null;
+            /** Contact Id */
+            contact_id?: string | null;
+            /** Organisation Id */
+            organisation_id?: string | null;
+            /** Notes */
+            notes?: string | null;
+        };
+        /** ReferralListResponse */
+        ReferralListResponse: {
+            /** Items */
+            items: components["schemas"]["ReferralSchemaOut"][];
+            /** Total */
+            total: number;
+            /** Page */
+            page: number;
+            /** Limit */
+            limit: number;
+            /** Total Pages */
+            total_pages: number;
+        };
+        /** ReferralSchemaOut */
+        ReferralSchemaOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            type: components["schemas"]["OptionListItemSchemaOut"];
+            status: components["schemas"]["OptionListItemSchemaOut"];
+            priority: components["schemas"]["OptionListItemSchemaOut"];
+            service_type: components["schemas"]["OptionListItemSchemaOut"];
+            /** Reason */
+            reason: string;
+            /** Client Type */
+            client_type: string;
+            /**
+             * Referral Date
+             * Format: date
+             */
+            referral_date: string;
+            /** Accepted Date */
+            accepted_date?: string | null;
+            /** Completed Date */
+            completed_date?: string | null;
+            /** Follow Up Date */
+            follow_up_date?: string | null;
+            /** Client Consent Date */
+            client_consent_date?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** External Organisation Id */
+            external_organisation_id?: string | null;
+            /** External Organisation Contact Id */
+            external_organisation_contact_id?: string | null;
+            /**
+             * Created At
+             * Format: date
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date
+             */
+            updated_at: string;
+            created_by: components["schemas"]["UserAuditSchema"];
+            updated_by: components["schemas"]["UserAuditSchema"];
+        };
+        /** ReferralSchemaIn */
+        ReferralSchemaIn: {
+            /** Type Id */
+            type_id: number;
+            /** Status Id */
+            status_id: number;
+            /** Priority Id */
+            priority_id: number;
+            /** Service Type Id */
+            service_type_id: number;
+            /** Reason */
+            reason: string;
+            /**
+             * Client Type
+             * @default new
+             */
+            client_type: string;
+            /**
+             * Referral Date
+             * Format: date
+             */
+            referral_date: string;
+            /** Accepted Date */
+            accepted_date?: string | null;
+            /** Completed Date */
+            completed_date?: string | null;
+            /** Follow Up Date */
+            follow_up_date?: string | null;
+            /** Client Consent Date */
+            client_consent_date?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** External Organisation Id */
+            external_organisation_id?: string | null;
+            /** External Organisation Contact Id */
+            external_organisation_contact_id?: string | null;
+        };
+        /** ReferralUpdateSchemaIn */
+        ReferralUpdateSchemaIn: {
+            /** Type Id */
+            type_id?: number | null;
+            /** Status Id */
+            status_id?: number | null;
+            /** Priority Id */
+            priority_id?: number | null;
+            /** Service Type Id */
+            service_type_id?: number | null;
+            /** Reason */
+            reason?: string | null;
+            /** Client Type */
+            client_type?: string | null;
+            /** Referral Date */
+            referral_date?: string | null;
+            /** Accepted Date */
+            accepted_date?: string | null;
+            /** Completed Date */
+            completed_date?: string | null;
+            /** Follow Up Date */
+            follow_up_date?: string | null;
+            /** Client Consent Date */
+            client_consent_date?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** External Organisation Id */
+            external_organisation_id?: string | null;
+            /** External Organisation Contact Id */
+            external_organisation_contact_id?: string | null;
+        };
+        /** ReferralStatusUpdateSchemaIn */
+        ReferralStatusUpdateSchemaIn: {
+            /** Status Id */
+            status_id: number;
+        };
+        /** ReferralBatchDropdownsSchemaOut */
+        ReferralBatchDropdownsSchemaOut: {
+            /** Referral Types */
+            referral_types: components["schemas"]["OptionListItemSchemaOut"][];
+            /** Referral Statuses */
+            referral_statuses: components["schemas"]["OptionListItemSchemaOut"][];
+            /** Referral Priorities */
+            referral_priorities: components["schemas"]["OptionListItemSchemaOut"][];
+            /** Referral Service Types */
+            referral_service_types: components["schemas"]["OptionListItemSchemaOut"][];
+        };
+        /** Input */
+        Input: {
+            /**
+             * Limit
+             * @default 100
+             */
+            limit: number;
+            /**
+             * Offset
+             * @default 0
+             */
+            offset: number;
+        };
+        /**
+         * ClientListSchema
+         * @description Lightweight schema for client list view.
+         */
+        ClientListSchema: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** First Name */
+            first_name: string;
+            /** Last Name */
+            last_name: string;
+            /** Preferred Name */
+            preferred_name?: string | null;
+            /**
+             * Date Of Birth
+             * Format: date
+             */
+            date_of_birth: string;
+            /** Email */
+            email?: string | null;
+            /** Phone */
+            phone?: string | null;
+            /** Risk Level */
+            risk_level: string;
+            /** Consent Required */
+            consent_required: boolean;
+            /** Incomplete Documentation */
+            incomplete_documentation: boolean;
+            status?: components["schemas"]["OptionListItemSchemaOut"] | null;
+            primary_language?: components["schemas"]["OptionListItemSchemaOut"] | null;
+        };
+        /** PagedClientListSchema */
+        PagedClientListSchema: {
+            /** Items */
+            items: components["schemas"]["ClientListSchema"][];
+            /** Count */
+            count: number;
+        };
+        /**
+         * ClientSearchSchema
+         * @description Simple schema for client search parameters.
+         */
+        ClientSearchSchema: {
+            /**
+             * Search
+             * @description Search term for name, email, or phone
+             */
+            search?: string | null;
+            /**
+             * Status Id
+             * @description Filter by status
+             */
+            status_id?: string | null;
+            /**
+             * Risk Level
+             * @description Filter by risk level
+             */
+            risk_level?: string | null;
+            /**
+             * Primary Language Id
+             * @description Filter by primary language
+             */
+            primary_language_id?: string | null;
+            /**
+             * Interpreter Needed
+             * @description Filter by interpreter requirement
+             */
+            interpreter_needed?: boolean | null;
+            /**
+             * Consent Required
+             * @description Filter by consent requirement
+             */
+            consent_required?: boolean | null;
+            /**
+             * Incomplete Documentation
+             * @description Filter by documentation status
+             */
+            incomplete_documentation?: boolean | null;
+        };
+        /**
+         * ClientDetailSchema
+         * @description Extended schema for detailed client view.
+         */
+        ClientDetailSchema: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** First Name */
+            first_name: string;
+            /** Last Name */
+            last_name: string;
+            /** Preferred Name */
+            preferred_name?: string | null;
+            /**
+             * Date Of Birth
+             * Format: date
+             */
+            date_of_birth: string;
+            /** Email */
+            email?: string | null;
+            /** Phone */
+            phone?: string | null;
+            /** Risk Level */
+            risk_level: string;
+            /** Consent Required */
+            consent_required: boolean;
+            /** Incomplete Documentation */
+            incomplete_documentation: boolean;
+            status?: components["schemas"]["OptionListItemSchemaOut"] | null;
+            primary_language?: components["schemas"]["OptionListItemSchemaOut"] | null;
+            /** Address */
+            address?: string | null;
+            /** Interpreter Needed */
+            interpreter_needed: boolean;
+            /** Cultural Identity */
+            cultural_identity?: {
+                [key: string]: unknown;
+            } | null;
+            /** Notes */
+            notes?: string | null;
+            /** Extended Data */
+            extended_data?: {
+                [key: string]: unknown;
+            } | null;
+            /** Display Name */
+            display_name?: string | null;
+            /** Full Name */
+            full_name?: string | null;
+            /** Age */
+            age?: number | null;
+        };
+        /**
+         * ClientCreateSchema
+         * @description Lightweight schema for creating a new client.
+         */
+        ClientCreateSchema: {
+            /**
+             * First Name
+             * @description Client's first name
+             */
+            first_name: string;
+            /**
+             * Last Name
+             * @description Client's last name
+             */
+            last_name: string;
+            /**
+             * Date Of Birth
+             * Format: date
+             * @description Client's date of birth
+             */
+            date_of_birth: string;
+            /**
+             * Status Id
+             * @description Client status option list item ID
+             */
+            status_id: string;
+            /**
+             * Preferred Name
+             * @description Preferred name
+             */
+            preferred_name?: string | null;
+            /**
+             * Email
+             * @description Primary email address
+             */
+            email?: string | null;
+            /**
+             * Phone
+             * @description Primary phone number
+             */
+            phone?: string | null;
+            /**
+             * Address
+             * @description Full address
+             */
+            address?: string | null;
+            /**
+             * Primary Language Id
+             * @description Primary language option list item ID
+             */
+            primary_language_id?: string | null;
+            /**
+             * Interpreter Needed
+             * @description Whether interpreter is needed
+             * @default false
+             */
+            interpreter_needed: boolean | null;
+            /**
+             * Risk Level
+             * @description Risk assessment level (low, medium, high)
+             * @default low
+             */
+            risk_level: string | null;
+            /**
+             * Consent Required
+             * @description Whether consent is required
+             * @default true
+             */
+            consent_required: boolean | null;
+            /**
+             * Incomplete Documentation
+             * @description Whether documentation is incomplete
+             * @default false
+             */
+            incomplete_documentation: boolean | null;
+            /**
+             * Cultural Identity
+             * @description Cultural identity information
+             */
+            cultural_identity?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Notes
+             * @description Additional notes
+             */
+            notes?: string | null;
+            /**
+             * Extended Data
+             * @description Extended data for future use
+             */
+            extended_data?: {
+                [key: string]: unknown;
+            } | null;
+        };
+        /**
+         * ClientUpdateSchema
+         * @description Lightweight schema for updating an existing client.
+         */
+        ClientUpdateSchema: {
+            /**
+             * First Name
+             * @description Client's first name
+             */
+            first_name?: string | null;
+            /**
+             * Last Name
+             * @description Client's last name
+             */
+            last_name?: string | null;
+            /**
+             * Preferred Name
+             * @description Preferred name
+             */
+            preferred_name?: string | null;
+            /**
+             * Date Of Birth
+             * @description Client's date of birth
+             */
+            date_of_birth?: string | null;
+            /**
+             * Email
+             * @description Primary email address
+             */
+            email?: string | null;
+            /**
+             * Phone
+             * @description Primary phone number
+             */
+            phone?: string | null;
+            /**
+             * Address
+             * @description Full address
+             */
+            address?: string | null;
+            /**
+             * Status Id
+             * @description Client status option list item ID
+             */
+            status_id?: string | null;
+            /**
+             * Primary Language Id
+             * @description Primary language option list item ID
+             */
+            primary_language_id?: string | null;
+            /**
+             * Interpreter Needed
+             * @description Whether interpreter is needed
+             */
+            interpreter_needed?: boolean | null;
+            /**
+             * Risk Level
+             * @description Risk assessment level (low, medium, high)
+             */
+            risk_level?: string | null;
+            /**
+             * Consent Required
+             * @description Whether consent is required
+             */
+            consent_required?: boolean | null;
+            /**
+             * Incomplete Documentation
+             * @description Whether documentation is incomplete
+             */
+            incomplete_documentation?: boolean | null;
+            /**
+             * Cultural Identity
+             * @description Cultural identity information
+             */
+            cultural_identity?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Notes
+             * @description Additional notes
+             */
+            notes?: string | null;
+            /**
+             * Extended Data
+             * @description Extended data for future use
+             */
+            extended_data?: {
+                [key: string]: unknown;
+            } | null;
+        };
+        /**
+         * MessageSchema
+         * @description Simple message response schema.
+         */
+        MessageSchema: {
+            /** Message */
+            message: string;
+        };
+        /**
+         * ClientStatsSchema
+         * @description Schema for client statistics.
+         */
+        ClientStatsSchema: {
+            /** Total Clients */
+            total_clients: number;
+            /** Active Clients */
+            active_clients: number;
+            /** High Risk Clients */
+            high_risk_clients: number;
+            /** Clients Needing Interpreter */
+            clients_needing_interpreter: number;
+            /** Clients With Incomplete Docs */
+            clients_with_incomplete_docs: number;
+            /** Age Distribution */
+            age_distribution: {
+                [key: string]: number;
+            };
+            /** Language Distribution */
+            language_distribution: {
+                [key: string]: number;
+            };
+            /** Risk Distribution */
+            risk_distribution: {
+                [key: string]: number;
+            };
         };
     };
     responses: never;
@@ -517,58 +1792,12 @@ export interface operations {
             };
         };
     };
-    apps_common_api_list_documents: {
-        parameters: {
-            query?: {
-                client_id?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DocumentSchema"][];
-                };
-            };
-        };
-    };
-    apps_common_api_create_document: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["DocumentCreateSchema"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DocumentSchema"];
-                };
-            };
-        };
-    };
-    apps_common_api_get_document: {
+    apps_optionlists_api_list_option_list_items_by_slug: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                doc_id: string;
+                list_slug: string;
             };
             cookie?: never;
         };
@@ -580,54 +1809,8 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["DocumentSchema"];
+                    "application/json": components["schemas"]["OptionListItemSchemaOut"][];
                 };
-            };
-        };
-    };
-    apps_common_api_update_document: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                doc_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["DocumentUpdateSchema"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DocumentSchema"];
-                };
-            };
-        };
-    };
-    apps_common_api_delete_document: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                doc_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
         };
     };
@@ -928,12 +2111,58 @@ export interface operations {
             };
         };
     };
-    apps_optionlists_api_list_option_list_items_by_slug: {
+    apps_common_api_list_documents: {
+        parameters: {
+            query?: {
+                client_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentSchema"][];
+                };
+            };
+        };
+    };
+    apps_common_api_create_document: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DocumentCreateSchema"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentSchema"];
+                };
+            };
+        };
+    };
+    apps_common_api_get_document: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                list_slug: string;
+                doc_id: string;
             };
             cookie?: never;
         };
@@ -945,7 +2174,946 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OptionListItemSchemaOut"][];
+                    "application/json": components["schemas"]["DocumentSchema"];
+                };
+            };
+        };
+    };
+    apps_common_api_update_document: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                doc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DocumentUpdateSchema"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentSchema"];
+                };
+            };
+        };
+    };
+    apps_common_api_delete_document: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                doc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    apps_authentication_api_get_current_user: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorSchema"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorSchema"];
+                };
+            };
+        };
+    };
+    apps_external_organisation_management_api_external_organisation_crud_batch_dropdowns_external_org: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExternalOrganisationBatchDropdownsOut"];
+                };
+            };
+        };
+    };
+    apps_external_organisation_management_api_external_organisation_crud_list_external_organisations: {
+        parameters: {
+            query?: {
+                type__slug?: string | null;
+                name__icontains?: string | null;
+                is_active?: boolean | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExternalOrganisationSchemaOut"][];
+                };
+            };
+        };
+    };
+    apps_external_organisation_management_api_external_organisation_crud_create_external_organisation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExternalOrganisationSchemaIn"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExternalOrganisationSchemaOut"];
+                };
+            };
+        };
+    };
+    apps_external_organisation_management_api_external_organisation_crud_get_external_organisation_by_id: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                org_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExternalOrganisationSchemaOut"];
+                };
+            };
+        };
+    };
+    apps_external_organisation_management_api_external_organisation_crud_update_external_organisation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                org_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExternalOrganisationSchemaIn"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExternalOrganisationSchemaOut"];
+                };
+            };
+        };
+    };
+    apps_external_organisation_management_api_external_organisation_crud_delete_external_organisation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                org_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    apps_external_organisation_management_api_contact_api_list_external_organisation_contacts: {
+        parameters: {
+            query?: {
+                organisation_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["apps__external_organisation_management__schemas__ExternalOrganisationContactSchemaOut__2"][];
+                };
+            };
+        };
+    };
+    apps_external_organisation_management_api_contact_api_create_external_organisation_contact: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExternalOrganisationContactSchemaIn"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["apps__external_organisation_management__schemas__ExternalOrganisationContactSchemaOut__2"];
+                };
+            };
+        };
+    };
+    apps_external_organisation_management_api_contact_api_get_external_organisation_contact: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contact_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["apps__external_organisation_management__schemas__ExternalOrganisationContactSchemaOut__2"];
+                };
+            };
+        };
+    };
+    apps_external_organisation_management_api_contact_api_update_external_organisation_contact: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contact_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExternalOrganisationContactSchemaIn"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["apps__external_organisation_management__schemas__ExternalOrganisationContactSchemaOut__2"];
+                };
+            };
+        };
+    };
+    apps_external_organisation_management_api_contact_api_delete_external_organisation_contact: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contact_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    apps_external_organisation_management_api_email_api_list_email_addresses: {
+        parameters: {
+            query?: {
+                contact_id?: string | null;
+                organisation_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmailAddressSchemaOut"][];
+                };
+            };
+        };
+    };
+    apps_external_organisation_management_api_email_api_create_email_address: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmailAddressSchemaIn"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmailAddressSchemaOut"];
+                };
+            };
+        };
+    };
+    apps_external_organisation_management_api_email_api_get_email_address: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                email_address_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmailAddressSchemaOut"];
+                };
+            };
+        };
+    };
+    apps_external_organisation_management_api_email_api_update_email_address: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                email_address_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmailAddressSchemaIn"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmailAddressSchemaOut"];
+                };
+            };
+        };
+    };
+    apps_external_organisation_management_api_email_api_delete_email_address: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                email_address_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    apps_external_organisation_management_api_phone_api_list_phone_numbers: {
+        parameters: {
+            query?: {
+                contact_id?: string | null;
+                organisation_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PhoneNumberSchemaOut"][];
+                };
+            };
+        };
+    };
+    apps_external_organisation_management_api_phone_api_create_phone_number: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PhoneNumberSchemaIn"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PhoneNumberSchemaOut"];
+                };
+            };
+        };
+    };
+    apps_external_organisation_management_api_phone_api_get_phone_number: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                phone_number_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PhoneNumberSchemaOut"];
+                };
+            };
+        };
+    };
+    apps_external_organisation_management_api_phone_api_update_phone_number: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                phone_number_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PhoneNumberSchemaIn"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PhoneNumberSchemaOut"];
+                };
+            };
+        };
+    };
+    apps_external_organisation_management_api_phone_api_delete_phone_number: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                phone_number_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    apps_referral_management_api_list_referrals: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+                status?: string | null;
+                priority?: string | null;
+                client_type?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReferralListResponse"];
+                };
+            };
+        };
+    };
+    apps_referral_management_api_create_referral: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReferralSchemaIn"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReferralSchemaOut"];
+                };
+            };
+        };
+    };
+    apps_referral_management_api_get_referral: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                referral_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReferralSchemaOut"];
+                };
+            };
+        };
+    };
+    apps_referral_management_api_update_referral: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                referral_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReferralUpdateSchemaIn"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReferralSchemaOut"];
+                };
+            };
+        };
+    };
+    apps_referral_management_api_delete_referral: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                referral_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    apps_referral_management_api_update_referral_status: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                referral_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReferralStatusUpdateSchemaIn"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReferralSchemaOut"];
+                };
+            };
+        };
+    };
+    apps_referral_management_api_get_batch_dropdowns: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReferralBatchDropdownsSchemaOut"];
+                };
+            };
+        };
+    };
+    apps_client_management_api_list_clients: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ClientSearchSchema"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedClientListSchema"];
+                };
+            };
+        };
+    };
+    apps_client_management_api_create_client: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ClientCreateSchema"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientDetailSchema"];
+                };
+            };
+        };
+    };
+    apps_client_management_api_get_client: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientDetailSchema"];
+                };
+            };
+        };
+    };
+    apps_client_management_api_delete_client: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageSchema"];
+                };
+            };
+        };
+    };
+    apps_client_management_api_update_client: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ClientUpdateSchema"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientDetailSchema"];
+                };
+            };
+        };
+    };
+    apps_client_management_api_get_client_stats: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientStatsSchema"];
+                };
+            };
+        };
+    };
+    apps_client_management_api_get_client_summary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientListSchema"];
+                };
+            };
+        };
+    };
+    apps_client_management_api_validate_client_data: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ClientCreateSchema"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageSchema"];
+                };
+            };
+        };
+    };
+    apps_client_management_api_get_search_suggestions: {
+        parameters: {
+            query?: {
+                query?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string[];
                 };
             };
         };

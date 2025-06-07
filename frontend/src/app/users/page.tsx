@@ -7,22 +7,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { UsersDataTable } from './data-table'
 import { columns } from './columns'
 import { User, userListSchema } from '@/types/users'
-import { useAuthBypassSession } from '@/hooks/useAuthBypass'
+import { useAuthBypassSession, useAccessToken } from '@/hooks/useAuthBypass'
+import { usersApi } from '@/services/apiService'
 
 // Function to fetch users from the API
-async function fetchUsers(): Promise<User[]> {
+async function fetchUsers(accessToken: string | null): Promise<User[]> {
   try {
-    const response = await fetch('/api/users/', {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch users: ${response.statusText}`)
+    if (!accessToken) {
+      throw new Error('No access token available')
     }
 
-    const data = await response.json()
+    // Use the proper API service instead of direct fetch
+    const data = await usersApi.listUsers(accessToken)
     
     // Validate the data against our schema
     const validatedUsers = userListSchema.parse(data)
@@ -43,21 +39,37 @@ export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const { data: session, status } = useAuthBypassSession()
+  const { data: session, status, isAuthBypass } = useAuthBypassSession()
+  const accessToken = useAccessToken()
+
+  // Debug: Log auth state
+  console.log('Users page auth state:', {
+    status,
+    isAuthBypass,
+    hasSession: !!session,
+    hasAccessToken: !!accessToken,
+    accessToken: accessToken ? `${accessToken.substring(0, 20)}...` : null,
+    userRoles: session?.user?.roles
+  });
 
   // Check if user has admin access
   const userRoles = session?.user?.roles as string[] | undefined
   const hasAccess = hasAdminAccess(userRoles)
 
   useEffect(() => {
-    // Only load users if user has access
+    // Only load users if user has access and we have required auth data
     if (!hasAccess && status !== 'loading') return
+    if (status === 'loading') return // Wait for auth to complete
+    if (!accessToken) {
+      console.log('Waiting for access token...');
+      return // Wait for access token
+    }
 
     const loadUsers = async () => {
       try {
         setIsLoading(true)
         setError(null)
-        const fetchedUsers = await fetchUsers()
+        const fetchedUsers = await fetchUsers(accessToken)
         setUsers(fetchedUsers)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred while fetching users')
@@ -67,7 +79,7 @@ export default function UsersPage() {
     }
 
     loadUsers()
-  }, [hasAccess, status])
+  }, [hasAccess, status, accessToken])
 
   // Show access denied if user doesn't have permission
   if (status !== 'loading' && !hasAccess) {

@@ -18,3 +18,4 @@ psycopg2-binary>=2.9
 redis>=4.5
 dj-database-url>=2.1
 inflect>=7.0
+pydantic[email]>=2.0  # For email validation in Django Ninja schemas

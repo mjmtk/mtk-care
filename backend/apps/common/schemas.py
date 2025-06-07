@@ -3,6 +3,25 @@ from typing import Optional, Any
 from uuid import UUID
 import datetime
 
+
+class UUIDPKBaseModelSchema(Schema):
+    """Base schema for models with UUID primary keys and audit fields."""
+    model_config = {"from_attributes": True}
+    
+    id: UUID
+    created_at: datetime.datetime
+    updated_at: datetime.datetime
+
+
+class MessageSchema(Schema):
+    """Simple message response schema."""
+    message: str
+
+class UserAuditSchema(Schema):
+    model_config = {"from_attributes": True}
+    id: UUID  # This project uses UUID primary keys for User model
+    username: str
+
 class DocumentSchema(Schema):
     id: UUID
     file_name: str

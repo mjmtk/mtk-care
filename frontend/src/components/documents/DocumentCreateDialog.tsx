@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { useState, useRef } from "react";
 import { usePnP } from "@/providers/PnpSharePointProvider";
 import { components } from "@/types/openapi";
-import axiosInstance from "@/lib/axiosClient";
+import axiosInstance from "@/services/axios-client";
 import { getApiPath } from "@/lib/apiConfig";
 
 type DocumentCreateSchema = components['schemas']['DocumentCreateSchema'];

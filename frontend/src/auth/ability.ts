@@ -1,5 +1,5 @@
 import { AbilityBuilder, createMongoAbility } from "@casl/ability";
-import { AppRoles } from "./auth-config";
+import { AppRoles } from "@/types/auth";
 
 // Define subject types for our application
 type Subjects = 'Client' | 'Assessment' | 'Programme' | 'Referral' | 'Staff' | 'Report' | 'all';

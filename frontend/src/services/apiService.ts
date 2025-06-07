@@ -6,9 +6,9 @@
  * The '/api' prefix is automatically added by `getApiPath` from `apiConfig.ts`.
  */
 import { AxiosRequestConfig } from 'axios';
-import axiosInstance from '@/lib/axiosClient';
+import axiosInstance from './axios-client';
 import { getApiPath } from '@/lib/apiConfig';
-import type { components } from '@/types/api'; // Adjusted import path for generated types
+import type { components } from '@/types/openapi'; // Updated to use new OpenAPI types
 
 export type ApiRequestOptions<RequestBody = unknown> = {
   /** Relative endpoint path (e.g., 'v1/users/me') - version included */
@@ -294,10 +294,190 @@ export const rolesApi = {
   },
 };
 
+/**
+ * API service for external organisation management
+ */
+export const externalOrganisationsApi = {
+  /**
+   * Lists all external organisations with optional filters
+   * GET /api/v1/external-organisations/
+   */
+  listExternalOrganisations: async (
+    accessToken: string,
+    params?: {
+      type__slug?: string;
+      name__icontains?: string;
+      is_active?: boolean;
+    }
+  ): Promise<components['schemas']['ExternalOrganisationSchemaOut'][]> => {
+    return apiRequest<components['schemas']['ExternalOrganisationSchemaOut'][]>({
+      url: 'v1/external-organisations/',
+      method: 'get',
+      params,
+      accessToken,
+    });
+  },
+
+  /**
+   * Gets an external organisation by ID
+   * GET /api/v1/external-organisations/{org_id}/
+   */
+  getExternalOrganisationById: async (
+    orgId: string,
+    accessToken: string
+  ): Promise<components['schemas']['ExternalOrganisationSchemaOut']> => {
+    return apiRequest<components['schemas']['ExternalOrganisationSchemaOut']>({
+      url: `v1/external-organisations/${orgId}/`,
+      method: 'get',
+      accessToken,
+    });
+  },
+
+  /**
+   * Creates a new external organisation
+   * POST /api/v1/external-organisations/
+   */
+  createExternalOrganisation: async (
+    orgData: components['schemas']['ExternalOrganisationSchemaIn'],
+    accessToken: string
+  ): Promise<components['schemas']['ExternalOrganisationSchemaOut']> => {
+    return apiRequest<components['schemas']['ExternalOrganisationSchemaOut'], components['schemas']['ExternalOrganisationSchemaIn']>({
+      url: 'v1/external-organisations/',
+      method: 'post',
+      data: orgData,
+      accessToken,
+    });
+  },
+
+  /**
+   * Updates an external organisation
+   * PUT /api/v1/external-organisations/{org_id}/
+   */
+  updateExternalOrganisation: async (
+    orgId: string,
+    orgData: components['schemas']['ExternalOrganisationSchemaIn'],
+    accessToken: string
+  ): Promise<components['schemas']['ExternalOrganisationSchemaOut']> => {
+    return apiRequest<components['schemas']['ExternalOrganisationSchemaOut'], components['schemas']['ExternalOrganisationSchemaIn']>({
+      url: `v1/external-organisations/${orgId}/`,
+      method: 'put',
+      data: orgData,
+      accessToken,
+    });
+  },
+
+  /**
+   * Deletes an external organisation
+   * DELETE /api/v1/external-organisations/{org_id}/
+   */
+  deleteExternalOrganisation: async (orgId: string, accessToken: string): Promise<void> => {
+    return apiRequest<void>({
+      url: `v1/external-organisations/${orgId}/`,
+      method: 'delete',
+      accessToken,
+    });
+  },
+
+  /**
+   * Gets batch dropdown data for external organisations
+   * GET /api/v1/external-organisations/batch-dropdowns/
+   */
+  getBatchDropdowns: async (accessToken: string): Promise<components['schemas']['ExternalOrganisationBatchDropdownsOut']> => {
+    return apiRequest<components['schemas']['ExternalOrganisationBatchDropdownsOut']>({
+      url: 'v1/external-organisations/batch-dropdowns/',
+      method: 'get',
+      accessToken,
+    });
+  },
+};
+
+/**
+ * API service for external organisation contacts
+ */
+export const externalOrganisationContactsApi = {
+  /**
+   * Lists all external organisation contacts
+   * GET /api/v1/external-organisation-contacts/
+   */
+  listContacts: async (
+    accessToken: string,
+    params?: { organisation_id?: string }
+  ): Promise<components['schemas']['apps__external_organisation_management__schemas__ExternalOrganisationContactSchemaOut__2'][]> => {
+    return apiRequest({
+      url: 'v1/external-organisation-contacts/',
+      method: 'get',
+      params,
+      accessToken,
+    });
+  },
+
+  /**
+   * Creates a new external organisation contact
+   * POST /api/v1/external-organisation-contacts/
+   */
+  createContact: async (
+    contactData: components['schemas']['ExternalOrganisationContactSchemaIn'],
+    accessToken: string
+  ): Promise<components['schemas']['apps__external_organisation_management__schemas__ExternalOrganisationContactSchemaOut__2']> => {
+    return apiRequest({
+      url: 'v1/external-organisation-contacts/',
+      method: 'post',
+      data: contactData,
+      accessToken,
+    });
+  },
+
+  /**
+   * Gets a contact by ID
+   * GET /api/v1/external-organisation-contacts/{contact_id}
+   */
+  getContactById: async (
+    contactId: string,
+    accessToken: string
+  ): Promise<components['schemas']['apps__external_organisation_management__schemas__ExternalOrganisationContactSchemaOut__2']> => {
+    return apiRequest({
+      url: `v1/external-organisation-contacts/${contactId}`,
+      method: 'get',
+      accessToken,
+    });
+  },
+
+  /**
+   * Updates a contact
+   * PUT /api/v1/external-organisation-contacts/{contact_id}
+   */
+  updateContact: async (
+    contactId: string,
+    contactData: components['schemas']['ExternalOrganisationContactSchemaIn'],
+    accessToken: string
+  ): Promise<components['schemas']['apps__external_organisation_management__schemas__ExternalOrganisationContactSchemaOut__2']> => {
+    return apiRequest({
+      url: `v1/external-organisation-contacts/${contactId}`,
+      method: 'put',
+      data: contactData,
+      accessToken,
+    });
+  },
+
+  /**
+   * Deletes a contact
+   * DELETE /api/v1/external-organisation-contacts/{contact_id}
+   */
+  deleteContact: async (contactId: string, accessToken: string): Promise<void> => {
+    return apiRequest<void>({
+      url: `v1/external-organisation-contacts/${contactId}`,
+      method: 'delete',
+      accessToken,
+    });
+  },
+};
+
 // Export all API services in a single object for easier imports
 export const api = {
   users: usersApi,
   roles: rolesApi,
+  externalOrganisations: externalOrganisationsApi,
+  externalOrganisationContacts: externalOrganisationContactsApi,
 };
 
 // Keep the individual exports for backward compatibility

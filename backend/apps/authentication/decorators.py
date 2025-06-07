@@ -5,6 +5,29 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+def auth_required(func):
+    """
+    Simple authentication decorator for API endpoints.
+    
+    Usage:
+        @auth_required
+        def some_endpoint(request):
+            pass
+    """
+    @wraps(func)
+    def wrapper(request, *args, **kwargs):
+        # Check for authenticated user (either via request.user or request.auth)
+        if hasattr(request, 'user') and request.user and request.user.is_authenticated:
+            # User authenticated via Django session/middleware
+            return func(request, *args, **kwargs)
+        elif hasattr(request, 'auth') and request.auth:
+            # User authenticated via JWT or other auth method
+            return func(request, *args, **kwargs)
+        else:
+            # No authentication found
+            return Response({"error": "Authentication required"}, status=401)
+    return wrapper
+
 def require_role(role_name):
     """
     Decorator to require specific role for API endpoint access.

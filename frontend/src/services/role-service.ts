@@ -1,4 +1,4 @@
-import { AppRoles } from "../auth/auth-config";
+import { AppRoles } from "@/types/auth";
 
 /**
  * Service for interacting with the Django backend for role management

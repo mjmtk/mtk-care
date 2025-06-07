@@ -1,5 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import axiosInstance from './axios-client';
+// import { tokenManager } from './token-manager'; // Removed - using simplified auth
 
 /**
  * Centralized API request utility supporting both session-based and token-based authentication.
@@ -53,9 +54,12 @@ export async function apiRequest<T = any>(options: ApiRequestOptions): Promise<T
     if (!accessToken) {
       throw new Error('apiRequest: accessToken required for token-based requests');
     }
+    
+    let tokenToUse = accessToken;
+    
     finalHeaders = {
       ...finalHeaders,
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${tokenToUse}`,
     };
   }
   // For session mode, axiosInstance is already configured with withCredentials: true

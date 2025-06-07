@@ -4,6 +4,36 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   trailingSlash: true,
   
+  // Development performance optimizations
+  ...(process.env.NODE_ENV === 'development' && {
+    // Only apply webpack config when NOT using turbo mode
+    ...(process.env.TURBOPACK !== '1' && {
+      webpack: (config, { dev, isServer }) => {
+        if (dev && !isServer) {
+          // Optimize webpack for faster development builds
+          config.optimization = {
+            ...config.optimization,
+            removeAvailableModules: false,
+            removeEmptyChunks: false,
+            splitChunks: false,
+          };
+        }
+        return config;
+      },
+    }),
+    experimental: {
+      // Turbopack configuration for when using --turbo flag
+      turbo: {
+        rules: {
+          '*.svg': {
+            loaders: ['@svgr/webpack'],
+            as: '*.js',
+          },
+        },
+      },
+    },
+  }),
+  
   async rewrites() {
     // Use local backend in development mode, production backend otherwise
     const isProduction = process.env.NODE_ENV === 'production';

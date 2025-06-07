@@ -1,4 +1,4 @@
-import { AppRoles } from "../auth/auth-config";
+import { AppRoles } from "@/types/auth";
 import { apiRequest } from './api-request';
 import type { UserProfile } from '../types/auth';
 

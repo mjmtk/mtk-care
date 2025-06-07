@@ -1,0 +1,107 @@
+[
+  {
+    "model": "referral_management.referralstatus",
+    "pk": 1,
+    "fields": {
+      "name": "PENDING",
+      "description": "Referral is pending review",
+      "is_active": true,
+      "order": 10,
+      "created_at": "2025-04-14T00:00:00Z",
+      "updated_at": "2025-04-14T00:00:00Z",
+      "created_by": "system"
+    }
+  },
+  {
+    "model": "referral_management.referralstatus",
+    "pk": 2,
+    "fields": {
+      "name": "ACCEPTED",
+      "description": "Referral has been accepted",
+      "is_active": true,
+      "order": 20,
+      "created_at": "2025-04-14T00:00:00Z",
+      "updated_at": "2025-04-14T00:00:00Z",
+      "created_by": "system"
+    }
+  },
+  {
+    "model": "referral_management.referralstatus",
+    "pk": 3,
+    "fields": {
+      "name": "COMPLETED",
+      "description": "Referral has been completed",
+      "is_active": true,
+      "order": 30,
+      "created_at": "2025-04-14T00:00:00Z",
+      "updated_at": "2025-04-14T00:00:00Z",
+      "created_by": "system"
+    }
+  },
+  {
+    "model": "referral_management.referralpriority",
+    "pk": 1,
+    "fields": {
+      "name": "LOW",
+      "description": "Low priority",
+      "is_active": true,
+      "order": 10,
+      "created_at": "2025-04-14T00:00:00Z",
+      "updated_at": "2025-04-14T00:00:00Z",
+      "created_by": "system"
+    }
+  },
+  {
+    "model": "referral_management.referralpriority",
+    "pk": 2,
+    "fields": {
+      "name": "MEDIUM",
+      "description": "Medium priority",
+      "is_active": true,
+      "order": 20,
+      "created_at": "2025-04-14T00:00:00Z",
+      "updated_at": "2025-04-14T00:00:00Z",
+      "created_by": "system"
+    }
+  },
+  {
+    "model": "referral_management.referralpriority",
+    "pk": 3,
+    "fields": {
+      "name": "HIGH",
+      "description": "High priority",
+      "is_active": true,
+      "order": 30,
+      "created_at": "2025-04-14T00:00:00Z",
+      "updated_at": "2025-04-14T00:00:00Z",
+      "created_by": "system"
+    }
+  },
+
+  {
+    "model": "referral_management.servicetype",
+    "pk": 1,
+    "fields": {
+      "name": "Mental Health",
+      "code": "mental-health",
+      "description": "Mental health services",
+      "is_active": true,
+      "created_at": "2025-04-14T00:00:00Z",
+      "updated_at": "2025-04-14T00:00:00Z",
+      "created_by": "system"
+    }
+  },
+  {
+    "model": "referral_management.servicetype",
+    "pk": 2,
+    "fields": {
+      "name": "Family Support",
+      "code": "family-support",
+      "description": "Family support services",
+      "is_active": true,
+      "created_at": "2025-04-14T00:00:00Z",
+      "updated_at": "2025-04-14T00:00:00Z",
+      "created_by": "system"
+    }
+  }
+]

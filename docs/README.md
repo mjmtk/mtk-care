@@ -61,7 +61,7 @@ docs/
 ### 💻 Development Guides
 - **Backend**: [Django Ninja Best Practices](./04-development/backend/django-ninja-best-practices.md) | [App Refactor Checklist](./04-development/backend/app-refactor-checklist.md)
 - **Frontend**: [Next.js Conventions](./04-development/frontend/nextjs-conventions.md) | [ShadCN UI Guide](./04-development/frontend/ShadCN-context.md) | [OpenAPI Types](./04-development/frontend/openapi-type-generation.md)
-- **Authentication**: [Overview](./04-development/authentication/overview.md) | [Backend Implementation](./04-development/authentication/backend-implementation.md) | [Auth Bypass Mode](./04-development/authentication/auth-bypass-mode.md) | [Azure AD Integration](./04-development/authentication/azure-ad-role-integration.md)
+- **Authentication**: [Overview](./04-development/authentication/overview.md) | [Backend Implementation](./04-development/authentication/backend-implementation.md) | [Frontend Session Management](./04-development/authentication/frontend-session-management.md) | [Auth Bypass Mode](./04-development/authentication/auth-bypass-mode.md) | [Azure AD Integration](./04-development/authentication/azure-ad-role-integration.md)
 
 ### 🚀 Deployment & Operations
 - [Azure Deployment Guide](./05-deployment/azure-deployment-guide.md) - Complete Azure setup
@@ -100,16 +100,28 @@ docs/
 ### Key Technologies
 - **Backend**: Django 4.2+ with Django Ninja API
 - **Frontend**: Next.js 14+ with TypeScript
-- **Authentication**: Azure AD with role-based access
+- **Authentication**: Azure AD with professional session management
 - **Database**: PostgreSQL (production), SQLite (development)
 - **Deployment**: Azure Web Apps
 - **Monitoring**: Azure Application Insights
+
+### 🆕 Recent Enhancements
+
+#### Professional Session Management
+- **AuthGuard Component**: Layout-level route protection with branded authentication UI
+- **SessionManager**: Proactive session timeout warnings with one-click extension
+- **Smart State Detection**: Distinguishes between session expiry vs. unauthenticated states
+- **Professional UX**: No more "Please sign in" text with visible UI shell
+- **Healthcare-Compliant**: Secure session handling with graceful timeout management
+
+**Documentation**: [Frontend Session Management](./04-development/authentication/frontend-session-management.md)
 
 ### Core Architectural Patterns
 - **API-First**: Backend provides data via REST APIs
 - **UUID Identifiers**: All models use UUIDs as primary keys
 - **Role-Based Access Control**: Permissions tied to Azure AD groups
 - **Stateless Authentication**: JWT tokens for API access
+- **Professional Session Management**: AuthGuard route protection with proactive timeout warnings
 - **Component-Based Frontend**: Reusable React components with TypeScript
 
 ### Development Workflow

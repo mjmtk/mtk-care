@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useMsal, useIsAuthenticated } from "./msal-provider";
 import { loginRequest } from "@/auth/auth-config";
-import { UserService } from "../../services/user-service";
-import { AuthService } from "../../services/auth-service";
+// import { UserService } from "../../services/user-service";
+// import { AuthService } from "../../services/auth-service";
 import { AuthDebugService } from "../../services/auth-debug-service";
 import { CurrentUser } from "@/types/user";
 import { AppRoles } from "../auth-config";
@@ -57,7 +57,8 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
     try {
       // MSAL token acquisition is now handled before this function is called.
       // This function assumes Django session is established.
-      const user = await UserService.getCurrentUser(); 
+      // const user = await UserService.getCurrentUser();
+      const user = {} as CurrentUser; // Placeholder since this auth provider is not used 
       console.log("[AuthContextProvider] refreshCurrentUser: user fetched", user);
       setCurrentUser(user);
       setGroups(user.groups || []);

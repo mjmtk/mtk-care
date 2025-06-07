@@ -20,10 +20,16 @@ Development authentication bypass configuration for local development.
 ### [Azure AD Role Integration](./azure-ad-role-integration.md)
 Azure AD integration guide with role-based permissions setup.
 
+### [Frontend Session Management](./frontend-session-management.md)
+Professional session handling with AuthGuard and SessionManager components.
+
 **Key topics across all files:**
 - System authentication architecture
 - Backend JWT token validation
 - Frontend NextAuth.js integration
+- Professional session timeout handling
+- Route protection with AuthGuard
+- Proactive session warnings
 - Azure AD setup and configuration
 - Development bypass mode
 - Role mapping and permissions
@@ -44,4 +50,6 @@ Azure AD integration guide with role-based permissions setup.
 ### Key Concepts
 - **JWT Tokens**: Used for stateless authentication
 - **Role-Based Access**: Permissions tied to Azure AD groups
-- **Session Management**: Handled by NextAuth.js on frontend
+- **Session Management**: Professional UI with AuthGuard and SessionManager
+- **Route Protection**: Layout-level authentication guards
+- **Session Timeouts**: Proactive warnings and graceful handling

@@ -1,0 +1,126 @@
+[
+  {
+    "model": "optionlists.optionlist",
+    "pk": "client-statuses",
+    "fields": {
+      "name": "Client Statuses",
+      "slug": "client-statuses",
+      "description": "Available client status options",
+      "is_active": true,
+      "created_at": "2025-01-06T10:00:00Z",
+      "updated_at": "2025-01-06T10:00:00Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": "client-status-active",
+    "fields": {
+      "option_list": "client-statuses",
+      "value": "active",
+      "label": "Active",
+      "description": "Client is actively receiving services",
+      "sort_order": 1,
+      "is_active": true,
+      "created_at": "2025-01-06T10:00:00Z",
+      "updated_at": "2025-01-06T10:00:00Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": "client-status-inactive",
+    "fields": {
+      "option_list": "client-statuses",
+      "value": "inactive",
+      "label": "Inactive",
+      "description": "Client is not currently receiving services",
+      "sort_order": 2,
+      "is_active": true,
+      "created_at": "2025-01-06T10:00:00Z",
+      "updated_at": "2025-01-06T10:00:00Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": "client-status-pending",
+    "fields": {
+      "option_list": "client-statuses",
+      "value": "pending",
+      "label": "Pending",
+      "description": "Client application is pending approval",
+      "sort_order": 3,
+      "is_active": true,
+      "created_at": "2025-01-06T10:00:00Z",
+      "updated_at": "2025-01-06T10:00:00Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": "client-status-discharged",
+    "fields": {
+      "option_list": "client-statuses",
+      "value": "discharged",
+      "label": "Discharged",
+      "description": "Client has been discharged from services",
+      "sort_order": 4,
+      "is_active": true,
+      "created_at": "2025-01-06T10:00:00Z",
+      "updated_at": "2025-01-06T10:00:00Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": "language-english",
+    "fields": {
+      "option_list": "languages",
+      "value": "en",
+      "label": "English",
+      "description": "English language",
+      "sort_order": 1,
+      "is_active": true,
+      "created_at": "2025-01-06T10:00:00Z",
+      "updated_at": "2025-01-06T10:00:00Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": "language-maori",
+    "fields": {
+      "option_list": "languages",
+      "value": "mi",
+      "label": "Te Reo Māori",
+      "description": "Māori language",
+      "sort_order": 2,
+      "is_active": true,
+      "created_at": "2025-01-06T10:00:00Z",
+      "updated_at": "2025-01-06T10:00:00Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": "language-mandarin",
+    "fields": {
+      "option_list": "languages",
+      "value": "zh",
+      "label": "Mandarin",
+      "description": "Mandarin Chinese",
+      "sort_order": 3,
+      "is_active": true,
+      "created_at": "2025-01-06T10:00:00Z",
+      "updated_at": "2025-01-06T10:00:00Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": "language-spanish",
+    "fields": {
+      "option_list": "languages",
+      "value": "es",
+      "label": "Spanish",
+      "description": "Spanish language",
+      "sort_order": 4,
+      "is_active": true,
+      "created_at": "2025-01-06T10:00:00Z",
+      "updated_at": "2025-01-06T10:00:00Z"
+    }
+  }
+]

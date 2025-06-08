@@ -39,7 +39,7 @@ fi
 
 # Step 1: Update package index
 echo -e "\n${BLUE}Step 1: Updating package index...${NC}"
-apt update
+apt update && apt upgrade -y
 
 # Step 2: Install Docker
 echo -e "\n${BLUE}Step 2: Installing Docker...${NC}"
@@ -72,15 +72,40 @@ if command_exists docker-compose; then
     docker-compose --version
 else
     echo "Installing Docker Compose..."
-    apt install -y docker-compose-plugin
     
-    # Create symlink for backward compatibility
-    if [ ! -f /usr/local/bin/docker-compose ]; then
-        ln -sf /usr/libexec/docker/cli-plugins/docker-compose /usr/local/bin/docker-compose 2>/dev/null || true
+    # Try different package names for Ubuntu 24.04
+    if apt install -y docker-compose-v2 2>/dev/null; then
+        echo -e "${GREEN}✓${NC} Docker Compose v2 installed"
+        # Create symlink for backward compatibility
+        if [ ! -f /usr/local/bin/docker-compose ] && [ -f /usr/bin/docker-compose ]; then
+            ln -sf /usr/bin/docker-compose /usr/local/bin/docker-compose 2>/dev/null || true
+        fi
+    elif apt install -y docker-compose-plugin 2>/dev/null; then
+        echo -e "${GREEN}✓${NC} Docker Compose plugin installed"
+        # Create symlink for backward compatibility
+        if [ ! -f /usr/local/bin/docker-compose ]; then
+            ln -sf /usr/libexec/docker/cli-plugins/docker-compose /usr/local/bin/docker-compose 2>/dev/null || true
+        fi
+    else
+        echo "Plugin not available, trying standalone docker-compose..."
+        # Fallback to standalone installation (older Ubuntu versions)
+        if command -v curl &> /dev/null; then
+            COMPOSE_VERSION=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep -Po '"tag_name": "\K.*?(?=")')
+            curl -L "https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            chmod +x /usr/local/bin/docker-compose
+            echo -e "${GREEN}✓${NC} Docker Compose standalone installed"
+        else
+            # Last fallback - try apt package
+            apt install -y docker-compose 2>/dev/null || {
+                echo -e "${RED}✗${NC} Failed to install Docker Compose"
+                echo "Please install manually: https://docs.docker.com/compose/install/"
+                exit 1
+            }
+        fi
     fi
     
     echo -e "${GREEN}✓${NC} Docker Compose installed successfully"
-    docker compose version || docker-compose --version
+    docker compose version 2>/dev/null || docker-compose --version 2>/dev/null || echo "Version check failed but installation completed"
 fi
 
 # Step 4: Configure Docker permissions (if not root user)

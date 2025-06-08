@@ -4,16 +4,18 @@ This file provides important context for AI assistants (like Claude) working on 
 
 ## Project Overview
 
-MTK Care is a healthcare task management system with:
+MTK Care is a case management system for community services organizations with:
 - **Frontend**: Next.js application deployed to Azure Web App (`mtk-care`)
 - **Backend**: Django application deployed to Azure Web App (`mtkcare-backend`)
 - **Authentication**: Azure AD with role-based access control
+
+The system supports community services including counselling for alcohol and other drugs (AOD), mental health, youth services, and family violence support. Currently being developed for the first client in New Zealand, run by local Māori people.
 
 ## Critical Information
 
 ### API Versioning Standard (IMPORTANT)
 
-**All API endpoints use `/api/v1/` prefix**. This was decided on January 6, 2025, to resolve inconsistencies.
+**All API endpoints use `/api/v1/` prefix**. This was decided on June 6, 2025, to resolve inconsistencies.
 
 - Backend serves all endpoints under `/api/v1/`
 - Frontend must include `v1/` in all API calls
@@ -38,7 +40,7 @@ Production requires these critical environment variables:
 ### Common Issues and Solutions
 
 1. **404 errors on API calls**: Check that frontend is using `v1/` prefix
-2. **CORS errors**: Ensure `CORS_ALLOWED_ORIGINS` includes frontend URL
+2. **CORS errors**: Ensure `CORS_ALLOWED_ORIGINS` includes frontend URL. Let Azure setup handle it - remove middleware
 3. **Authentication failures**: Verify Azure AD configuration matches between frontend and backend
 
 ### Development Commands
@@ -72,10 +74,10 @@ Run these before committing:
 ## File Structure
 
 - `/frontend`: Next.js application
-- `/backend`: Django application  
+- `/backend`: Django application
 - `/docs`: Technical documentation
 - `/.github/workflows`: CI/CD pipelines
 
 ## Recent Changes
 
-- January 6, 2025: Standardized API versioning to use `/api/v1/` prefix consistently
+- June 6, 2025: Standardized API versioning to use `/api/v1/` prefix consistently

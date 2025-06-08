@@ -42,3 +42,12 @@ tasks/
 
 /backend/reference-projects/**
 /frontend/reference-projects/**
+# Docker development environment
+docker/envs/
+docker/volumes/
+.developer-config
+docker-compose.override.yml
+
+# Code-server configuration
+docker/volumes/code-server/
+.vscode/

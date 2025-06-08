@@ -63,7 +63,7 @@ This project is a full-stack application featuring a Django backend and a Next.j
     NEXTAUTH_SECRET="generate_a_strong_random_secret" # e.g., openssl rand -hex 32
 
     # Custom scope for backend API
-    NEXT_PUBLIC_AZURE_AD_BACKEND_API_SCOPE="api://YOUR_BACKEND_APP_REG_CLIENT_ID/your_scope_name" 
+    NEXT_PUBLIC_AZURE_AD_BACKEND_API_SCOPE="api://YOUR_BACKEND_APP_REG_CLIENT_ID/your_scope_name"
     # e.g., api://xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/access_as_user
 
     # Backend API URL

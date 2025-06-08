@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'frontend/**'  # Only trigger on changes within the frontend directory
+      - '.github/workflows/main_mtk-care.yml'  # Also trigger if the workflow file itself changes
   workflow_dispatch:
 
 jobs:

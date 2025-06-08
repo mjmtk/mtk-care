@@ -15,7 +15,12 @@ echo "================================================"
 
 # Check if running as root
 if [[ $EUID -eq 0 ]]; then
-   echo -e "${RED}This script should not be run as root. Run as a regular user with sudo privileges.${NC}"
+   echo -e "${RED}This script should not be run as root.${NC}"
+   echo -e "${YELLOW}If you're logged in as root on a VPS, use: ./install-docker-ubuntu-root.sh instead${NC}"
+   echo -e "Or create a non-root user first:"
+   echo -e "  adduser developer"
+   echo -e "  usermod -aG sudo developer"
+   echo -e "  su - developer"
    exit 1
 fi
 

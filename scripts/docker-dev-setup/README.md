@@ -2,6 +2,18 @@
 
 This directory contains scripts to set up a complete Dockerized development environment for the MTK Care application.
 
+## Prerequisites
+
+If Docker is not installed on your system (common on fresh VPS installations):
+
+```bash
+# For Ubuntu/Debian systems - install Docker first
+./install-docker-ubuntu.sh
+
+# Then log out and back in, or run:
+newgrp docker
+```
+
 ## Quick Start
 
 ```bash
@@ -28,6 +40,13 @@ The main script that runs all other scripts in sequence. Use this for complete s
 - `--help`, `-h`: Show help message
 
 ### 2. Individual Scripts (Run Independently)
+
+#### `install-docker-ubuntu.sh`
+Installs Docker and Docker Compose on Ubuntu/Debian systems:
+- Installs docker.io package and docker-compose plugin
+- Adds user to docker group for sudo-less operation
+- Installs additional tools (jq, curl, git)
+- Provides security recommendations
 
 #### `check-prerequisites.sh`
 Verifies system requirements:

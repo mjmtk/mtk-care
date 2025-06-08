@@ -136,9 +136,18 @@ if [ "$ALL_CHECKS_PASSED" = true ]; then
     exit 0
 else
     echo -e "${RED}✗ Some prerequisites are not met. Please install missing components.${NC}"
-    echo -e "\nInstallation hints:"
+    echo -e "\nInstallation commands for Ubuntu/Debian:"
+    echo "- Docker: sudo apt update && sudo apt install docker.io"
+    echo "- Docker Compose: sudo apt install docker-compose-plugin"
+    echo "- Add user to docker group: sudo usermod -aG docker \$USER && newgrp docker"
+    echo "- jq: sudo apt install jq"
+    echo "- curl: sudo apt install curl"
+    echo ""
+    echo "Alternative Docker installation:"
+    echo "- Via snap: sudo snap install docker"
+    echo ""
+    echo "For other distributions:"
     echo "- Docker: https://docs.docker.com/get-docker/"
     echo "- Docker Compose: https://docs.docker.com/compose/install/"
-    echo "- jq: sudo apt-get install jq (Ubuntu) or brew install jq (macOS)"
     exit 1
 fi

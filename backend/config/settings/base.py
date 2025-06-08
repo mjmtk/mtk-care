@@ -228,7 +228,7 @@ JWT_AUTH = {
 }
 
 # Session configuration
-SESSION_COOKIE_AGE = 14400  # 4 hours
+SESSION_COOKIE_AGE = 28800  # 8 hours (matching frontend expectations)
 SESSION_COOKIE_SECURE = not DEBUG
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Lax'

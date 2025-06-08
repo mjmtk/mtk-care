@@ -24,6 +24,11 @@ jobs:
 
       - name: npm install and build
         working-directory: ./frontend
+        env:
+          NEXT_PUBLIC_PROD_API_BASE_URL: https://mtkcare-backend-abbffge3c9gqcqhr.newzealandnorth-01.azurewebsites.net
+          NEXT_PUBLIC_AZURE_AD_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_AZURE_AD_CLIENT_ID }}
+          NEXT_PUBLIC_AZURE_AD_TENANT_ID: ${{ secrets.NEXT_PUBLIC_AZURE_AD_TENANT_ID }}
+          NEXT_PUBLIC_AZURE_AD_REDIRECT_URI: https://mtk-care.azurewebsites.net
         run: |
           npm ci
           npm run build

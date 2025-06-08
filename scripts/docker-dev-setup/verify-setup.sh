@@ -66,7 +66,7 @@ check_container_health() {
 test_database_connection() {
     echo -n "Testing database connection... "
     
-    if docker-compose -f "$PROJECT_ROOT/docker-compose.dev.yml" exec -T postgres pg_isready -U "${DB_USER:-mtk_dev}" > /dev/null 2>&1; then
+    if docker compose -f "$PROJECT_ROOT/docker-compose.dev.yml" exec -T postgres pg_isready -U "${DB_USER:-mtk_dev}" > /dev/null 2>&1; then
         echo -e "${GREEN}✓${NC} Connected"
         return 0
     else
@@ -80,7 +80,7 @@ test_database_connection() {
 test_redis_connection() {
     echo -n "Testing Redis connection... "
     
-    if docker-compose -f "$PROJECT_ROOT/docker-compose.dev.yml" exec -T redis redis-cli ping > /dev/null 2>&1; then
+    if docker compose -f "$PROJECT_ROOT/docker-compose.dev.yml" exec -T redis redis-cli ping > /dev/null 2>&1; then
         echo -e "${GREEN}✓${NC} Connected"
         return 0
     else
@@ -170,7 +170,7 @@ echo -e "\n${BLUE}7. Testing Django management:${NC}"
 echo "-----------------------------"
 
 echo -n "Running Django check... "
-if docker-compose -f "$PROJECT_ROOT/docker-compose.dev.yml" exec -T backend python manage.py check > /dev/null 2>&1; then
+if docker compose -f "$PROJECT_ROOT/docker-compose.dev.yml" exec -T backend python manage.py check > /dev/null 2>&1; then
     echo -e "${GREEN}✓${NC} No issues found"
 else
     echo -e "${YELLOW}⚠${NC}  Some warnings (non-critical)"
@@ -188,11 +188,11 @@ echo -e "API Docs:        ${GREEN}http://localhost:8000/api/docs/${NC}"
 # Step 9: Display logs location
 echo -e "\n${BLUE}9. Useful commands:${NC}"
 echo "-------------------"
-echo "View logs:        docker-compose -f docker-compose.dev.yml logs -f [service]"
-echo "Django shell:     docker-compose -f docker-compose.dev.yml exec backend python manage.py shell"
-echo "PostgreSQL:       docker-compose -f docker-compose.dev.yml exec postgres psql -U \${DB_USER} \${DB_NAME}"
-echo "Stop services:    docker-compose -f docker-compose.dev.yml down"
-echo "Restart service:  docker-compose -f docker-compose.dev.yml restart [service]"
+echo "View logs:        docker compose -f docker-compose.dev.yml logs -f [service]"
+echo "Django shell:     docker compose -f docker-compose.dev.yml exec backend python manage.py shell"
+echo "PostgreSQL:       docker compose -f docker-compose.dev.yml exec postgres psql -U \${DB_USER} \${DB_NAME}"
+echo "Stop services:    docker compose -f docker-compose.dev.yml down"
+echo "Restart service:  docker compose -f docker-compose.dev.yml restart [service]"
 
 # Load and use helper functions
 if [ -f "$PROJECT_ROOT/scripts/docker-dev-setup/docker-helpers.sh" ]; then
@@ -216,9 +216,9 @@ if [ "$VERIFICATION_PASSED" = true ]; then
 else
     echo -e "${RED}✗ Some checks failed. Please review the output above.${NC}"
     echo -e "\nTroubleshooting tips:"
-    echo "1. Check Docker logs: docker-compose -f docker-compose.dev.yml logs"
-    echo "2. Ensure all containers are running: docker-compose -f docker-compose.dev.yml ps"
-    echo "3. Try restarting services: docker-compose -f docker-compose.dev.yml restart"
+    echo "1. Check Docker logs: docker compose -f docker-compose.dev.yml logs"
+    echo "2. Ensure all containers are running: docker compose -f docker-compose.dev.yml ps"
+    echo "3. Try restarting services: docker compose -f docker-compose.dev.yml restart"
     echo "4. Check environment files exist in docker/envs/"
     
     exit 1

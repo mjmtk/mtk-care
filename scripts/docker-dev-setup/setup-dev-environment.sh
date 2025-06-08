@@ -173,7 +173,7 @@ cd "$PROJECT_ROOT"
 
 if [ "$SKIP_BUILD" != "true" ]; then
     echo "Building Docker images (this may take a few minutes)..."
-    if docker-compose -f docker-compose.dev.yml build; then
+    if docker compose -f docker-compose.dev.yml build; then
         echo -e "${GREEN}✓ Docker images built${NC}"
     else
         handle_error "Docker build"
@@ -183,7 +183,7 @@ else
 fi
 
 echo "Starting services..."
-if docker-compose -f docker-compose.dev.yml up -d; then
+if docker compose -f docker-compose.dev.yml up -d; then
     echo -e "${GREEN}✓ Services started${NC}"
     
     # Wait for services to be ready
@@ -191,7 +191,7 @@ if docker-compose -f docker-compose.dev.yml up -d; then
     for i in {1..30}; do
         echo -n "."
         sleep 2
-        if docker-compose -f docker-compose.dev.yml exec -T backend curl -s http://localhost:8000/api/v1/health/ > /dev/null 2>&1; then
+        if docker compose -f docker-compose.dev.yml exec -T backend curl -s http://localhost:8000/api/v1/health/ > /dev/null 2>&1; then
             echo -e "\n${GREEN}✓ Services are ready${NC}"
             break
         fi

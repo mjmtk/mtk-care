@@ -24,7 +24,7 @@ fi
 
 # Function to run Django management commands
 run_django_command() {
-    docker-compose -f "$PROJECT_ROOT/docker-compose.dev.yml" exec -T backend python manage.py "$@"
+    docker compose -f "$PROJECT_ROOT/docker-compose.dev.yml" exec -T backend python manage.py "$@"
 }
 
 # Function to check if container is running
@@ -44,7 +44,7 @@ wait_for_db() {
     local attempt=1
     
     while [ $attempt -le $max_attempts ]; do
-        if docker-compose -f "$PROJECT_ROOT/docker-compose.dev.yml" exec -T postgres pg_isready -U "${DB_USER:-mtk_dev}" > /dev/null 2>&1; then
+        if docker compose -f "$PROJECT_ROOT/docker-compose.dev.yml" exec -T postgres pg_isready -U "${DB_USER:-mtk_dev}" > /dev/null 2>&1; then
             echo -e "${GREEN}✓${NC} Database is ready!"
             return 0
         fi
@@ -63,7 +63,7 @@ echo "------------------------------"
 
 if ! check_container "mtk_backend" || ! check_container "mtk_postgres"; then
     echo -e "${YELLOW}⚠${NC}  Containers not running. Starting services..."
-    docker-compose -f "$PROJECT_ROOT/docker-compose.dev.yml" up -d postgres redis backend
+    docker compose -f "$PROJECT_ROOT/docker-compose.dev.yml" up -d postgres redis backend
     sleep 5
 fi
 
@@ -102,7 +102,7 @@ FIXTURES=(
 
 for fixture_pattern in "${FIXTURES[@]}"; do
     # Check if fixtures exist
-    if docker-compose -f "$PROJECT_ROOT/docker-compose.dev.yml" exec -T backend bash -c "ls /app/apps/$fixture_pattern 2>/dev/null" > /dev/null; then
+    if docker compose -f "$PROJECT_ROOT/docker-compose.dev.yml" exec -T backend bash -c "ls /app/apps/$fixture_pattern 2>/dev/null" > /dev/null; then
         echo "Loading fixtures: $fixture_pattern"
         if run_django_command loaddata "apps/$fixture_pattern"; then
             echo -e "${GREEN}✓${NC} Loaded $fixture_pattern"
@@ -252,7 +252,7 @@ echo "-------------------------------"
 
 # Get database stats
 echo "Database statistics:"
-docker-compose -f "$PROJECT_ROOT/docker-compose.dev.yml" exec -T postgres psql -U "${DB_USER:-mtk_dev}" -d "${DB_NAME:-mtk_care_dev}" -c "\dt" | grep -E "apps_|auth_|django_" | wc -l | xargs -I {} echo "  Tables created: {}"
+docker compose -f "$PROJECT_ROOT/docker-compose.dev.yml" exec -T postgres psql -U "${DB_USER:-mtk_dev}" -d "${DB_NAME:-mtk_care_dev}" -c "\dt" | grep -E "apps_|auth_|django_" | wc -l | xargs -I {} echo "  Tables created: {}"
 
 # Summary
 echo -e "\n${GREEN}Database initialization complete!${NC}"

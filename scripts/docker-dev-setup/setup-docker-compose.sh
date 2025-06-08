@@ -88,8 +88,6 @@ echo -e "${GREEN}✓${NC} Created Dockerfiles"
 echo -e "\n${BLUE}Creating docker-compose.dev.yml...${NC}"
 
 cat > "$PROJECT_ROOT/docker-compose.dev.yml" << 'EOF'
-version: '3.8'
-
 services:
   # PostgreSQL Database
   postgres:
@@ -228,8 +226,6 @@ cat > "$PROJECT_ROOT/docker-compose.override.yml.template" << 'EOF'
 # docker-compose.override.yml
 # This file is for developer-specific overrides
 # Copy to docker-compose.override.yml and customize
-
-version: '3.8'
 
 services:
   backend:

@@ -1,59 +1,93 @@
-# MTK Care Docker Development Environment Setup
+# MTK Care Development Environment Setup
 
-This directory contains scripts to set up a complete Dockerized development environment for the MTK Care application.
+This directory contains scripts to set up development environments for the MTK Care application. Choose between **Docker** or **Native** development based on your needs.
 
-## Prerequisites
+## 🚀 Quick Start Guide
 
-If Docker is not installed on your system (common on fresh VPS installations):
-
+### Option A: Docker Development (Isolated, Containerized)
 ```bash
-# For Ubuntu/Debian systems - install Docker first
-./install-docker-ubuntu.sh
+# 1. Install Docker (if needed)
+./install-docker-ubuntu-root.sh  # If logged in as root
+# OR
+./install-docker-ubuntu.sh       # If using sudo user
 
-# Then log out and back in, or run:
-newgrp docker
-```
-
-## Quick Start
-
-```bash
-# Full setup with prompts
+# 2. Run full Docker setup
 ./setup-dev-environment.sh
 
-# Quick demo setup (insecure credentials)
-./setup-dev-environment.sh --demo --yes
-
-# Setup without rebuilding Docker images
-./setup-dev-environment.sh --skip-build
+# 3. Access your applications
+# Frontend: http://localhost:3000
+# Backend: http://localhost:8000
+# Web IDE: http://localhost:8080
 ```
 
-## Scripts Overview
+### Option B: Native Development (Direct on VPS, like traditional setup)
+```bash
+# 1. Install Docker first (still needed for some services)
+./install-docker-ubuntu-root.sh  # If logged in as root
 
-### 1. `setup-dev-environment.sh` (Main Orchestrator)
-The main script that runs all other scripts in sequence. Use this for complete setup.
+# 2. Set up native development environment
+./setup-native-development.sh
 
-**Options:**
+# 3. Start your development servers
+./start-dev.sh                   # Starts both frontend & backend
+# OR individually:
+./start-backend.sh               # Django on port 8000
+./start-frontend.sh              # Next.js on port 3000
+```
+
+## 🤔 Which Option Should I Choose?
+
+| Feature | Docker Development | Native Development |
+|---------|-------------------|-------------------|
+| **Isolation** | ✅ Fully isolated containers | ❌ Shares VPS system |
+| **Setup Complexity** | 🟡 Medium (Docker required) | 🟢 Simple (traditional) |
+| **Performance** | 🟡 Good (container overhead) | ✅ Best (native speed) |
+| **Familiarity** | 🟡 Docker knowledge needed | ✅ Traditional dev workflow |
+| **Dependencies** | ✅ Contained in images | ❌ Installed on system |
+| **Port Conflicts** | ✅ Easy to change | 🟡 Manual management |
+| **Database** | ✅ PostgreSQL in container | 🟡 System PostgreSQL |
+| **Cleanup** | ✅ `docker compose down` | 🟡 Manual service management |
+
+**Recommendation**: Use **Native Development** if you want a traditional development experience similar to local machine development.
+
+## 📋 Script Reference
+
+### Main Setup Scripts (Choose One)
+
+| Script | Purpose | When to Use |
+|--------|---------|-------------|
+| `setup-dev-environment.sh` | **Docker Development** | Want containerized, isolated environment |
+| `setup-native-development.sh` | **Native Development** | Want traditional development workflow |
+
+### Supporting Scripts
+
+| Script | Purpose | Required For |
+|--------|---------|-------------|
+| `install-docker-ubuntu-root.sh` | Install Docker (root user) | Both setups |
+| `install-docker-ubuntu.sh` | Install Docker (sudo user) | Both setups |
+| `check-prerequisites.sh` | Verify system requirements | Docker setup |
+| `verify-setup.sh` | Test installation | Docker setup |
+
+### Individual Component Scripts (Advanced)
+
+| Script | Purpose | Standalone Use |
+|--------|---------|---------------|
+| `setup-environment-vars.sh` | Create environment files | ✅ Yes |
+| `setup-docker-compose.sh` | Docker Compose config | ✅ Yes |
+| `setup-code-server.sh` | Web IDE setup | ✅ Yes |
+| `initialize-database.sh` | Database setup | ✅ Yes |
+
+### Script Options
+
+#### `setup-dev-environment.sh` Options:
 - `--skip-prereq`: Skip prerequisite checks
 - `--skip-build`: Skip Docker image building
 - `--demo`: Use demo credentials (insecure, for testing only)
 - `--yes`, `-y`: Auto-confirm all prompts
 - `--help`, `-h`: Show help message
 
-### 2. Individual Scripts (Run Independently)
-
-#### `install-docker-ubuntu.sh`
-Installs Docker and Docker Compose on Ubuntu/Debian systems:
-- Installs docker.io package and docker-compose plugin
-- Adds user to docker group for sudo-less operation
-- Installs additional tools (jq, curl, git)
-- Provides security recommendations
-
-#### `check-prerequisites.sh`
-Verifies system requirements:
-- Docker and Docker Compose installation
-- Required ports availability (3000, 8000, 5432, 6379)
-- Disk space (5GB minimum)
-- Memory requirements (4GB recommended)
+#### `setup-native-development.sh` Options:
+- No additional options needed
 
 #### `setup-environment-vars.sh`
 Creates environment configuration files:

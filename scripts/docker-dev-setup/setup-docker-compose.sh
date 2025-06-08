@@ -268,37 +268,37 @@ PROJECT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." &> /dev/null && pwd
 
 # Function to run Django management commands
 django_manage() {
-    docker-compose -f "$PROJECT_ROOT/docker-compose.dev.yml" exec backend python manage.py "$@"
+    docker compose -f "$PROJECT_ROOT/docker-compose.dev.yml" exec backend python manage.py "$@"
 }
 
 # Function to access Django shell
 django_shell() {
-    docker-compose -f "$PROJECT_ROOT/docker-compose.dev.yml" exec backend python manage.py shell
+    docker compose -f "$PROJECT_ROOT/docker-compose.dev.yml" exec backend python manage.py shell
 }
 
 # Function to run backend tests
 backend_test() {
-    docker-compose -f "$PROJECT_ROOT/docker-compose.dev.yml" exec backend python manage.py test "$@"
+    docker compose -f "$PROJECT_ROOT/docker-compose.dev.yml" exec backend python manage.py test "$@"
 }
 
 # Function to access PostgreSQL
 psql_shell() {
-    docker-compose -f "$PROJECT_ROOT/docker-compose.dev.yml" exec postgres psql -U ${DB_USER:-mtk_dev} ${DB_NAME:-mtk_care_dev}
+    docker compose -f "$PROJECT_ROOT/docker-compose.dev.yml" exec postgres psql -U ${DB_USER:-mtk_dev} ${DB_NAME:-mtk_care_dev}
 }
 
 # Function to view logs
 dev_logs() {
-    docker-compose -f "$PROJECT_ROOT/docker-compose.dev.yml" logs -f "$@"
+    docker compose -f "$PROJECT_ROOT/docker-compose.dev.yml" logs -f "$@"
 }
 
 # Function to restart a service
 dev_restart() {
-    docker-compose -f "$PROJECT_ROOT/docker-compose.dev.yml" restart "$@"
+    docker compose -f "$PROJECT_ROOT/docker-compose.dev.yml" restart "$@"
 }
 
 # Function to rebuild a service
 dev_rebuild() {
-    docker-compose -f "$PROJECT_ROOT/docker-compose.dev.yml" up -d --build "$@"
+    docker compose -f "$PROJECT_ROOT/docker-compose.dev.yml" up -d --build "$@"
 }
 
 # Print available commands
@@ -389,4 +389,5 @@ echo -e "  - ${BLUE}frontend/Dockerfile.dev${NC}"
 echo -e "  - ${BLUE}docker/nginx/nginx.dev.conf${NC} (optional)"
 echo -e "  - ${BLUE}scripts/docker-dev-setup/docker-helpers.sh${NC}"
 echo -e "\nTo start the development environment, run:"
-echo -e "  ${YELLOW}docker-compose -f docker-compose.dev.yml up${NC}"
+echo -e "  ${YELLOW}docker compose -f docker-compose.dev.yml up${NC}"
+echo -e "  OR (legacy): ${YELLOW}docker-compose -f docker-compose.dev.yml up${NC}"

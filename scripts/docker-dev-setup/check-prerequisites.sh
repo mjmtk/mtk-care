@@ -71,7 +71,17 @@ echo "------------------------------"
 
 # Check for required commands
 check_command "docker" "" "docker --version"
-check_command "docker-compose" "" "docker-compose --version"
+
+# Check for docker-compose (handle both legacy and modern syntax)
+if command -v docker-compose &> /dev/null; then
+    echo -e "${GREEN}✓${NC} docker-compose is installed: $(docker-compose --version)"
+elif docker compose version &> /dev/null; then
+    echo -e "${GREEN}✓${NC} docker compose is available: $(docker compose version)"
+else
+    echo -e "${RED}✗${NC} docker-compose is not installed"
+    ALL_CHECKS_PASSED=false
+fi
+
 check_command "git" "" "git --version"
 check_command "curl" "" "curl --version"
 check_command "jq" "" "jq --version"

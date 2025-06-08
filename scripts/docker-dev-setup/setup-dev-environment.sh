@@ -16,6 +16,9 @@ NC='\033[0m' # No Color
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 PROJECT_ROOT="$( cd "$SCRIPT_DIR/../.." &> /dev/null && pwd )"
 
+# Make all scripts executable (in case they weren't committed with execute permissions)
+find "$SCRIPT_DIR" -name "*.sh" -type f -exec chmod +x {} \;
+
 # Banner
 echo -e "${CYAN}"
 echo "╔══════════════════════════════════════════════════════════════╗"

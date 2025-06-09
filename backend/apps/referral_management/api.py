@@ -20,7 +20,7 @@ from apps.authentication.decorators import auth_required
 
 router = Router()
 
-@router.get("/", response=ReferralListResponse, auth=auth_required)
+@router.get("", response=ReferralListResponse, auth=auth_required)
 def list_referrals(request: HttpRequest, page: int = 1, limit: int = 20, 
                   status: Optional[str] = None, priority: Optional[str] = None, 
                   client_type: Optional[str] = None):
@@ -52,7 +52,7 @@ def list_referrals(request: HttpRequest, page: int = 1, limit: int = 20,
         'total_pages': total_pages
     }
 
-@router.post("/", response=ReferralSchemaOut, auth=auth_required)
+@router.post("", response=ReferralSchemaOut, auth=auth_required)
 def create_referral(request: HttpRequest, payload: ReferralSchemaIn):
     """Create a new referral."""
     from django.contrib.auth import get_user_model
@@ -73,6 +73,16 @@ def create_referral(request: HttpRequest, payload: ReferralSchemaIn):
         )
     
     return ReferralService.create_referral(payload.dict(), user)
+
+@router.get("/batch-dropdowns", response=ReferralBatchDropdownsSchemaOut, auth=auth_required)
+def get_batch_dropdowns(request: HttpRequest):
+    """Get all dropdown options needed for referral forms."""
+    return {
+        "referral_types": OptionListService.get_active_items_for_list_slug('referral-types'),
+        "referral_statuses": OptionListService.get_active_items_for_list_slug('referral-statuses'),
+        "referral_priorities": OptionListService.get_active_items_for_list_slug('referral-priorities'),
+        "referral_service_types": OptionListService.get_active_items_for_list_slug('referral-service-types'),
+    }
 
 @router.get("/{referral_id}", response=ReferralSchemaOut, auth=auth_required)
 def get_referral(request: HttpRequest, referral_id: UUID):
@@ -138,13 +148,3 @@ def delete_referral(request: HttpRequest, referral_id: UUID):
     referral = get_object_or_404(Referral, id=referral_id)
     ReferralService.delete_referral(referral)
     return {"detail": "Referral deleted successfully"}
-
-@router.get("/batch-dropdowns/", response=ReferralBatchDropdownsSchemaOut, auth=auth_required)
-def get_batch_dropdowns(request: HttpRequest):
-    """Get all dropdown options needed for referral forms."""
-    return {
-        "referral_types": OptionListService.get_active_items_for_list_slug('referral-types'),
-        "referral_statuses": OptionListService.get_active_items_for_list_slug('referral-statuses'),
-        "referral_priorities": OptionListService.get_active_items_for_list_slug('referral-priorities'),
-        "referral_service_types": OptionListService.get_active_items_for_list_slug('referral-service-types'),
-    }

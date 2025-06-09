@@ -12,5 +12,5 @@ export interface ServiceProgramDropdownsResponse {
 }
 
 export const fetchServiceProgramDropdowns = async (): Promise<ServiceProgramDropdownsResponse> => {
-  return apiRequest<ServiceProgramDropdownsResponse>({ url: 'service-programs/dropdowns/' });
+  return apiRequest<ServiceProgramDropdownsResponse>({ url: 'service-programs/dropdowns' });
 };

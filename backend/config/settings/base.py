@@ -3,7 +3,7 @@ from pathlib import Path
 import environ
 
 # Build paths
-BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Environment variables
 env = environ.Env(DJANGO_DEBUG=(bool, False))
@@ -17,12 +17,17 @@ if env_file.exists():
 SECRET_KEY = env('DJANGO_SECRET_KEY')
 DEBUG = env('DJANGO_DEBUG', default=True)
 ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=[
-    'localhost', 
-    '127.0.0.1', 
-    '*.gitpod.io', 
+    'localhost',
+    '127.0.0.1',
+    '*.gitpod.io',
     '*.github.dev',
     '*.codespaces.github.dev'
 ])
+
+# Disable automatic slash appending for REST API consistency
+# This prevents Django from trying to redirect /api/v1/users to /api/v1/users/
+# which breaks POST/PUT requests and conflicts with our API standards
+APPEND_SLASH = False
 
 # Application definition
 DJANGO_APPS = [
@@ -43,7 +48,7 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     'apps.users',          # Defines AUTH_USER_MODEL
     'apps.common',         # Depends on AUTH_USER_MODEL
-    'apps.authentication', 
+    'apps.authentication',
     'apps.tasks',
     'apps.notifications',
     'apps.audit',
@@ -219,7 +224,7 @@ AZURE_AD = {
      'CLIENT_ID': env('AZURE_AD_CLIENT_ID', default=''),
      'CLIENT_SECRET': env('AZURE_AD_CLIENT_SECRET', default=''),
 }
-# JWT Configuration  
+# JWT Configuration
 JWT_AUTH = {
      'ALGORITHM': 'RS256',
      'AUDIENCE': f"api://{AZURE_AD['CLIENT_ID']}", # Match Application ID URI format

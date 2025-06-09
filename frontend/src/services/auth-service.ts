@@ -17,7 +17,7 @@ export class AuthService {
    */
   static async getUserProfile(): Promise<UserProfile> {
     try {
-      const data = await apiRequest<UserProfile>({ url: 'user/me/' });
+      const data = await apiRequest<UserProfile>({ url: 'user/me' });
       // Optionally, add runtime validation here if data is not strictly UserProfile
       return data;
     } catch (error: any) {

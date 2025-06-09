@@ -27,8 +27,8 @@ export class ReferralService {
     }
 
     const url = queryParams.toString() 
-      ? `${this.BASE_PATH}/?${queryParams.toString()}`
-      : `${this.BASE_PATH}/`;
+      ? `${this.BASE_PATH}?${queryParams.toString()}`
+      : `${this.BASE_PATH}`;
 
     return apiRequest<ReferralListResponse>({
       url,
@@ -41,7 +41,7 @@ export class ReferralService {
    */
   static async getReferral(id: string): Promise<Referral> {
     return apiRequest<Referral>({
-      url: `${this.BASE_PATH}/${id}/`,
+      url: `${this.BASE_PATH}/${id}`,
       method: 'GET',
     });
   }
@@ -51,7 +51,7 @@ export class ReferralService {
    */
   static async createReferral(data: ReferralCreate): Promise<Referral> {
     return apiRequest<Referral>({
-      url: `${this.BASE_PATH}/`,
+      url: `${this.BASE_PATH}`,
       method: 'POST',
       data,
     });
@@ -62,7 +62,7 @@ export class ReferralService {
    */
   static async updateReferral(id: string, data: ReferralUpdate): Promise<Referral> {
     return apiRequest<Referral>({
-      url: `${this.BASE_PATH}/${id}/`,
+      url: `${this.BASE_PATH}/${id}`,
       method: 'PUT',
       data,
     });
@@ -73,7 +73,7 @@ export class ReferralService {
    */
   static async updateReferralStatus(id: string, data: ReferralStatusUpdate): Promise<Referral> {
     return apiRequest<Referral>({
-      url: `${this.BASE_PATH}/${id}/status/`,
+      url: `${this.BASE_PATH}/${id}/status`,
       method: 'PATCH',
       data,
     });
@@ -84,7 +84,7 @@ export class ReferralService {
    */
   static async deleteReferral(id: string): Promise<void> {
     return apiRequest<void>({
-      url: `${this.BASE_PATH}/${id}/`,
+      url: `${this.BASE_PATH}/${id}`,
       method: 'DELETE',
     });
   }

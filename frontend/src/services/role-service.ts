@@ -19,7 +19,7 @@ export class RoleService {
    */
   static async getAllRoles(): Promise<Role[]> {
     try {
-      const data = await apiRequest<Role[]>({ url: 'roles/' });
+      const data = await apiRequest<Role[]>({ url: 'roles' });
       return data;
     } catch (error: any) {
       console.error("Error fetching all roles:", error.response ? error.response.data : error.message);
@@ -37,7 +37,7 @@ export class RoleService {
     try {
       // For debugging purposes
       console.log(`Fetching roles for user ${userId}`);
-      const data = await apiRequest<{ roles: AppRoles[] }>({ url: `users/${userId}/roles/` });
+      const data = await apiRequest<{ roles: AppRoles[] }>({ url: `users/${userId}/roles` });
       console.log(`Roles for user ${userId}:`, data.roles);
       return data.roles;
     } catch (error: any) {
@@ -63,7 +63,7 @@ export class RoleService {
    */
   static async assignRolesToUser(userId: string, roles: AppRoles[]): Promise<void> {
     try {
-      await apiRequest({ url: `users/${userId}/roles/`, method: 'post', data: { roles } });
+      await apiRequest({ url: `users/${userId}/roles`, method: 'post', data: { roles } });
       // No specific data needs to be returned on success for POST, assuming 2xx is success
     } catch (error: any) {
       console.error('Error assigning roles to user:', error.response ? error.response.data : error.message);
@@ -81,7 +81,7 @@ export class RoleService {
    */
   static async removeRoleFromUser(userId: string, roleId: string): Promise<void> {
     try {
-      await apiRequest({ url: `users/${userId}/roles/${roleId}/`, method: 'delete' });
+      await apiRequest({ url: `users/${userId}/roles/${roleId}`, method: 'delete' });
       // No specific data needs to be returned on success for DELETE, assuming 2xx is success
     } catch (error: any) {
       console.error('Error removing role from user:', error.response ? error.response.data : error.message);

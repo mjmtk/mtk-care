@@ -17,6 +17,12 @@ This project is a full-stack application featuring a Django backend and a Next.j
 
 ## Setup
 
+* code server password :
+
+```bash
+    docker exec -it mtk_code_server env | grep -i password
+```
+
 ### Backend
 
 1.  **Navigate to the backend directory:**

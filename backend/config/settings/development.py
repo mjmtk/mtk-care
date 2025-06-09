@@ -2,6 +2,9 @@ from .base import *
 
 DEBUG = True
 
+# Allow all hosts in development for remote VPS access
+ALLOWED_HOSTS = ['*']
+
 # Additional CORS settings for development
 CORS_ALLOW_ALL_ORIGINS = True
 

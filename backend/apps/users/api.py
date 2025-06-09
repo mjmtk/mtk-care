@@ -10,7 +10,7 @@ roles_router = Router(tags=["roles"])
 
 # --- User Endpoints ---
 
-@users_router.get("/me/", response=UserOut)
+@users_router.get("/me", response=UserOut)
 def get_current_user(request):
     print("HIT /me endpoint (CASCADE DEBUG)")
     user = request.auth if hasattr(request, 'auth') and request.auth else request.user

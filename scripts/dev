@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# MTK Care Development Launcher
+# Simple one-command development environment setup
+
+# Get the directory where this script is located
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
+# Execute the main connection script
+exec "$SCRIPT_DIR/local-dev-connect.sh" "$@"

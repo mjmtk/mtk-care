@@ -2,6 +2,12 @@
 ALL Django Ninja routers must be registered here, using a trailing slash in the path (e.g., '/users/', '/roles/').
 Do NOT register routers in any other file. This prevents redirect/proxy issues and maintains a single source of truth.
 Always use consistent import and naming conventions for routers. Add new routers here only.
+
+API STANDARDS:
+- Router registration: USE trailing slashes (e.g., "/users/", "/referrals/")  
+- Individual endpoints: NO trailing slashes (e.g., @router.get("/me"), @router.get("/{id}"))
+- See docs/03-architecture/api-design/django-ninja-api-standards.md for full guidelines
+- Frontend has automatic trailing slash retry logic as failsafe
 """
 
 from django.conf import settings

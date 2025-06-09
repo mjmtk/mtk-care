@@ -102,7 +102,7 @@ export class ClientService {
    * Relies on an established Django session.
    */
   static async getBatchDropdowns(): Promise<ClientBatchDropdowns> {
-    const url = 'optionlists/client-batch-dropdowns/';
+    const url = 'optionlists/client-batch-dropdowns';
     try {
       const data = await apiRequest<ClientBatchDropdowns>({ url });
       // Validate that all expected keys exist
@@ -181,7 +181,7 @@ export class ClientService {
    */
   static async getClientById(clientId: string): Promise<Client | null> {
     try {
-      const data = await apiRequest<Client>({ url: `clients/${clientId}/` });
+      const data = await apiRequest<Client>({ url: `clients/${clientId}` });
       return data;
     } catch (error: any) {
       console.error(`Error fetching client ${clientId}:`, error);
@@ -214,7 +214,7 @@ export class ClientService {
    */
   static async createClient(clientData: ClientCreateRequest): Promise<Client> {
     try {
-      const data = await apiRequest<Client>({ url: 'clients/', method: 'post', data: clientData });
+      const data = await apiRequest<Client>({ url: 'clients', method: 'post', data: clientData });
       if (!data || !data.id) { // Basic validation
         console.error('[ClientService.createClient] API contract error: invalid response from client creation API:', data);
         throw new Error('API contract error: invalid response from client creation API. Please contact support.');
@@ -233,7 +233,7 @@ export class ClientService {
    */
   static async updateClient(clientId: string, clientData: Partial<ClientCreateRequest>): Promise<Client | null> {
     try {
-      const data = await apiRequest<Client>({ url: `clients/${clientId}/`, method: 'patch', data: clientData });
+      const data = await apiRequest<Client>({ url: `clients/${clientId}`, method: 'patch', data: clientData });
       return data;
     } catch (error: any) {
       console.error(`Error updating client ${clientId}:`, error);
@@ -249,7 +249,7 @@ export class ClientService {
    */
   static async linkClientToReferral(clientId: string, referralId: string): Promise<boolean> {
     try {
-      await apiRequest({ url: `clients/${clientId}/link_to_referral/`, method: 'post', data: { referral_id: referralId } });
+      await apiRequest({ url: `clients/${clientId}/link_to_referral`, method: 'post', data: { referral_id: referralId } });
       return true;
     } catch (error: any) {
       console.error(`Error linking client ${clientId} to referral ${referralId}:`, error);
@@ -263,7 +263,7 @@ export class ClientService {
    */
   static async getClientStatuses(): Promise<ClientStatus[]> {
     try {
-      const data = await apiRequest<ClientStatus[]>({ url: 'client-statuses/' });
+      const data = await apiRequest<ClientStatus[]>({ url: 'client-statuses' });
       return data;
     } catch (error: any) {
       console.error("Error fetching client statuses:", error);
@@ -278,7 +278,7 @@ export class ClientService {
    */
   static async getLanguages(): Promise<Language[]> {
     try {
-      const data = await apiRequest<Language[]>({ url: 'languages/' });
+      const data = await apiRequest<Language[]>({ url: 'languages' });
       return data;
     } catch (error: any) {
       console.error("Error fetching languages:", error);
@@ -293,7 +293,7 @@ export class ClientService {
    */
   static async getPronouns(): Promise<Pronoun[]> {
     try {
-      const data = await apiRequest<Pronoun[]>({ url: 'pronouns/' });
+      const data = await apiRequest<Pronoun[]>({ url: 'pronouns' });
       return data;
     } catch (error: any) {
       console.error("Error fetching pronouns:", error);

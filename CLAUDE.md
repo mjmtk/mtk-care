@@ -19,9 +19,17 @@ The system supports community services including counselling for alcohol and oth
 
 - Backend serves all endpoints under `/api/v1/`
 - Frontend must include `v1/` in all API calls
-- Example: `apiRequest({ url: 'v1/users/me/' })` → `/api/v1/users/me/`
+- Example: `apiRequest({ url: 'v1/users/me' })` → `/api/v1/users/me`
 
-See `docs/API_VERSIONING_STANDARD.md` for full details.
+### API URL Standards (IMPORTANT)
+
+**Django Ninja endpoints should NOT use trailing slashes** for consistency:
+
+- ✅ Correct: `@router.get("/me")`, `@router.get("/{id}")`
+- ❌ Incorrect: `@router.get("/me/")`, `@router.get("/{id}/")`
+- **REQUIRED**: Set `APPEND_SLASH = False` in Django settings to prevent conflicts
+- Frontend has automatic retry logic as failsafe
+- See `docs/03-architecture/api-design/django-ninja-api-standards.md` for full guidelines
 
 ### Environment Variables
 

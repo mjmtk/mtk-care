@@ -15,7 +15,18 @@ export default withAuth(
   },
   {
     callbacks: {
-      authorized: ({ token }) => !!token, // If there is a token, the user is authorized
+      authorized: ({ token, req }) => {
+        // Check if auth bypass mode is enabled first
+        const isAuthBypassMode = process.env.NEXT_PUBLIC_AUTH_BYPASS_MODE === 'true';
+        
+        if (isAuthBypassMode) {
+          console.log(`[Auth Bypass] Authorizing request to ${req.nextUrl?.pathname} via bypass mode`);
+          return true; // Always authorize in bypass mode
+        }
+        
+        // Normal mode - require a valid token
+        return !!token;
+      },
     },
     // You can specify a custom login page if you have one
     // pages: {

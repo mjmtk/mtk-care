@@ -47,7 +47,7 @@ def django_api_client(db, user): # Add db and user for potential auth
 @pytest.fixture
 def ext_org_type_option_list(db):
     ol, _ = OptionList.objects.get_or_create(
-        slug='external-organisation-types',
+        slug='external_organisation-types',
         defaults={'name': 'External Organisation Types', 'is_active': True}
     )
     return ol

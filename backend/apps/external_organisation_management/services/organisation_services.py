@@ -22,7 +22,7 @@ def get_external_organisation_batch_dropdowns() -> ExternalOrganisationBatchDrop
     """
     Fetches all dropdown options required for the external organisation management UI.
     """
-    org_types_items = OptionListService.get_active_items_for_list_slug('external-organisation-types')
+    org_types_items = OptionListService.get_active_items_for_list_slug('external_organisation-types')
 
     # Map OptionListItem to ExtOrgDropdownItemOut
     # OptionListItem has: id, slug, name, label, sort_order, is_active
@@ -52,7 +52,7 @@ def external_organisation_create(payload: ExternalOrganisationSchemaIn, user: se
     try:
         organisation_type = OptionListItem.objects.get(
             pk=type_id,
-            option_list__slug='external-organisation-types'
+            option_list__slug='external_organisation-types'
         )
     except OptionListItem.DoesNotExist:
         raise ValueError(f"Invalid type_id: {type_id}. Organisation type not found.")
@@ -80,7 +80,7 @@ def external_organisation_update(organisation_id: uuid.UUID, payload: ExternalOr
             try:
                 new_organisation_type = OptionListItem.objects.get(
                     pk=new_type_id,
-                    option_list__slug='external-organisation-types'
+                    option_list__slug='external_organisation-types'
                 )
                 organisation.type = new_organisation_type
             except OptionListItem.DoesNotExist:

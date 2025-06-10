@@ -1,19 +1,22 @@
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { RoleGuard } from '@/components/auth/RoleGuard';
-import { useRoles, useHasRole, useHasAnyRole } from '@/hooks/useRoles';
+import { PermissionGuard, AdminGuard } from '@/components/auth/PermissionGuard';
+import { usePermissions } from '@/hooks/usePermissions';
+import { useRoles, useHasRole, useHasAnyRole } from '@/hooks/usePermissions'; // Legacy compatibility
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Info, Shield, Users, Briefcase, UserCheck, BookOpen, Star } from 'lucide-react';
-import { AppRoles } from '@/auth/auth-config';
+import { useDynamicRoles } from '@/contexts/DynamicRoleProvider';
 
 export default function RoleDemoPage() {
   const currentRoles = useRoles();
+  const permissions = usePermissions();
   const isAdmin = useHasRole('Administrator');
   const isSupervisor = useHasRole('Supervisor');
-  const isManager = useHasAnyRole(['Program Manager', 'Organisation Executive']);
+  const isManager = useHasAnyRole(['Manager']);
+  const { getAvailableRoleNames } = useDynamicRoles();
 
   return (
     <div className="space-y-6">
@@ -61,7 +64,7 @@ export default function RoleDemoPage() {
 
         <TabsContent value="features" className="space-y-4">
           {/* Administrator Features */}
-          <RoleGuard allowedRoles={['Administrator']} showError>
+          <AdminGuard showError>
             <Card className="border-destructive">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-destructive">
@@ -77,15 +80,15 @@ export default function RoleDemoPage() {
                 <div>✅ Full Data Access</div>
               </CardContent>
             </Card>
-          </RoleGuard>
+          </AdminGuard>
 
-          {/* Organisation Executive Features */}
-          <RoleGuard allowedRoles={['Organisation Executive']}>
-            <Card className="border-orange-500">
+          {/* Manager Features */}
+          <PermissionGuard check={p => p.canAccessDashboard('admin')}>
+            <Card className="border-blue-500">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-orange-600">
+                <CardTitle className="flex items-center gap-2 text-blue-600">
                   <Briefcase className="h-5 w-5" />
-                  Organisation Executive Features
+                  Manager Features
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
@@ -93,30 +96,13 @@ export default function RoleDemoPage() {
                 <div>✅ Organisation-wide Reports</div>
                 <div>✅ Budget Management</div>
                 <div>✅ Program Oversight</div>
-              </CardContent>
-            </Card>
-          </RoleGuard>
-
-          {/* Program Manager Features */}
-          <RoleGuard allowedRoles={['Program Manager']}>
-            <Card className="border-blue-500">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-blue-600">
-                  <Users className="h-5 w-5" />
-                  Program Manager Features
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div>✅ Program Configuration</div>
-                <div>✅ Service Delivery Reports</div>
-                <div>✅ Team Performance</div>
                 <div>✅ Resource Allocation</div>
               </CardContent>
             </Card>
-          </RoleGuard>
+          </PermissionGuard>
 
           {/* Supervisor Features */}
-          <RoleGuard allowedRoles={['Supervisor']}>
+          <PermissionGuard check={p => p.canAccessDashboard('program')}>
             <Card className="border-purple-500">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-purple-600">
@@ -131,15 +117,15 @@ export default function RoleDemoPage() {
                 <div>✅ Staff Schedules</div>
               </CardContent>
             </Card>
-          </RoleGuard>
+          </PermissionGuard>
 
-          {/* Caseworker Features */}
-          <RoleGuard allowedRoles={['Caseworker']}>
+          {/* Practitioner Features */}
+          <PermissionGuard action="create" subject="Client">
             <Card className="border-green-500">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-green-600">
                   <Users className="h-5 w-5" />
-                  Caseworker Features
+                  Practitioner Features
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
@@ -149,25 +135,25 @@ export default function RoleDemoPage() {
                 <div>✅ Referral Creation</div>
               </CardContent>
             </Card>
-          </RoleGuard>
+          </PermissionGuard>
 
-          {/* Practice Lead Features */}
-          <RoleGuard allowedRoles={['Practice Lead']}>
+          {/* Staff Features */}
+          <PermissionGuard action="access" subject="Dashboard">
             <Card className="border-yellow-500">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-yellow-600">
                   <BookOpen className="h-5 w-5" />
-                  Practice Lead Features
+                  Staff Features
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <div>✅ Practice Guidelines</div>
-                <div>✅ Training Materials</div>
-                <div>✅ Quality Standards</div>
-                <div>✅ Compliance Monitoring</div>
+                <div>✅ Daily Operations</div>
+                <div>✅ Data Entry</div>
+                <div>✅ Basic Reporting</div>
+                <div>✅ Documentation</div>
               </CardContent>
             </Card>
-          </RoleGuard>
+          </PermissionGuard>
         </TabsContent>
 
         <TabsContent value="components" className="space-y-4">
@@ -186,8 +172,8 @@ export default function RoleDemoPage() {
                 <CardTitle>Management Tools</CardTitle>
               </CardHeader>
               <CardContent>
-                <RoleGuard 
-                  allowedRoles={['Administrator', 'Organisation Executive', 'Program Manager']}
+                <PermissionGuard 
+                  check={p => p.canViewReports('financial') || p.canAccessDashboard('admin')}
                   fallback={<p className="text-muted-foreground">Not available for your role</p>}
                 >
                   <div className="space-y-2">
@@ -201,7 +187,7 @@ export default function RoleDemoPage() {
                       📈 Financial Reports
                     </button>
                   </div>
-                </RoleGuard>
+                </PermissionGuard>
               </CardContent>
             </Card>
 
@@ -210,8 +196,9 @@ export default function RoleDemoPage() {
                 <CardTitle>Client Operations</CardTitle>
               </CardHeader>
               <CardContent>
-                <RoleGuard 
-                  allowedRoles={['Caseworker', 'Supervisor', 'Practice Lead']}
+                <PermissionGuard 
+                  action="read" 
+                  subject="Client"
                   fallback={<p className="text-muted-foreground">Not available for your role</p>}
                 >
                   <div className="space-y-2">
@@ -225,23 +212,27 @@ export default function RoleDemoPage() {
                       🔄 Referrals
                     </button>
                   </div>
-                </RoleGuard>
+                </PermissionGuard>
               </CardContent>
             </Card>
           </div>
 
           {/* Hide from specific roles */}
-          <RoleGuard deniedRoles={['Caseworker']} showError>
+          <PermissionGuard 
+            check={p => p.canCreate('Client') || p.canUpdate('Client')}
+            showError
+            errorMessage="This section requires active operational permissions"
+          >
             <Card>
               <CardHeader>
                 <CardTitle>Restricted Section</CardTitle>
-                <CardDescription>Hidden from Caseworkers</CardDescription>
+                <CardDescription>Hidden from Read-Only and Restricted Users</CardDescription>
               </CardHeader>
               <CardContent>
-                <p>This content is only visible to supervisory and management roles.</p>
+                <p>This content is only visible to active operational roles.</p>
               </CardContent>
             </Card>
-          </RoleGuard>
+          </PermissionGuard>
         </TabsContent>
 
         <TabsContent value="permissions" className="space-y-4">
@@ -258,65 +249,51 @@ export default function RoleDemoPage() {
                   <thead>
                     <tr className="border-b">
                       <th className="text-left p-2">Feature</th>
-                      {Object.values(AppRoles).map(role => (
+                      {getAvailableRoleNames().map(role => (
                         <th key={role} className="text-center p-2 text-xs">
-                          {role.split(' ').map(word => word[0]).join('')}
+                          {role.length > 10 ? role.substring(0, 8) + '...' : role}
                         </th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
-                    <tr className="border-b">
-                      <td className="p-2">User Management</td>
-                      <td className="text-center p-2">✅</td>
-                      <td className="text-center p-2">❌</td>
-                      <td className="text-center p-2">❌</td>
-                      <td className="text-center p-2">❌</td>
-                      <td className="text-center p-2">❌</td>
-                      <td className="text-center p-2">❌</td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="p-2">View All Clients</td>
-                      <td className="text-center p-2">✅</td>
-                      <td className="text-center p-2">✅</td>
-                      <td className="text-center p-2">✅</td>
-                      <td className="text-center p-2">✅</td>
-                      <td className="text-center p-2">❌</td>
-                      <td className="text-center p-2">✅</td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="p-2">Edit Clients</td>
-                      <td className="text-center p-2">✅</td>
-                      <td className="text-center p-2">❌</td>
-                      <td className="text-center p-2">✅</td>
-                      <td className="text-center p-2">✅</td>
-                      <td className="text-center p-2">✅</td>
-                      <td className="text-center p-2">✅</td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="p-2">Financial Reports</td>
-                      <td className="text-center p-2">✅</td>
-                      <td className="text-center p-2">✅</td>
-                      <td className="text-center p-2">✅</td>
-                      <td className="text-center p-2">❌</td>
-                      <td className="text-center p-2">❌</td>
-                      <td className="text-center p-2">❌</td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="p-2">System Config</td>
-                      <td className="text-center p-2">✅</td>
-                      <td className="text-center p-2">❌</td>
-                      <td className="text-center p-2">❌</td>
-                      <td className="text-center p-2">❌</td>
-                      <td className="text-center p-2">❌</td>
-                      <td className="text-center p-2">❌</td>
-                    </tr>
+                    {[
+                      {
+                        feature: 'User Management',
+                        permissions: { 'Superuser': true, 'Administrator': true } as Record<string, boolean>
+                      },
+                      {
+                        feature: 'View All Clients',
+                        permissions: { 'Superuser': true, 'Administrator': true, 'Manager': true, 'Supervisor': true, 'ReadOnlyUser': true } as Record<string, boolean>
+                      },
+                      {
+                        feature: 'Edit Clients',
+                        permissions: { 'Superuser': true, 'Administrator': true, 'Supervisor': true, 'Practitioner': true, 'Staff': true } as Record<string, boolean>
+                      },
+                      {
+                        feature: 'Financial Reports',
+                        permissions: { 'Superuser': true, 'Administrator': true, 'Manager': true } as Record<string, boolean>
+                      },
+                      {
+                        feature: 'System Config',
+                        permissions: { 'Superuser': true, 'Administrator': true } as Record<string, boolean>
+                      }
+                    ].map((row, index) => (
+                      <tr key={index} className="border-b">
+                        <td className="p-2">{row.feature}</td>
+                        {getAvailableRoleNames().map(role => (
+                          <td key={role} className="text-center p-2">
+                            {row.permissions[role] ? '✅' : '❌'}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
               <div className="mt-4 text-xs text-muted-foreground">
-                <p>Legend: A = Administrator, OE = Organisation Executive, PM = Program Manager,</p>
-                <p>S = Supervisor, C = Caseworker, PL = Practice Lead</p>
+                <p>Dynamic permissions matrix based on database-driven roles.</p>
+                <p>Roles are fetched from the API and permissions are defined programmatically.</p>
               </div>
             </CardContent>
           </Card>

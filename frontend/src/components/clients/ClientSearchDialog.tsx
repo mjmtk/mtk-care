@@ -26,11 +26,11 @@ interface ClientSearchDialogProps {
   isReferral?: boolean; // Whether this is for a referral flow
 }
 
-export function ClientSearchDialog({ 
-  trigger, 
-  onClientSelect, 
+export function ClientSearchDialog({
+  trigger,
+  onClientSelect,
   onCreateNew,
-  isReferral = false 
+  isReferral = false
 }: ClientSearchDialogProps) {
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -45,9 +45,9 @@ export function ClientSearchDialog({
       if (term.length >= 2) {
         setIsSearching(true);
         try {
-          const response = await NewClientService.searchClients({ 
-            search: term, 
-            limit: 10 
+          const response = await NewClientService.searchClients({
+            search: term,
+            limit: 10
           });
           setSearchResults(response.items || []);
           setHasSearched(true);
@@ -142,7 +142,7 @@ export function ClientSearchDialog({
             Search for an existing client first. If not found, you can create a new one.
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="space-y-4 flex-1 overflow-hidden flex flex-col">
           {/* Search Input */}
           <div className="relative">
@@ -189,8 +189,8 @@ export function ClientSearchDialog({
                   Found {searchResults.length} matching client{searchResults.length === 1 ? '' : 's'}:
                 </p>
                 {searchResults.map((client) => (
-                  <Card 
-                    key={client.id} 
+                  <Card
+                    key={client.id}
                     className="hover:shadow-md transition-shadow cursor-pointer"
                     onClick={() => handleClientSelect(client)}
                   >
@@ -229,31 +229,6 @@ export function ClientSearchDialog({
                   <p className="text-lg font-medium">No clients found</p>
                   <p className="text-sm">No existing clients match "{searchTerm}"</p>
                 </div>
-                
-                {/* Create new client options */}
-                <div className="space-y-2 pt-4 border-t">
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Create new client:
-                  </p>
-                  <div className="flex gap-2 justify-center">
-                    <Button 
-                      onClick={() => handleCreateNew(false)}
-                      variant="default"
-                      size="sm"
-                    >
-                      <UserPlus className="h-4 w-4 mr-2" />
-                      Walk-in Client
-                    </Button>
-                    <Button 
-                      onClick={() => handleCreateNew(true)}
-                      variant="outline"
-                      size="sm"
-                    >
-                      <Building2 className="h-4 w-4 mr-2" />
-                      Referred Client
-                    </Button>
-                  </div>
-                </div>
               </div>
             ) : (
               <div className="text-center py-8 text-gray-500">
@@ -271,7 +246,7 @@ export function ClientSearchDialog({
                 Can't find the client? Create new:
               </p>
               <div className="flex gap-2">
-                <Button 
+                <Button
                   onClick={() => handleCreateNew(false)}
                   variant="default"
                   size="sm"
@@ -280,7 +255,7 @@ export function ClientSearchDialog({
                   <UserPlus className="h-4 w-4 mr-2" />
                   Walk-in Client
                 </Button>
-                <Button 
+                <Button
                   onClick={() => handleCreateNew(true)}
                   variant="outline"
                   size="sm"

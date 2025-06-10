@@ -1,4 +1,4 @@
-import { AppRoles } from "@/types/auth";
+import { ROLE_NAMES } from "@/types/auth";
 import { apiRequest } from './api-request';
 import type { UserProfile } from '../types/auth';
 
@@ -24,7 +24,7 @@ export class AuthService {
       console.warn("Error fetching user profile from Django backend:", error.response ? error.response.data : error.message);
       // Return a fallback profile with isFallback flag
       return {
-        roles: [AppRoles.Administrator],
+        roles: [ROLE_NAMES.ADMINISTRATOR],
         displayName: "Administrator (Default)",
         email: "admin@example.com",
         isFallback: true
@@ -45,7 +45,7 @@ export class AuthService {
    * @param fetchImpl Optionally inject fetch for testability
    * @returns Array of roles
    */
-  static async getUserRoles(token: string, userId?: string, fetchImpl: typeof fetch = defaultFetch): Promise<AppRoles[]> {
+  static async getUserRoles(token: string, userId?: string, fetchImpl: typeof fetch = defaultFetch): Promise<string[]> {
     try {
       // First get the user profile from MS Graph API
       const headers = new Headers();
@@ -80,24 +80,24 @@ export class AuthService {
       console.log("User data from Graph API:", userInfo);
       
       // Assign roles based on display name matching the Azure AD screenshot
-      const roles: AppRoles[] = [];
+      const roles: string[] = [];
       const displayName = userInfo.displayName;
       
       if (displayName === "Aftab Jalal") {
         // Assign Administrator role to Aftab
-        roles.push(AppRoles.Administrator);
+        roles.push(ROLE_NAMES.ADMINISTRATOR);
       } else if (displayName === "Tashi") {
-        // Assign OrganisationExecutive role to Tashi
-        roles.push(AppRoles.ProgramManager); // Was OrganisationExecutive, which is not defined
+        // Assign Manager role to Tashi
+        roles.push(ROLE_NAMES.MANAGER);
       } else if (displayName === "Caleb") {
-        // Assign Caseworker role to Caleb
-        roles.push(AppRoles.Caseworker);
+        // Assign Practitioner role to Caleb
+        roles.push(ROLE_NAMES.PRACTITIONER);
       }
       
       // For any other users or if no matching name was found, assign a default role
       if (roles.length === 0) {
-        console.log("User not recognized, assigning Caseworker role for testing");
-        roles.push(AppRoles.Caseworker);
+        console.log("User not recognized, assigning Practitioner role for testing");
+        roles.push(ROLE_NAMES.PRACTITIONER);
       }
       
       console.log("Assigned roles for user:", roles);

@@ -5,7 +5,7 @@ import { loginRequest } from "@/auth/auth-config";
 // import { AuthService } from "../../services/auth-service";
 import { AuthDebugService } from "../../services/auth-debug-service";
 import { CurrentUser } from "@/types/users";
-import { AppRoles } from "../auth-config";
+// Note: AppRoles import removed - now using dynamic roles
 import { AbilityContext } from "../ability-context";
 import { defineRulesForUser, AppAbility } from "../ability";
 
@@ -13,15 +13,15 @@ interface AuthContextProps {
   currentUser: CurrentUser | null;
   groups: { id: number; name: string }[];
   permissions: string[];
-  userRoles: AppRoles[];
-  impersonatedRole: AppRoles | null;
+  userRoles: string[];
+  impersonatedRole: string | null;
   ability: AppAbility;
   isLoading: boolean;
   error: Error | null;
-  setImpersonatedRole: (role: AppRoles | null) => void;
+  setImpersonatedRole: (role: string | null) => void;
   refreshCurrentUser: () => Promise<void>;
   isAccessUnavailable: boolean;
-  getEffectiveRoles: () => AppRoles[];
+  getEffectiveRoles: () => string[];
   getAccessToken: () => Promise<string>; // For MS Graph or other external APIs
   getMsalIdToken: () => Promise<string>; // For Django session establishment
   getSharePointAccessToken: () => Promise<string>;
@@ -42,8 +42,8 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [groups, setGroups] = useState<{ id: number; name: string }[]>([]);
   const [permissions, setPermissions] = useState<string[]>([]);
-  const [userRoles, setUserRoles] = useState<AppRoles[]>([]);
-  const [impersonatedRole, setImpersonatedRole] = useState<AppRoles | null>(null);
+  const [userRoles, setUserRoles] = useState<string[]>([]);
+  const [impersonatedRole, setImpersonatedRole] = useState<string | null>(null);
   const [ability, setAbility] = useState<AppAbility>(defineRulesForUser({ roles: [] }));
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
@@ -63,8 +63,8 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
       setCurrentUser(user);
       setGroups(user.groups || []);
       setPermissions(user.permissions || []);
-      // Optionally, map Django groups to AppRoles if needed for legacy code:
-      const backendRoles = (user.groups || []).map((g: { id: number; name: string }) => g.name as AppRoles).filter(Boolean);
+      // Map Django groups to string roles:
+      const backendRoles = (user.groups || []).map((g: { id: number; name: string }) => g.name).filter(Boolean);
       setUserRoles(backendRoles);
 
       // Ensure id is string for ability context

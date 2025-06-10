@@ -3,7 +3,8 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { useAuthBypassSession } from '@/hooks/useAuthBypass';
 import { Session } from 'next-auth';
-import { AppRoles } from '@/auth/auth-config';
+import { ROLE_NAMES } from '@/types/auth';
+import { useDynamicRoles } from '@/contexts/DynamicRoleProvider';
 
 interface RoleSwitcherContextType {
   availableRoles: string[];
@@ -35,9 +36,12 @@ export function RoleSwitcherProvider({ children }: RoleSwitcherProviderProps) {
   const { data: session, status } = useAuthBypassSession();
   const [overriddenRoles, setOverriddenRoles] = useState<string[] | null>(null);
   const [originalRoles, setOriginalRoles] = useState<string[]>([]);
-
-  // All available roles in the system
-  const availableRoles = Object.values(AppRoles);
+  
+  // Get dynamic roles from API (with fallback to hardcoded)
+  const { getAvailableRoleNames, loading: rolesLoading } = useDynamicRoles();
+  
+  // All available roles in the system (dynamic from API)
+  const availableRoles = rolesLoading ? Object.values(ROLE_NAMES) : getAvailableRoleNames();
 
   // Determine if user can switch roles (must be superuser or admin)
   const canSwitchRoles = session?.user?.roles?.some(role => 

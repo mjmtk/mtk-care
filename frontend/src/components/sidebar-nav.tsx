@@ -6,58 +6,115 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Home, Users, UserCog, FileText, Building, GitBranch, Shield } from "lucide-react";
-import { useAuthBypassSession } from "@/hooks/useAuthBypass";
-import { useRoles } from "@/hooks/useRoles";
+import { usePermissions } from "@/hooks/usePermissions";
 
 // Define the structure for navigation items
 interface NavItem {
   href: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
-  requiredRoles?: string[]; // Optional: specify required roles for this nav item
+  // CASL-based permissions (recommended)
+  action?: string;
+  subject?: string;
+  // Legacy role-based (for migration)
+  requiredRoles?: string[];
 }
 
 const navItems: NavItem[] = [
-  { href: "/dashboard", label: "Overview", icon: Home },
-  { href: "/dashboard/clients", label: "Clients", icon: Users },
-  { href: "/dashboard/referrals", label: "Referrals", icon: GitBranch },
-  { href: "/dashboard/external-organisations", label: "External Organisations", icon: Building },
-  { href: "/dashboard/documents", label: "Documents", icon: FileText },
+  { 
+    href: "/dashboard", 
+    label: "Overview", 
+    icon: Home,
+    action: "access",
+    subject: "Dashboard"
+  },
+  { 
+    href: "/dashboard/clients", 
+    label: "Clients", 
+    icon: Users,
+    action: "read",
+    subject: "Client"
+  },
+  { 
+    href: "/dashboard/referrals", 
+    label: "Referrals", 
+    icon: GitBranch,
+    action: "read",
+    subject: "Referral"
+  },
+  { 
+    href: "/dashboard/external-organisations", 
+    label: "External Organisations", 
+    icon: Building,
+    action: "read",
+    subject: "ExternalOrg"
+  },
+  { 
+    href: "/dashboard/documents", 
+    label: "Documents", 
+    icon: FileText,
+    action: "read",
+    subject: "Document"
+  },
   { 
     href: "/users", 
     label: "User Management", 
     icon: UserCog,
-    requiredRoles: ["Administrator", "Superuser"] // Only show to admins
+    action: "access",
+    subject: "UserManagement"
   },
   {
     href: "/dashboard/role-demo",
     label: "Role Demo",
     icon: Shield,
-    requiredRoles: ["Administrator", "Superuser"] // Development/testing feature
+    action: "impersonate",
+    subject: "User" // Role switching capability
   },
-  // Add more top-level navigation items here
-  // Example for a settings page:
-  // { href: "/dashboard/settings", label: "Settings", icon: Settings },
+  // Future analytics navigation items:
+  // { 
+  //   href: "/dashboard/analytics", 
+  //   label: "Analytics", 
+  //   icon: BarChart,
+  //   action: "view",
+  //   subject: "Analytics"
+  // },
+  // { 
+  //   href: "/dashboard/reports", 
+  //   label: "Reports", 
+  //   icon: FileBarChart,
+  //   action: "view",
+  //   subject: "Report"
+  // },
 ];
 
-// Helper function to check if user has required roles
-function hasRequiredRole(userRoles: string[] | undefined, requiredRoles: string[] | undefined): boolean {
-  if (!requiredRoles || requiredRoles.length === 0) return true; // No role requirement
-  if (!userRoles || userRoles.length === 0) return false; // User has no roles
+// Helper function to check if user has permission for nav item
+function hasNavPermission(
+  permissions: ReturnType<typeof usePermissions>, 
+  item: NavItem
+): boolean {
+  // CASL-based permission check (preferred)
+  if (item.action && item.subject) {
+    return permissions.can(item.action as any, item.subject as any);
+  }
   
-  return requiredRoles.some(role => userRoles.includes(role));
+  // Legacy role-based check (for migration)
+  if (item.requiredRoles && item.requiredRoles.length > 0) {
+    return item.requiredRoles.some(role => permissions.hasRole(role));
+  }
+  
+  // No permission specified - allow access
+  return true;
 }
 
 export function SidebarNav({ className, ...props }: React.HTMLAttributes<HTMLElement>) {
   const pathname = usePathname();
   
-  // Get user roles (respects role switcher)
-  const userRoles = useRoles();
+  // Get user permissions (respects role switcher)
+  const permissions = usePermissions();
   
-  
-  // Filter nav items based on user roles
+  // Filter nav items based on user permissions
   const visibleNavItems = navItems.filter(item => 
-    hasRequiredRole(userRoles, item.requiredRoles)
+    hasNavPermission(permissions, item)
   );
 
   return (

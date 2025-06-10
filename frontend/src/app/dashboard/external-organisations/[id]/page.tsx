@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { useAuthBypassSession, useAccessToken } from '@/hooks/useAuthBypass';
 import { externalOrganisationsApi, externalOrganisationContactsApi } from '@/services/apiService';
 import type { components } from '@/types/openapi';
@@ -56,7 +55,7 @@ function useOrganisationDetails(orgId: string, accessToken: string | null) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchOrganisation = async () => {
+  const fetchOrganisation = useCallback(async () => {
     if (!accessToken || !orgId) {
       setLoading(false);
       return;
@@ -77,11 +76,11 @@ function useOrganisationDetails(orgId: string, accessToken: string | null) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [orgId, accessToken]);
 
   useEffect(() => {
     fetchOrganisation();
-  }, [orgId, accessToken]);
+  }, [fetchOrganisation]);
 
   return { organisation, contacts, loading, error, refetch: fetchOrganisation };
 }

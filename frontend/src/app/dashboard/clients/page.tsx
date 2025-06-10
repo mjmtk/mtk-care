@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Users, Plus, Search, Filter } from 'lucide-react';
+import { Users, Plus, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { ClientSearchDialog } from '@/components/clients/ClientSearchDialog';
 import { NewClientService } from '@/services/new-client-service';

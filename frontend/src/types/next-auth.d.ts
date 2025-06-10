@@ -9,6 +9,8 @@ declare module 'next-auth' {
     accessToken?: string;
     user?: {
       roles?: string[];
+      programIds?: string[];
+      practiceId?: string;
     } & DefaultSession['user']; // Merge with default user properties (name, email, image)
   }
 
@@ -18,6 +20,8 @@ declare module 'next-auth' {
    */
   interface User {
     roles?: string[];
+    programIds?: string[];
+    practiceId?: string;
   }
 
   /**
@@ -34,5 +38,7 @@ declare module 'next-auth/jwt' {
   interface JWT {
     accessToken?: string;
     roles?: string[];
+    programIds?: string[];
+    practiceId?: string;
   }
 }

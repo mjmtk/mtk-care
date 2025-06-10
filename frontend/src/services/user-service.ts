@@ -1,4 +1,4 @@
-// import { AppRoles } from "@/auth/auth-config";
+// Note: This file is commented out - AppRoles replaced with string roles
 // import { apiRequest } from './api-request';
 // import { isApiError } from '@/types/manual/common/api';
 
@@ -223,7 +223,7 @@
 //    * @param userId User ID
 //    * @param roles Roles to assign
 //    */
-//   static async assignRolesToUser( userId: string, roles: AppRoles[]) {
+//   static async assignRolesToUser( userId: string, roles: string[]) {
 //     try {
 //       // The apiFetch will throw an error if the request fails
 //       await apiRequest({

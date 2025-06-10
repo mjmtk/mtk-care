@@ -258,6 +258,20 @@ export class ClientService {
   }
 
   /**
+   * Get a single client by ID.
+   * Relies on an established Django session.
+   */
+  static async getClient(id: string): Promise<Client> {
+    try {
+      const data = await apiRequest<Client>({ url: `v1/clients/${id}/` });
+      return data;
+    } catch (error: any) {
+      console.error(`Error fetching client ${id}:`, error);
+      throw error;
+    }
+  }
+
+  /**
    * Get all client statuses.
    * Relies on an established Django session.
    */

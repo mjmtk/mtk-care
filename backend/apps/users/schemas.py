@@ -9,6 +9,10 @@ class RoleOut(Schema):
     name: str
     description: Optional[str] = None
     level: int
+    is_system_role: bool = False
+    is_active: bool = True
+    custom_permissions: dict = {}
+    permissions: List[str] = []  # List of permission codenames
 
 from uuid import UUID
 

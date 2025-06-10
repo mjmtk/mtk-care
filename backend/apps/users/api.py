@@ -252,7 +252,20 @@ def assign_roles(request, user_id: UUID, role_ids: List[UUID]):
 # --- Role Endpoints ---
 @roles_router.get("/", response=List[RoleOut])
 def list_roles(request):
-    return [RoleOut.from_orm(r) for r in RoleService.list_roles()]
+    roles = RoleService.list_roles()
+    result = []
+    for role in roles:
+        result.append({
+            'id': role.id,
+            'name': role.name,
+            'description': role.description,
+            'level': role.level,
+            'is_system_role': role.is_system_role,
+            'is_active': role.is_active,
+            'custom_permissions': role.custom_permissions,
+            'permissions': list(role.permissions.values_list('codename', flat=True))
+        })
+    return result
 
 @roles_router.post("/", response=RoleOut)
 def create_role(request, data: RoleCreate):

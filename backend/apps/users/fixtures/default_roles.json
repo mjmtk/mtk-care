@@ -1,0 +1,145 @@
+[
+  {
+    "model": "users.role",
+    "pk": "00000000-0000-0000-0000-000000000001",
+    "fields": {
+      "name": "Superuser",
+      "description": "System superuser with full access to all features and data",
+      "level": 0,
+      "is_system_role": true,
+      "is_active": true,
+      "custom_permissions": {
+        "can_impersonate": true,
+        "can_manage_system": true,
+        "can_view_audit_logs": true
+      },
+      "created_at": "2025-06-10T00:00:00Z",
+      "updated_at": "2025-06-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "users.role",
+    "pk": "00000000-0000-0000-0000-000000000002",
+    "fields": {
+      "name": "Administrator",
+      "description": "Administrator with access to manage users, roles, and system settings",
+      "level": 1,
+      "is_system_role": true,
+      "is_active": true,
+      "custom_permissions": {
+        "can_manage_users": true,
+        "can_manage_roles": true,
+        "can_view_reports": true
+      },
+      "created_at": "2025-06-10T00:00:00Z",
+      "updated_at": "2025-06-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "users.role",
+    "pk": "00000000-0000-0000-0000-000000000003",
+    "fields": {
+      "name": "Supervisor",
+      "description": "Supervisor with access to manage teams and review work",
+      "level": 2,
+      "is_system_role": true,
+      "is_active": true,
+      "custom_permissions": {
+        "can_manage_team": true,
+        "can_approve_actions": true,
+        "can_view_team_reports": true
+      },
+      "created_at": "2025-06-10T00:00:00Z",
+      "updated_at": "2025-06-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "users.role",
+    "pk": "00000000-0000-0000-0000-000000000004",
+    "fields": {
+      "name": "Manager",
+      "description": "Manager with access to oversee operations and resources",
+      "level": 3,
+      "is_system_role": true,
+      "is_active": true,
+      "custom_permissions": {
+        "can_manage_resources": true,
+        "can_view_analytics": true,
+        "can_export_data": true
+      },
+      "created_at": "2025-06-10T00:00:00Z",
+      "updated_at": "2025-06-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "users.role",
+    "pk": "00000000-0000-0000-0000-000000000005",
+    "fields": {
+      "name": "Practitioner",
+      "description": "Practitioner with access to provide services and interact with clients",
+      "level": 4,
+      "is_system_role": true,
+      "is_active": true,
+      "custom_permissions": {
+        "can_provide_services": true,
+        "can_interact_with_clients": true,
+        "can_create_referrals": true,
+        "can_manage_caseload": true
+      },
+      "created_at": "2025-06-10T00:00:00Z",
+      "updated_at": "2025-06-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "users.role",
+    "pk": "00000000-0000-0000-0000-000000000006",
+    "fields": {
+      "name": "Staff",
+      "description": "Staff member with standard access to perform daily operations",
+      "level": 5,
+      "is_system_role": true,
+      "is_active": true,
+      "custom_permissions": {
+        "can_view_clients": true,
+        "can_edit_clients": true,
+        "can_add_notes": true
+      },
+      "created_at": "2025-06-10T00:00:00Z",
+      "updated_at": "2025-06-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "users.role",
+    "pk": "00000000-0000-0000-0000-000000000007",
+    "fields": {
+      "name": "ReadOnlyUser",
+      "description": "Read-only user with view access to permitted data",
+      "level": 6,
+      "is_system_role": true,
+      "is_active": true,
+      "custom_permissions": {
+        "can_view_only": true,
+        "restricted_access": true
+      },
+      "created_at": "2025-06-10T00:00:00Z",
+      "updated_at": "2025-06-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "users.role",
+    "pk": "00000000-0000-0000-0000-000000000008",
+    "fields": {
+      "name": "RestrictedUser",
+      "description": "Restricted user with minimal access rights",
+      "level": 7,
+      "is_system_role": true,
+      "is_active": true,
+      "custom_permissions": {
+        "limited_access": true,
+        "requires_supervision": true
+      },
+      "created_at": "2025-06-10T00:00:00Z",
+      "updated_at": "2025-06-10T00:00:00Z"
+    }
+  }
+]

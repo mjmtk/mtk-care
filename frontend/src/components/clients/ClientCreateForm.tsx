@@ -22,6 +22,7 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { NewClientService } from '@/services/new-client-service';
 import { OptionListService } from '@/services/option-list-service';
+import { ReferenceService } from '@/services/reference-service';
 import type { components } from '@/types/openapi';
 
 type ClientCreateSchema = components['schemas']['ClientCreateSchema'];
@@ -57,6 +58,7 @@ interface ClientCreateFormProps {
 }
 
 import { OptionListItem } from '@/types/option-list';
+import { ReferenceItem } from '@/services/reference-service';
 
 export function ClientCreateForm({
   open,
@@ -69,7 +71,7 @@ export function ClientCreateForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [statuses, setStatuses] = useState<OptionListItem[]>([]);
-  const [languages, setLanguages] = useState<OptionListItem[]>([]);
+  const [languages, setLanguages] = useState<ReferenceItem[]>([]);
   const [loadingOptions, setLoadingOptions] = useState(true);
 
   const {
@@ -96,7 +98,7 @@ export function ClientCreateForm({
       try {
         const [statusesData, languagesData] = await Promise.all([
           OptionListService.fetchOptionList('client-statuses'),
-          OptionListService.fetchOptionList('languages'),
+          ReferenceService.fetchLanguages(),
         ]);
         
         setStatuses(statusesData || []);
@@ -109,7 +111,7 @@ export function ClientCreateForm({
         }
         
         // Set default language to English if available
-        const englishLanguage = languagesData?.find(l => l.slug === 'english' || l.label.toLowerCase() === 'english');
+        const englishLanguage = languagesData?.find(l => l.name.toLowerCase() === 'english');
         if (englishLanguage) {
           setValue('primary_language_id', String(englishLanguage.id));
         }
@@ -329,7 +331,9 @@ export function ClientCreateForm({
                     </SelectTrigger>
                     <SelectContent>
                       {loadingOptions ? (
-                        <SelectItem value="" disabled>Loading statuses...</SelectItem>
+                        <SelectItem value="loading" disabled>Loading statuses...</SelectItem>
+                      ) : statuses.length === 0 ? (
+                        <SelectItem value="none" disabled>No statuses available</SelectItem>
                       ) : (
                         statuses.map((status) => (
                           <SelectItem key={status.id} value={String(status.id)}>
@@ -355,11 +359,13 @@ export function ClientCreateForm({
                     </SelectTrigger>
                     <SelectContent>
                       {loadingOptions ? (
-                        <SelectItem value="" disabled>Loading languages...</SelectItem>
+                        <SelectItem value="loading" disabled>Loading languages...</SelectItem>
+                      ) : languages.length === 0 ? (
+                        <SelectItem value="none" disabled>No languages available</SelectItem>
                       ) : (
                         languages.map((language) => (
                           <SelectItem key={language.id} value={String(language.id)}>
-                            {language.label}
+                            {language.name}
                           </SelectItem>
                         ))
                       )}

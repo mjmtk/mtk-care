@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -9,18 +9,16 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { 
-  Clock, 
   FileText, 
   Stethoscope, 
   ClipboardList, 
   Activity,
   Plus,
   MessageSquare,
-  BookOpen,
-  AlertCircle
+  BookOpen
 } from 'lucide-react';
 import { TimelineActivity, Program } from '@/types/client';
-import { mockClientService } from '@/services/mock-client-service';
+import { unifiedClientService } from '@/services/unified-client-service';
 import { cn } from '@/lib/utils';
 
 interface TimelineSectionProps {
@@ -75,18 +73,14 @@ export function TimelineSection({ clientId, canEditClient = true }: TimelineSect
   const [newNoteProgram, setNewNoteProgram] = useState<string>('');
   const [submittingNote, setSubmittingNote] = useState(false);
 
-  useEffect(() => {
-    loadData();
-  }, [clientId, selectedTypes]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       const [activitiesData, programsData] = await Promise.all([
-        mockClientService.getTimelineActivities(clientId, { 
+        unifiedClientService.getTimelineActivities(clientId, { 
           activityTypes: selectedTypes.length > 0 ? selectedTypes : undefined 
         }),
-        mockClientService.getPrograms()
+        unifiedClientService.getPrograms()
       ]);
       
       setActivities(activitiesData);
@@ -96,7 +90,11 @@ export function TimelineSection({ clientId, canEditClient = true }: TimelineSect
     } finally {
       setLoading(false);
     }
-  };
+  }, [clientId, selectedTypes]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const handleTypeToggle = (type: ActivityType) => {
     setSelectedTypes(prev => 
@@ -123,7 +121,7 @@ export function TimelineSection({ clientId, canEditClient = true }: TimelineSect
 
     try {
       setSubmittingNote(true);
-      const newActivity = await mockClientService.createNote(clientId, {
+      const newActivity = await unifiedClientService.addTimelineActivity(clientId, {
         type: newNoteType,
         content: newNoteContent,
         program: newNoteProgram

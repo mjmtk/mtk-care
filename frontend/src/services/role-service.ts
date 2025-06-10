@@ -1,4 +1,4 @@
-import { AppRoles } from "@/types/auth";
+import { ROLE_NAMES } from "@/types/auth";
 
 /**
  * Service for interacting with the Django backend for role management
@@ -33,25 +33,25 @@ export class RoleService {
    * @param userId User ID
    * @returns Array of roles
    */
-  static async getUserRoles(userId: string): Promise<AppRoles[]> {
+  static async getUserRoles(userId: string): Promise<string[]> {
     try {
       // For debugging purposes
       console.log(`Fetching roles for user ${userId}`);
-      const data = await apiRequest<{ roles: AppRoles[] }>({ url: `users/${userId}/roles` });
+      const data = await apiRequest<{ roles: string[] }>({ url: `users/${userId}/roles` });
       console.log(`Roles for user ${userId}:`, data.roles);
       return data.roles;
     } catch (error: any) {
       console.error('Error fetching user roles:', error.response ? error.response.data : error.message);
-      // If user doesn't exist in the backend yet, return default Caseworker role
+      // If user doesn't exist in the backend yet, return default Practitioner role
       if (error.response && error.response.status === 404) {
-        console.log(`User ${userId} not found in backend, using default Caseworker role`);
-        return [AppRoles.Caseworker];
+        console.log(`User ${userId} not found in backend, using default Practitioner role`);
+        return [ROLE_NAMES.PRACTITIONER];
       }
       // Return default role if there's another error
       // Consider if specific error from parseApiError equivalent is needed or if console.error is enough
       // const parsedError = await parseApiError(error.response); // parseApiError expects a Fetch Response object
       // console.warn(`Error fetching user roles: ${parsedError.detail}`);
-      return [AppRoles.Caseworker];
+      return [ROLE_NAMES.PRACTITIONER];
     }
   }
 
@@ -61,7 +61,7 @@ export class RoleService {
    * @param userId User ID
    * @param roles Roles to assign
    */
-  static async assignRolesToUser(userId: string, roles: AppRoles[]): Promise<void> {
+  static async assignRolesToUser(userId: string, roles: string[]): Promise<void> {
     try {
       await apiRequest({ url: `users/${userId}/roles`, method: 'post', data: { roles } });
       // No specific data needs to be returned on success for POST, assuming 2xx is success

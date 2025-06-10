@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAuthBypassSession, useAccessToken } from '@/hooks/useAuthBypass';
 import { externalOrganisationsApi } from '@/services/apiService';
 import type { components } from '@/types/openapi';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { ErrorDisplay } from '@/components/error-display';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -57,7 +57,7 @@ function useExternalOrganisations(accessToken: string | null) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchOrganisations = async () => {
+  const fetchOrganisations = useCallback(async () => {
     if (!accessToken) {
       setLoading(false);
       return;
@@ -74,11 +74,11 @@ function useExternalOrganisations(accessToken: string | null) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [accessToken]);
 
   useEffect(() => {
     fetchOrganisations();
-  }, [accessToken]);
+  }, [fetchOrganisations]);
 
   return { organisations, loading, error, refetch: fetchOrganisations };
 }

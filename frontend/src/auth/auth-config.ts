@@ -13,17 +13,8 @@ if (!isAuthBypassMode && (
 
 
 /**
- * App roles defined in Azure AD
+ * App roles are now defined in @/types/auth for better organization
  */
-export enum AppRoles {
-    Superuser = "Superuser",
-    Administrator = "Administrator",
-    OrganisationExecutive = "Organisation Executive",
-    ProgramManager = "Program Manager",
-    Supervisor = "Supervisor",
-    Caseworker = "Caseworker",
-    PracticeLead = "Practice Lead"
-}
 
 /**
  * MSAL configuration object (populated from environment variables for security and flexibility)

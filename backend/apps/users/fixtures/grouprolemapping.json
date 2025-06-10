@@ -5,11 +5,10 @@
     "fields": {
       "azure_ad_group_id": "4e74cb4d-8664-4303-91d8-cf189f1537cd",
       "azure_ad_group_name": "MC_Admin",
-      "role": "81aecd02-0000-0000-0000-000000000000",
+      "role": "00000000-0000-0000-0000-000000000002",
       "created_at": "2025-06-05T01:42:00Z",
       "updated_at": "2025-06-05T01:42:00Z",
-      "created_by": "086c146e-0c4a-4bde-a657-30f24290aab0",
-      "updated_by": "086c146e-0c4a-4bde-a657-30f24290aab0"
+      "created_by": "00000000-0000-0000-0000-000000000000"
     }
   },
   {
@@ -18,11 +17,10 @@
     "fields": {
       "azure_ad_group_id": "6a6cf256-ef54-4063-a06e-fcb8f0bc0b82",
       "azure_ad_group_name": "MC_Managers",
-      "role": "6f747867-0000-0000-0000-000000000000",
+      "role": "00000000-0000-0000-0000-000000000004",
       "created_at": "2025-06-05T01:42:00Z",
       "updated_at": "2025-06-05T01:42:00Z",
-      "created_by": "086c146e-0c4a-4bde-a657-30f24290aab0",
-      "updated_by": "086c146e-0c4a-4bde-a657-30f24290aab0"
+      "created_by": "00000000-0000-0000-0000-000000000000"
     }
   },
   {
@@ -30,12 +28,11 @@
     "pk": "edbe21c1-bf1b-4ade-85db-02367f5ac9af",
     "fields": {
       "azure_ad_group_id": "edbe21c1-bf1b-4ade-85db-02367f5ac9af",
-      "azure_ad_group_name": "MC_Providers",
-      "role": "71214387-0000-0000-0000-000000000000",
+      "azure_ad_group_name": "MC_Practitioners",
+      "role": "00000000-0000-0000-0000-000000000005",
       "created_at": "2025-06-05T01:42:00Z",
       "updated_at": "2025-06-05T01:42:00Z",
-      "created_by": "086c146e-0c4a-4bde-a657-30f24290aab0",
-      "updated_by": "086c146e-0c4a-4bde-a657-30f24290aab0"
+      "created_by": "00000000-0000-0000-0000-000000000000"
     }
   },
   {
@@ -44,11 +41,10 @@
     "fields": {
       "azure_ad_group_id": "23ce2e67-ae64-41e6-902a-43533534a37b",
       "azure_ad_group_name": "MC_Staff",
-      "role": "b9f44d10-0000-0000-0000-000000000000",
+      "role": "00000000-0000-0000-0000-000000000006",
       "created_at": "2025-06-05T01:42:00Z",
       "updated_at": "2025-06-05T01:42:00Z",
-      "created_by": "086c146e-0c4a-4bde-a657-30f24290aab0",
-      "updated_by": "086c146e-0c4a-4bde-a657-30f24290aab0"
+      "created_by": "00000000-0000-0000-0000-000000000000"
     }
   }
 ]

@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from .models import Client
 from .schemas import ClientCreateSchema, ClientUpdateSchema, ClientSearchSchema
 from apps.optionlists.models import OptionListItem
+from apps.reference_data.models import Language
 
 
 class ClientService:
@@ -28,11 +29,8 @@ class ClientService:
             primary_language = None
             if data.primary_language_id:
                 try:
-                    primary_language = OptionListItem.objects.get(
-                        id=data.primary_language_id,
-                        option_list__slug='languages'
-                    )
-                except OptionListItem.DoesNotExist:
+                    primary_language = Language.objects.get(id=data.primary_language_id)
+                except Language.DoesNotExist:
                     raise ValidationError("Invalid primary language ID provided")
             
             # Create client
@@ -65,12 +63,9 @@ class ClientService:
             # Handle primary language update
             if data.primary_language_id is not None:
                 try:
-                    primary_language = OptionListItem.objects.get(
-                        id=data.primary_language_id,
-                        option_list__slug='languages'
-                    )
+                    primary_language = Language.objects.get(id=data.primary_language_id)
                     client.primary_language = primary_language
-                except OptionListItem.DoesNotExist:
+                except Language.DoesNotExist:
                     raise ValidationError("Invalid primary language ID provided")
             
             # Update other fields

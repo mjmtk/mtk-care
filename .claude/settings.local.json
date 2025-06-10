@@ -6,7 +6,10 @@
       "Bash(grep:*)",
       "Bash(npm run typecheck:*)",
       "Bash(find:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run build:*)",
+      "Bash(python manage.py:*)"
     ],
     "deny": []
   }

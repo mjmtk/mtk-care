@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from apps.common.models import UUIDPKBaseModel
 from apps.optionlists.models import OptionListItem
+from apps.reference_data.models import Language
 
 
 class Client(UUIDPKBaseModel):
@@ -69,14 +70,13 @@ class Client(UUIDPKBaseModel):
     )
 
     primary_language = models.ForeignKey(
-        OptionListItem,
+        Language,
         on_delete=models.PROTECT,
         related_name='primary_language_clients',
         verbose_name=_('Primary Language'),
         null=True,
         blank=True,
         help_text=_('Client\'s preferred language'),
-        limit_choices_to={'option_list__slug': 'languages'},
     )
 
     interpreter_needed = models.BooleanField(

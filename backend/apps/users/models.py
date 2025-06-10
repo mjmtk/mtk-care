@@ -35,10 +35,27 @@ class Role(UserAppBaseModel):
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True, null=True)
     level = models.PositiveSmallIntegerField(unique=True, help_text="Numeric level for hierarchy (e.g., 1 for Admin, 2 for Manager)")
+    
+    # Enhanced fields for better role management
+    is_system_role = models.BooleanField(
+        default=False, 
+        help_text="System roles cannot be deleted or have their core properties modified"
+    )
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Inactive roles cannot be assigned to users"
+    )
+    custom_permissions = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="Custom permissions and settings specific to this role"
+    )
+    
+    # Keep Django permissions for standard auth
     permissions = models.ManyToManyField(
         Permission,
         blank=True,
-        help_text="Permissions associated with this role."
+        help_text="Django permissions associated with this role"
     )
 
     class Meta:
@@ -46,6 +63,12 @@ class Role(UserAppBaseModel):
 
     def __str__(self):
         return self.name
+    
+    def get_all_permissions(self):
+        """Get all permissions including custom ones."""
+        django_perms = list(self.permissions.values_list('codename', flat=True))
+        custom_perms = list(self.custom_permissions.keys()) if self.custom_permissions else []
+        return django_perms + custom_perms
 
 class UserProfile(UserAppBaseModel):
     """Extended user profile for additional information."""

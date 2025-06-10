@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, Users, AlertTriangle, Filter } from 'lucide-react'
+import { Plus, Filter } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { ReferralsDataTable } from './data-table'
@@ -10,6 +10,7 @@ import { columns } from './columns'
 import { Referral, ReferralListResponse, ReferralListParams } from '@/types/referral'
 import { useAuthBypassSession, useAccessToken } from '@/hooks/useAuthBypass'
 import { ReferralService } from '@/services/referral-service'
+import { ErrorBoundary } from '@/components/error-boundary'
 
 // Function to fetch referrals from the API
 async function fetchReferrals(params?: ReferralListParams): Promise<ReferralListResponse> {
@@ -22,7 +23,7 @@ async function fetchReferrals(params?: ReferralListParams): Promise<ReferralList
   }
 }
 
-export default function ReferralsPage() {
+function ReferralsPageContent() {
   const router = useRouter()
   const [referrals, setReferrals] = useState<Referral[]>([])
   const [totalCount, setTotalCount] = useState(0)
@@ -158,4 +159,12 @@ export default function ReferralsPage() {
       </div>
     </div>
   )
+}
+
+export default function ReferralsPage() {
+  return (
+    <ErrorBoundary level="page" showDetails={process.env.NODE_ENV === 'development'}>
+      <ReferralsPageContent />
+    </ErrorBoundary>
+  );
 }

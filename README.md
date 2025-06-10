@@ -43,6 +43,12 @@ This project is a full-stack application featuring a Django backend and a Next.j
     ```bash
     poetry run python manage.py migrate
     ```
+5.  **Load initial data fixtures:**
+    ```bash
+    cd .. # Go back to project root
+    ./scripts/load_fixtures.sh
+    ```
+    This will load all necessary option lists, reference data (countries, languages), and other initial data required for the application to function properly.
 
 ### Frontend
 

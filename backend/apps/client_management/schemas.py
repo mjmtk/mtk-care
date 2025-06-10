@@ -4,6 +4,7 @@ from ninja import Schema
 from pydantic import Field
 from apps.common.schemas import UUIDPKBaseModelSchema
 from apps.optionlists.schemas import OptionListItemSchemaOut
+from apps.reference_data.schemas import LanguageOut
 
 
 class ClientCreateSchema(Schema):
@@ -82,7 +83,7 @@ class ClientListSchema(UUIDPKBaseModelSchema):
     
     # Related objects
     status: Optional[OptionListItemSchemaOut] = None
-    primary_language: Optional[OptionListItemSchemaOut] = None
+    primary_language: Optional[LanguageOut] = None
 
 
 class ClientDetailSchema(ClientListSchema):

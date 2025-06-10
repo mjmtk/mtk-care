@@ -22,6 +22,7 @@ from apps.external_organisation_management.api_external_organisation_crud import
 from apps.external_organisation_management.api import contacts_router, emails_router, phones_router
 from apps.referral_management.api import router as referrals_router
 from apps.client_management.api import router as clients_router
+from apps.reference_data.api import create_reference_router
 # Add additional router imports here as needed, following the pattern above.
 
 # Instantiate NinjaAPI - This is the single, central API instance for the project.
@@ -47,6 +48,7 @@ api.add_router("/external-organisation-emails/", emails_router, tags=["External 
 api.add_router("/external-organisation-phones/", phones_router, tags=["External Organisation Phones"])
 api.add_router("/referrals/", referrals_router, tags=["Referrals"])
 api.add_router("/clients/", clients_router, tags=["Clients"])
+api.add_router("/reference/", create_reference_router(), tags=["Reference Data"])
 
 # Add any new application routers here, ensuring they use a trailing slash:
 # Example: api.add_router("/newfeature/", newfeature_router, tags=["NewFeature"])

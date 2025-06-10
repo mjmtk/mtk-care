@@ -33,12 +33,14 @@ export function RoleSwitcher() {
   // Define role colors and icons for better UX
   const getRoleConfig = (role: string) => {
     const roleMap: Record<string, { color: string; icon?: any }> = {
+      'Superuser': { color: 'destructive' },
       'Administrator': { color: 'destructive' },
-      'Organisation Executive': { color: 'orange' },
-      'Program Manager': { color: 'blue' },
       'Supervisor': { color: 'purple' },
-      'Caseworker': { color: 'green' },
-      'Practice Lead': { color: 'yellow' },
+      'Manager': { color: 'blue' },
+      'Practitioner': { color: 'green' },
+      'Staff': { color: 'default' },
+      'ReadOnlyUser': { color: 'secondary' },
+      'RestrictedUser': { color: 'outline' },
     };
     return roleMap[role] || { color: 'default' };
   };
@@ -111,16 +113,16 @@ export function RoleSwitcher() {
             Common Combinations
           </DropdownMenuLabel>
           <DropdownMenuItem
-            onClick={() => switchToMultipleRoles(['Supervisor', 'Caseworker'])}
+            onClick={() => switchToMultipleRoles(['Supervisor', 'Practitioner'])}
             className="cursor-pointer"
           >
-            Supervisor + Caseworker
+            Supervisor + Practitioner
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() => switchToMultipleRoles(['Program Manager', 'Practice Lead'])}
+            onClick={() => switchToMultipleRoles(['Manager', 'Staff'])}
             className="cursor-pointer"
           >
-            Program Manager + Practice Lead
+            Manager + Staff
           </DropdownMenuItem>
           
           <DropdownMenuSeparator />

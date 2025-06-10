@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { notFound } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -8,7 +8,7 @@ import { AlertCircle } from 'lucide-react';
 import { ClientHeader } from '@/components/clients/ClientHeader';
 import { ClientTabsSection } from '@/components/clients/ClientTabsSection';
 import { Client } from '@/types/client';
-import { mockClientService } from '@/services/mock-client-service';
+import { unifiedClientService } from '@/services/unified-client-service';
 
 interface ClientDashboardPageProps {
   params: Promise<{
@@ -30,17 +30,11 @@ export default function ClientDashboardPage({ params }: ClientDashboardPageProps
     getParams();
   }, [params]);
 
-  useEffect(() => {
-    if (clientId) {
-      loadClient();
-    }
-  }, [clientId]);
-
-  const loadClient = async () => {
+  const loadClient = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const clientData = await mockClientService.getClient(clientId);
+      const clientData = await unifiedClientService.getClient(clientId);
       setClient(clientData);
     } catch (err) {
       console.error('Error loading client:', err);
@@ -48,7 +42,13 @@ export default function ClientDashboardPage({ params }: ClientDashboardPageProps
     } finally {
       setLoading(false);
     }
-  };
+  }, [clientId]);
+
+  useEffect(() => {
+    if (clientId) {
+      loadClient();
+    }
+  }, [clientId, loadClient]);
 
   const handleGenealogyClick = () => {
     console.log('Genealogy clicked for client:', clientId);

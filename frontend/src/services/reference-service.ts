@@ -1,13 +1,14 @@
 import { apiRequest } from './api-request';
 
 export interface ReferenceItem {
-  id: string;
+  id: number;
+  code: string;
   name: string;
 }
 
 export class ReferenceService {
   static async fetchCountries(): Promise<ReferenceItem[]> {
-    const url = 'reference/countries/';
+    const url = 'v1/reference/countries/';
     try {
       const data = await apiRequest<ReferenceItem[]>({ url });
       return data;
@@ -18,7 +19,7 @@ export class ReferenceService {
   }
 
   static async fetchLanguages(): Promise<ReferenceItem[]> {
-    const url = 'reference/languages/';
+    const url = 'v1/reference/languages/';
     try {
       const data = await apiRequest<ReferenceItem[]>({ url });
       return data;

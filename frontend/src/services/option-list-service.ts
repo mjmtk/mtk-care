@@ -44,7 +44,7 @@ export class OptionListService {
       return OptionListService.cache.get(type)!;
     }
     // API call using axiosInstance with relative URL
-    const url = `/optionlistitems/${type}/`; // Assuming trailing slash is desired or handled by backend/axios
+    const url = `v1/optionlists/${type}/items/`; // Updated to match backend API pattern
     try {
       const response: AxiosResponse<OptionListItem[]> = await axiosInstance.get(url);
       OptionListService.cache.set(type, response.data);

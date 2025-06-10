@@ -3,6 +3,8 @@
 import { SessionProvider } from "next-auth/react";
 import { AuthBypassProvider, useAuthBypass } from "./auth-bypass-provider";
 import { RoleSwitcherProvider } from "./role-switcher-provider";
+import { DynamicRoleProvider } from "@/contexts/DynamicRoleProvider";
+import { AbilityProvider } from "@/auth/ability-context";
 
 function SessionProviderWrapper({ children }: { children: React.ReactNode }) {
   const { isAuthBypassMode, mockSession } = useAuthBypass();
@@ -20,9 +22,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <AuthBypassProvider>
       <SessionProviderWrapper>
-        <RoleSwitcherProvider>
-          {children}
-        </RoleSwitcherProvider>
+        <DynamicRoleProvider>
+          <RoleSwitcherProvider>
+            <AbilityProvider>
+              {children}
+            </AbilityProvider>
+          </RoleSwitcherProvider>
+        </DynamicRoleProvider>
       </SessionProviderWrapper>
     </AuthBypassProvider>
   );

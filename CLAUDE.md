@@ -128,6 +128,9 @@ Run these before committing:
 - Frontend: `npm run lint` and `npm run build`
 - Backend: `python manage.py test`
 - API Routes: `python scripts/validate_api_routes.py`
+- Frontend URLs: `python scripts/validate_frontend_urls.py`
+
+**Critical**: Always run `npm run build` before pushing to catch TypeScript errors!
 
 ## Architecture Decisions
 

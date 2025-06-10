@@ -3,6 +3,7 @@ import { SidebarNav } from "@/components/sidebar-nav";
 import { UserNav } from "@/components/user-nav";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { SessionManager } from "@/components/auth/SessionManager";
+import { RoleSwitcher } from "@/components/auth/RoleSwitcher";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
@@ -54,7 +55,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               </SheetContent>
             </Sheet>
           </div>
-          <UserNav />
+          <div className="flex items-center gap-4">
+            <RoleSwitcher />
+            <UserNav />
+          </div>
         </header>
         
         {/* Page Content */}

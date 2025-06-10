@@ -6,20 +6,22 @@ from ninja.responses import Response
 from ninja.security import HttpBearer
 from typing import Dict, Any
 
-from .jwt_auth import JWTAuth
+from .decorators import auth_required
 
 class ErrorSchema(Schema):
     detail: str
 
 router = Router()
 
-@router.get("/me", auth=JWTAuth(), response={200: Dict[str, Any], 401: ErrorSchema, 500: ErrorSchema})
+@router.get("/me", response={200: Dict[str, Any], 401: ErrorSchema, 500: ErrorSchema}, auth=auth_required)
 def get_current_user(request):
     """
     Returns the current authenticated user's information and role.
-    Requires a valid JWT token in the Authorization header.
+    Requires authentication (via middleware in auth bypass mode or JWT token).
     """
-    user = request.auth
+    # In auth bypass mode, user comes from middleware
+    # In normal mode, user comes from JWT authentication
+    user = request.user if hasattr(request, 'user') else request.auth
     
     # Check if user is authenticated
     if not user or not getattr(user, 'is_authenticated', False):

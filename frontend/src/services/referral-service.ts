@@ -10,7 +10,7 @@ import type {
 } from '@/types/referral';
 
 export class ReferralService {
-  private static readonly BASE_PATH = 'v1/referrals';
+  private static readonly BASE_PATH = 'v1/referrals/';
 
   /**
    * Get list of referrals with optional filtering
@@ -41,7 +41,7 @@ export class ReferralService {
    */
   static async getReferral(id: string): Promise<Referral> {
     return apiRequest<Referral>({
-      url: `${this.BASE_PATH}/${id}`,
+      url: `${this.BASE_PATH}${id}`,
       method: 'GET',
     });
   }
@@ -62,7 +62,7 @@ export class ReferralService {
    */
   static async updateReferral(id: string, data: ReferralUpdate): Promise<Referral> {
     return apiRequest<Referral>({
-      url: `${this.BASE_PATH}/${id}`,
+      url: `${this.BASE_PATH}${id}`,
       method: 'PUT',
       data,
     });
@@ -73,7 +73,7 @@ export class ReferralService {
    */
   static async updateReferralStatus(id: string, data: ReferralStatusUpdate): Promise<Referral> {
     return apiRequest<Referral>({
-      url: `${this.BASE_PATH}/${id}/status`,
+      url: `${this.BASE_PATH}${id}/status`,
       method: 'PATCH',
       data,
     });
@@ -84,7 +84,7 @@ export class ReferralService {
    */
   static async deleteReferral(id: string): Promise<void> {
     return apiRequest<void>({
-      url: `${this.BASE_PATH}/${id}`,
+      url: `${this.BASE_PATH}${id}`,
       method: 'DELETE',
     });
   }
@@ -94,7 +94,7 @@ export class ReferralService {
    */
   static async getBatchDropdowns(): Promise<ReferralBatchDropdowns> {
     return apiRequest<ReferralBatchDropdowns>({
-      url: `${this.BASE_PATH}/batch-dropdowns/`,
+      url: `${this.BASE_PATH}batch-dropdowns`,
       method: 'GET',
     });
   }

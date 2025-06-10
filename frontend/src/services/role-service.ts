@@ -19,7 +19,7 @@ export class RoleService {
    */
   static async getAllRoles(): Promise<Role[]> {
     try {
-      const data = await apiRequest<Role[]>({ url: 'roles' });
+      const data = await apiRequest<Role[]>({ url: 'v1/roles/' });
       return data;
     } catch (error: any) {
       console.error("Error fetching all roles:", error.response ? error.response.data : error.message);

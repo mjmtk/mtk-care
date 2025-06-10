@@ -13,7 +13,9 @@ roles_router = Router(tags=["roles"])
 @users_router.get("/me", response=UserOut)
 def get_current_user(request):
     print("HIT /me endpoint (CASCADE DEBUG)")
-    user = request.auth if hasattr(request, 'auth') and request.auth else request.user
+    # In auth bypass mode, user comes from request.user
+    # In normal mode, user comes from request.auth
+    user = request.user if hasattr(request, 'user') and request.user.is_authenticated else request.auth
     if not user or not user.is_authenticated:
         return 401, {"detail": "Not authenticated"}
     profile = user.profile if hasattr(user, 'profile') else None

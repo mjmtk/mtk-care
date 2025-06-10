@@ -214,7 +214,7 @@ export class ClientService {
    */
   static async createClient(clientData: ClientCreateRequest): Promise<Client> {
     try {
-      const data = await apiRequest<Client>({ url: 'clients', method: 'post', data: clientData });
+      const data = await apiRequest<Client>({ url: 'v1/clients/', method: 'post', data: clientData });
       if (!data || !data.id) { // Basic validation
         console.error('[ClientService.createClient] API contract error: invalid response from client creation API:', data);
         throw new Error('API contract error: invalid response from client creation API. Please contact support.');

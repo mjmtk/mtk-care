@@ -26,19 +26,10 @@ export class NewClientService {
    * Search for clients with optional filters
    */
   static async searchClients(params: ClientSearchParams = {}): Promise<PagedClientListSchema> {
-    const queryParams = new URLSearchParams();
-    
-    Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        queryParams.append(key, value.toString());
-      }
-    });
-
-    const url = `v1/clients/${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
-    
     return apiRequest({
-      url,
+      url: 'v1/clients/',
       method: 'GET',
+      params: params,
     });
   }
 

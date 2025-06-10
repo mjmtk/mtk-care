@@ -55,6 +55,10 @@ def _prepare_client_out_data(client_obj: Client) -> Optional[ClientSchema]:
 
 router = Router()
 
+def get_authenticated_user(request):
+    """Get authenticated user from request - works in both auth bypass and normal mode."""
+    return request.user if hasattr(request, 'user') and request.user.is_authenticated else request.auth
+
 @router.get("/", response=List[ReferralOut])
 def list_referrals(request):
     referrals_data = []
@@ -144,7 +148,7 @@ def update_referral(request, referral_id: UUID, data: ReferralIn):
         setattr(ref, k, v)
     # Call the custom save method, passing the authenticated user
     # The save() method in SoftDeleteModel will handle updated_by
-    ref.save(user=request.auth)
+    ref.save(user=get_authenticated_user(request))
     client_details_data = None
     client_id_val = None
     if ref.client:
@@ -209,7 +213,7 @@ def create_referral(request, data: ReferralIn):
     ref = Referral(**data_dict)
     # Call the custom save method, passing the authenticated user
     # The save() method in SoftDeleteModel will handle created_by and updated_by
-    ref.save(user=request.auth)
+    ref.save(user=get_authenticated_user(request))
     client_details_data = None
     client_id_val = None
     if ref.client:
@@ -285,7 +289,7 @@ def update_referral_status(request, referral_id: UUID, payload: ReferralStatusUp
     referral.status = new_status
     # Assuming your Referral model's save method can take a 'user' argument to update 'updated_by'
     # If not, you might need to set referral.updated_by = request.auth manually before saving
-    referral.save(user=request.auth) 
+    referral.save(user=get_authenticated_user(request)) 
 
     # Prepare the output using the same logic as retrieve_referral or create_referral for consistency
     client_details_data = None

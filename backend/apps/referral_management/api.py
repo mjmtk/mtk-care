@@ -20,7 +20,7 @@ from apps.authentication.decorators import auth_required
 
 router = Router()
 
-@router.get("", response=ReferralListResponse, auth=auth_required)
+@router.get("/", response=ReferralListResponse, auth=auth_required)
 def list_referrals(request: HttpRequest, page: int = 1, limit: int = 20, 
                   status: Optional[str] = None, priority: Optional[str] = None, 
                   client_type: Optional[str] = None):
@@ -52,7 +52,7 @@ def list_referrals(request: HttpRequest, page: int = 1, limit: int = 20,
         'total_pages': total_pages
     }
 
-@router.post("", response=ReferralSchemaOut, auth=auth_required)
+@router.post("/", response=ReferralSchemaOut, auth=auth_required)
 def create_referral(request: HttpRequest, payload: ReferralSchemaIn):
     """Create a new referral."""
     from django.contrib.auth import get_user_model

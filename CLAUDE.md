@@ -21,15 +21,52 @@ The system supports community services including counselling for alcohol and oth
 - Frontend must include `v1/` in all API calls
 - Example: `apiRequest({ url: 'v1/users/me' })` → `/api/v1/users/me`
 
-### API URL Standards (IMPORTANT)
+### API URL Pattern Standards (CRITICAL)
 
-**Django Ninja endpoints should NOT use trailing slashes** for consistency:
+**ALWAYS follow these patterns to prevent 404 errors:**
 
-- ✅ Correct: `@router.get("/me")`, `@router.get("/{id}")`
-- ❌ Incorrect: `@router.get("/me/")`, `@router.get("/{id}/")`
-- **REQUIRED**: Set `APPEND_SLASH = False` in Django settings to prevent conflicts
-- Frontend has automatic retry logic as failsafe
-- See `docs/03-architecture/api-design/django-ninja-api-standards.md` for full guidelines
+#### Backend (Django Ninja):
+```python
+# ✅ CORRECT - Collections use "/"
+@router.get("/", response=List[ModelOut])
+@router.post("/", response=ModelOut)
+
+# ✅ CORRECT - Individual resources use "/{id}"
+@router.get("/{resource_id}", response=ModelOut)
+@router.put("/{resource_id}", response=ModelOut)
+
+# ✅ CORRECT - Special actions use descriptive paths
+@router.get("/batch-dropdowns", response=DropdownsOut)
+
+# ❌ NEVER USE - Empty string routes cause 404s
+@router.get("", response=ModelOut)  # DON'T DO THIS
+```
+
+#### Frontend (API Calls):
+```typescript
+// ✅ CORRECT - Collections with trailing slash
+const users = await apiRequest({ url: 'v1/users/' });
+const referrals = await apiRequest({ url: 'v1/referrals/' });
+
+// ✅ CORRECT - Individual resources without trailing slash
+const user = await apiRequest({ url: `v1/users/${id}` });
+
+// ✅ CORRECT - Special actions without trailing slash
+const dropdowns = await apiRequest({ url: 'v1/referrals/batch-dropdowns' });
+```
+
+### Validation Tools
+
+Run before committing API changes:
+```bash
+# Backend route validation
+source backend/.venv/bin/activate
+python scripts/validate_api_routes.py
+
+# Pre-commit hooks (validates automatically)
+pre-commit install
+pre-commit run --all-files
+```
 
 ### Environment Variables
 
@@ -47,8 +84,11 @@ Production requires these critical environment variables:
 
 ### Common Issues and Solutions
 
-1. **404 errors on API calls**: Check that frontend is using `v1/` prefix
-2. **CORS errors**: Ensure `CORS_ALLOWED_ORIGINS` includes frontend URL. Let Azure setup handle it - remove middleware
+1. **404 errors on API calls**: Check URL patterns follow standards above
+2. **CORS errors**: 
+   - Development: CORS middleware is automatically included via `development.py`
+   - Production: Azure Web App handles CORS (don't add middleware)
+   - If you see "Method Not Allowed" for OPTIONS, restart Django server
 3. **Authentication failures**: Verify Azure AD configuration matches between frontend and backend
 
 ### Development Commands
@@ -63,14 +103,31 @@ npm run dev  # Runs on http://localhost:3000
 **Backend**:
 ```bash
 cd backend
+source .venv/bin/activate
 python manage.py runserver  # Runs on http://localhost:8000
 ```
+
+### Auth Bypass Mode Features
+
+When `AUTH_BYPASS_MODE=true`:
+- **Automatic superuser**: Creates `test.user@example.com` with superuser privileges
+- **Role switching enabled**: User gets "Superuser" role with access to role switcher
+- **All roles created**: Automatically creates all standard roles for testing:
+  - Superuser (level 0) - for development/testing
+  - Administrator (level 1) - full system admin
+  - Organisation Executive (level 2) - senior executive
+  - Program Manager (level 3) - manages programs
+  - Supervisor (level 4) - supervises staff
+  - Practice Lead (level 5) - leads practice development
+  - Caseworker (level 6) - direct service provider
+- **No Azure AD required**: Perfect for development and testing without HTTPS setup
 
 ### Testing Commands
 
 Run these before committing:
-- Frontend: `npm run lint` and `npm run typecheck`
+- Frontend: `npm run lint` and `npm run build`
 - Backend: `python manage.py test`
+- API Routes: `python scripts/validate_api_routes.py`
 
 ## Architecture Decisions
 
@@ -78,6 +135,7 @@ Run these before committing:
 2. **API Versioning**: URL-based versioning (`/api/v1/`)
 3. **Authentication**: Azure AD with JWT tokens
 4. **Database**: PostgreSQL on Azure
+5. **API Standards**: Consistent URL patterns enforced by validation tools
 
 ## File Structure
 
@@ -85,7 +143,9 @@ Run these before committing:
 - `/backend`: Django application
 - `/docs`: Technical documentation
 - `/.github/workflows`: CI/CD pipelines
+- `/scripts`: Development and validation scripts
 
 ## Recent Changes
 
 - June 6, 2025: Standardized API versioning to use `/api/v1/` prefix consistently
+- June 10, 2025: Implemented strict API URL pattern standards with validation tools

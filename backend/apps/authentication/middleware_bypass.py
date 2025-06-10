@@ -64,18 +64,28 @@ class AuthBypassMiddleware:
         try:
             # Try to get existing test user
             self._bypass_user = User.objects.get(username='test.user@example.com')
-            logger.info("Using existing bypass user: test.user@example.com")
+            
+            # Ensure existing user is a superuser
+            if not self._bypass_user.is_superuser or not self._bypass_user.is_staff:
+                self._bypass_user.is_superuser = True
+                self._bypass_user.is_staff = True
+                self._bypass_user.save()
+                logger.info("Updated existing bypass user to superuser")
+            else:
+                logger.info("Using existing bypass superuser: test.user@example.com")
         except User.DoesNotExist:
             try:
-                # Create mock user
+                # Create mock superuser for testing
                 self._bypass_user = User.objects.create_user(
                     username='test.user@example.com',
                     email='test.user@example.com',
                     first_name='Test',
                     last_name='User',
-                    is_active=True
+                    is_active=True,
+                    is_staff=True,
+                    is_superuser=True  # Make this user a superuser for role switching
                 )
-                logger.info("Created new bypass user: test.user@example.com")
+                logger.info("Created new bypass superuser: test.user@example.com")
             except Exception as e:
                 # If user creation fails (e.g., race condition), try to get it again
                 logger.warning(f"Failed to create bypass user: {e}. Attempting to retrieve existing user.")
@@ -107,22 +117,27 @@ class AuthBypassMiddleware:
         if created:
             logger.info("Created UserProfile for bypass user")
             
-        # Assign a role if one exists (for testing role-based features)
+        # Assign Superuser role for testing role-based features
         if not profile.role:
             try:
-                # Try to assign the first available role, or create a test role
-                role = Role.objects.first()
-                if not role:
-                    role = Role.objects.create(
-                        name='Test Admin',
-                        description='Test role for auth bypass mode',
-                        level=1
-                    )
-                    logger.info("Created test role for bypass user")
+                # Also create other common roles for role switching testing first
+                self._ensure_test_roles_exist()
+                
+                # Try to get or create Superuser role
+                role, created = Role.objects.get_or_create(
+                    name='Superuser',
+                    defaults={
+                        'description': 'System superuser for development and testing',
+                        'level': 0  # Highest level role
+                    }
+                )
+                if created:
+                    logger.info("Created Superuser role for bypass user")
                 
                 profile.role = role
                 profile.save()
-                logger.info(f"Assigned role '{role.name}' to bypass user")
+                logger.info(f"Assigned '{role.name}' role to bypass user")
+                
             except Exception as e:
                 logger.warning(f"Could not assign role to bypass user: {e}")
         
@@ -130,3 +145,29 @@ class AuthBypassMiddleware:
         self._bypass_user.role = profile.role
         
         return self._bypass_user
+    
+    def _ensure_test_roles_exist(self):
+        """Create all standard roles for testing role switching functionality."""
+        standard_roles = [
+            ('Superuser', 'System superuser for development and testing', 0),
+            ('Administrator', 'Full system administrator with all permissions', 1),
+            ('Organisation Executive', 'Senior executive with organizational oversight', 2),
+            ('Program Manager', 'Manages programs and services', 3),
+            ('Supervisor', 'Supervises staff and monitors cases', 4),
+            ('Practice Lead', 'Leads practice development and standards', 5),
+            ('Caseworker', 'Direct service provider working with clients', 6),
+        ]
+        
+        for role_name, description, level in standard_roles:
+            try:
+                role, created = Role.objects.get_or_create(
+                    name=role_name,
+                    defaults={
+                        'description': description,
+                        'level': level
+                    }
+                )
+                if created:
+                    logger.info(f"Created test role: {role_name}")
+            except Exception as e:
+                logger.warning(f"Could not create role {role_name}: {e}")

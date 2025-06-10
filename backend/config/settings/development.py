@@ -8,6 +8,9 @@ ALLOWED_HOSTS = ['*']
 # Additional CORS settings for development
 CORS_ALLOW_ALL_ORIGINS = True
 
+# Add CORS middleware for development (Azure handles CORS in production)
+MIDDLEWARE.insert(2, 'corsheaders.middleware.CorsMiddleware')
+
 # Debug Toolbar
 if DEBUG:
     INSTALLED_APPS += ['debug_toolbar']

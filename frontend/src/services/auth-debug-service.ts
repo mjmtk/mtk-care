@@ -18,7 +18,7 @@ export class AuthDebugService {
     // Test with a simple fetch to see raw headers
     console.log('[AuthDebugService] Testing with raw fetch...');
     try {
-      const response = await fetch('http://localhost:8000/api/v1/users/me/', {
+      const response = await fetch('http://localhost:8000/api/v1/users/me', {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -57,7 +57,7 @@ export class AuthDebugService {
     
     try {
       const response = await apiRequest({
-        url: 'auth/msal/login/',
+        url: 'v1/auth/msal/login/',
         method: 'post',
         data: { id_token: msalIdToken }
       });
@@ -90,7 +90,7 @@ export class AuthDebugService {
     
     try {
       const response = await apiRequest({
-        url: 'users/me/',
+        url: 'v1/users/me',
         method: 'get'
       });
       

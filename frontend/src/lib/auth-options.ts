@@ -41,7 +41,7 @@ export const authOptions: NextAuthOptions = {
       if (token.accessToken) {
         try {
           // Use the Django API to get current user with roles
-          const response = await fetch(`${process.env.NEXT_PUBLIC_DJANGO_API_URL}/v1/users/me/`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_DJANGO_API_URL}/v1/users/me`, {
             headers: {
               'Authorization': `Bearer ${token.accessToken}`,
               'Content-Type': 'application/json',

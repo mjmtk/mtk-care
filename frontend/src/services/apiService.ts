@@ -116,7 +116,7 @@ export const usersApi = {
    */
   getCurrentUserProfile: async (accessToken: string): Promise<components['schemas']['UserOut']> => {
     return apiRequest<components['schemas']['UserOut']>({
-      url: 'v1/users/me/',
+      url: 'v1/users/me',
       method: 'get',
       accessToken,
     });

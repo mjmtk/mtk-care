@@ -53,5 +53,8 @@ ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=[])
 CSRF_TRUSTED_ORIGINS = env.list('DJANGO_CSRF_TRUSTED_ORIGINS', default=[])
 
 # CORS settings for production
+# Note: CORS middleware is NOT included in production as Azure Web App handles CORS
+# If you need Django to handle CORS in production, add to MIDDLEWARE:
+# MIDDLEWARE.insert(2, 'corsheaders.middleware.CorsMiddleware')
 CORS_ALLOW_ALL_ORIGINS = False
 # CORS_ALLOWED_ORIGINS will be sourced from 'CORS_ALLOWED_ORIGINS' env var defined in base.py

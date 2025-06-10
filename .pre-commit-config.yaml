@@ -1,0 +1,57 @@
+# Pre-commit hooks for MTK Care project
+repos:
+  # Python code formatting and linting
+  - repo: https://github.com/psf/black
+    rev: 24.3.0
+    hooks:
+      - id: black
+        files: ^backend/
+        language_version: python3
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        files: ^backend/
+        args: ["--profile", "black"]
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+        files: ^backend/
+        args: ["--max-line-length=88", "--extend-ignore=E203,W503"]
+
+  # API Route Pattern Validation
+  - repo: local
+    hooks:
+      - id: validate-api-routes
+        name: Validate Django Ninja API Routes
+        entry: python3 scripts/validate_api_routes.py
+        language: system
+        files: ^backend/.*api.*\.py$
+        always_run: false
+        pass_filenames: false
+
+  # Frontend linting (optional - can be enabled when needed)
+  # - repo: https://github.com/pre-commit/mirrors-eslint
+  #   rev: v9.0.0
+  #   hooks:
+  #     - id: eslint
+  #       files: ^frontend/src/.*\.(js|ts|jsx|tsx)$
+  #       additional_dependencies:
+  #         - eslint@8.57.0
+  #         - typescript@5.4.0
+
+  # General file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: ^frontend/node_modules/
+      - id: end-of-file-fixer
+        exclude: ^frontend/node_modules/
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: check-merge-conflict

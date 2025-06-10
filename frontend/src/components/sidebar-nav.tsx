@@ -5,8 +5,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Home, Users, UserCog, FileText, Building, GitBranch } from "lucide-react";
+import { Home, Users, UserCog, FileText, Building, GitBranch, Shield } from "lucide-react";
 import { useAuthBypassSession } from "@/hooks/useAuthBypass";
+import { useRoles } from "@/hooks/useRoles";
 
 // Define the structure for navigation items
 interface NavItem {
@@ -26,7 +27,13 @@ const navItems: NavItem[] = [
     href: "/users", 
     label: "User Management", 
     icon: UserCog,
-    requiredRoles: ["admin", "superuser", "Superuser", "Manager"] // Only show to admins
+    requiredRoles: ["Administrator", "Superuser"] // Only show to admins
+  },
+  {
+    href: "/dashboard/role-demo",
+    label: "Role Demo",
+    icon: Shield,
+    requiredRoles: ["Administrator", "Superuser"] // Development/testing feature
   },
   // Add more top-level navigation items here
   // Example for a settings page:
@@ -43,10 +50,9 @@ function hasRequiredRole(userRoles: string[] | undefined, requiredRoles: string[
 
 export function SidebarNav({ className, ...props }: React.HTMLAttributes<HTMLElement>) {
   const pathname = usePathname();
-  const { data: session } = useAuthBypassSession();
   
-  // Get user roles from session
-  const userRoles = session?.user?.roles as string[] | undefined;
+  // Get user roles (respects role switcher)
+  const userRoles = useRoles();
   
   
   // Filter nav items based on user roles

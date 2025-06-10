@@ -4,7 +4,9 @@
       "Bash(docker exec:*)",
       "Bash(ls:*)",
       "Bash(grep:*)",
-      "Bash(npm run typecheck:*)"
+      "Bash(npm run typecheck:*)",
+      "Bash(find:*)",
+      "Bash(curl:*)"
     ],
     "deny": []
   }

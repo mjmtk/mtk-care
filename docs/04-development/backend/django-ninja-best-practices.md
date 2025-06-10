@@ -183,34 +183,104 @@ def list_roles(request):
 2. ⏳ Plan backward compatibility strategy
 3. ⏳ Document versioning approach
 
+## API Endpoint Standards (CRITICAL)
+
+### ⚠️ URL Pattern Consistency Rules
+
+**ALWAYS follow these patterns to prevent 404 errors:**
+
+#### ✅ Collection Endpoints (GET/POST lists)
+```python
+# ✅ CORRECT - Use "/" for collection endpoints
+@router.get("/", response=List[ModelOut])
+def list_resources(request):
+    pass
+
+@router.post("/", response=ModelOut) 
+def create_resource(request, data: ModelIn):
+    pass
+```
+
+#### ✅ Individual Resource Endpoints  
+```python
+# ✅ CORRECT - No trailing slash for individual resources
+@router.get("/{resource_id}", response=ModelOut)
+def get_resource(request, resource_id: UUID):
+    pass
+
+@router.put("/{resource_id}", response=ModelOut)
+def update_resource(request, resource_id: UUID, data: ModelIn):
+    pass
+
+@router.delete("/{resource_id}")
+def delete_resource(request, resource_id: UUID):
+    pass
+```
+
+#### ✅ Special Action Endpoints
+```python
+# ✅ CORRECT - Descriptive paths, no trailing slash
+@router.get("/batch-dropdowns", response=DropdownsOut)
+def get_batch_dropdowns(request):
+    pass
+
+@router.post("/{resource_id}/activate", response=ModelOut)
+def activate_resource(request, resource_id: UUID):
+    pass
+```
+
+#### ❌ NEVER DO - Empty String Routes
+```python
+# ❌ WRONG - This causes 404 errors with Django Ninja mounting
+@router.get("", response=List[ModelOut])  # DON'T USE EMPTY STRINGS
+@router.post("", response=ModelOut)       # DON'T USE EMPTY STRINGS
+```
+
+### 🔧 Frontend API Call Standards
+
+#### ✅ Consistent URL Building
+```typescript
+// ✅ CORRECT - Always use trailing slash for collections
+const users = await apiRequest({ url: 'v1/users/' });
+const referrals = await apiRequest({ url: 'v1/referrals/' });
+
+// ✅ CORRECT - No trailing slash for individual resources  
+const user = await apiRequest({ url: `v1/users/${id}` });
+const referral = await apiRequest({ url: `v1/referrals/${id}` });
+
+// ✅ CORRECT - No trailing slash for special actions
+const dropdowns = await apiRequest({ url: 'v1/referrals/batch-dropdowns' });
+```
+
 ## Best Practices Checklist
 
 ### ✅ API Organization
-- [ ] Global API instance in dedicated `api/ninja.py`
-- [ ] App-specific routers in each `apps/*/api.py`
-- [ ] Clean separation of concerns
-- [ ] Consistent import patterns
+- [x] Global API instance in dedicated `api/ninja.py`
+- [x] App-specific routers in each `apps/*/api.py`
+- [x] Clean separation of concerns
+- [x] Consistent import patterns
 
-### ✅ Endpoint Design
-- [ ] RESTful URL patterns
-- [ ] Proper HTTP methods (GET, POST, PUT, DELETE)
-- [ ] Consistent response schemas
-- [ ] Appropriate status codes
+### ✅ Endpoint Design  
+- [x] RESTful URL patterns
+- [x] Proper HTTP methods (GET, POST, PUT, DELETE)
+- [x] **CRITICAL: Consistent URL patterns (/ for collections, no / for resources)**
+- [x] Consistent response schemas
+- [x] Appropriate status codes
 
 ### ✅ Authentication & Authorization
-- [ ] Consistent auth decorators
-- [ ] Role-based access control
-- [ ] Proper error responses (401, 403)
+- [x] Consistent auth decorators
+- [x] Role-based access control
+- [x] Proper error responses (401, 403)
 
 ### ✅ Documentation
-- [ ] Comprehensive docstrings
-- [ ] Schema documentation
-- [ ] API docs accessible at `/api/docs/`
+- [x] Comprehensive docstrings
+- [x] Schema documentation
+- [x] API docs accessible at `/api/docs/`
 
 ### ✅ Error Handling  
-- [ ] Consistent error response format
-- [ ] Appropriate HTTP status codes
-- [ ] Helpful error messages
+- [x] Consistent error response format
+- [x] Appropriate HTTP status codes
+- [x] Helpful error messages
 
 ### ✅ Testing
 - [ ] Unit tests for each endpoint

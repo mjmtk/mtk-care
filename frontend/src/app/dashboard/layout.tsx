@@ -1,9 +1,13 @@
+'use client';
+
 // frontend/src/app/dashboard/layout.tsx
 import { SidebarNav } from "@/components/sidebar-nav";
 import { UserNav } from "@/components/user-nav";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { SessionManager } from "@/components/auth/SessionManager";
 import { RoleSwitcher } from "@/components/auth/RoleSwitcher";
+import { PageProvider, usePageContext } from "@/contexts/PageContext";
+import { EnhancedHeader } from "@/components/ui/enhanced-header";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
@@ -12,10 +16,11 @@ interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
+function DashboardLayoutInner({ children }: DashboardLayoutProps) {
+  const { pageTitle, pageSubtitle, saveStatus, lastSaved, steps, currentStep } = usePageContext();
+
   return (
-    <AuthGuard>
-      <div className="flex h-screen bg-background">
+    <div className="flex h-screen bg-background">
       {/* Sidebar: Hidden on mobile (md:flex) */}
       <aside className="hidden md:flex md:flex-col md:w-64 border-r">
         <div className="p-4 border-b h-16 flex items-center">
@@ -30,11 +35,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
       {/* Main content area */}
       <div className="flex flex-col flex-1 overflow-hidden">
-        {/* Header */}
-        <header className="flex items-center justify-between h-16 px-4 border-b md:justify-end">
-          {/* Mobile Nav Trigger (Placeholder for Subtask 11.4) */}
-          <div className="md:hidden">
-              <Sheet>
+        {/* Enhanced Header with Page Context */}
+        <EnhancedHeader
+          pageTitle={pageTitle}
+          pageSubtitle={pageSubtitle}
+          saveStatus={saveStatus}
+          lastSaved={lastSaved}
+          steps={steps}
+          currentStep={currentStep}
+          mobileNav={
+            <Sheet>
               <SheetTrigger asChild>
                 <Button variant="outline" size="icon" className="shrink-0">
                   <Menu className="h-5 w-5" />
@@ -54,12 +64,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 </div>
               </SheetContent>
             </Sheet>
-          </div>
-          <div className="flex items-center gap-4">
-            <RoleSwitcher />
-            <UserNav />
-          </div>
-        </header>
+          }
+          rightContent={
+            <>
+              <RoleSwitcher />
+              <UserNav />
+            </>
+          }
+        />
         
         {/* Page Content */}
         <main className="flex-1 p-6 overflow-y-auto">
@@ -70,6 +82,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Session Management */}
       <SessionManager warningThresholdMinutes={5} />
     </div>
+  );
+}
+
+export default function DashboardLayout({ children }: DashboardLayoutProps) {
+  return (
+    <AuthGuard>
+      <PageProvider>
+        <DashboardLayoutInner>{children}</DashboardLayoutInner>
+      </PageProvider>
     </AuthGuard>
   );
 }

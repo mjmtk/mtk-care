@@ -19,7 +19,7 @@ function transformApiClientToDisplayClient(apiClient: ClientDetailSchema): Clien
     preferredName: apiClient.preferred_name || undefined,
     nhiFacilityCode: 'Unknown', // Simplified - remove problematic field
     dateOfBirth: apiClient.date_of_birth,
-    primaryLanguage: String(apiClient.primary_language?.label || 'Unknown'),
+    primaryLanguage: String(apiClient.primary_language?.name || 'Unknown'),
     interpreterNeeded: Boolean(apiClient.interpreter_needed),
     culturalIdentity: {
       primaryIdentity: 'Not specified' // Simplified

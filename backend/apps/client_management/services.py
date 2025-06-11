@@ -3,7 +3,9 @@ from datetime import date, timedelta
 from django.db import transaction
 from django.db.models import Q, Count
 from django.core.exceptions import ValidationError
-from .models import Client
+from django.contrib.auth import get_user_model
+User = get_user_model()
+from .models import Client, ClientEmergencyContact
 from .schemas import ClientCreateSchema, ClientUpdateSchema, ClientSearchSchema
 from apps.optionlists.models import OptionListItem
 from apps.reference_data.models import Language
@@ -13,33 +15,101 @@ class ClientService:
     """Service layer for client management operations."""
     
     @staticmethod
-    def create_client(data: ClientCreateSchema) -> Client:
-        """Create a new client with validation."""
+    def create_client(data: Dict[str, Any], created_by_user: User = None) -> Client:
+        """Create a new client with validation and cultural identity fields."""
         with transaction.atomic():
             # Validate status
-            try:
-                status = OptionListItem.objects.get(
-                    id=data.status_id,
+            status_id = data.get('status_id')  # Get status ID if provided
+            if status_id:
+                try:
+                    status = OptionListItem.objects.get(
+                        id=status_id,
+                        option_list__slug='client-statuses'
+                    )
+                except OptionListItem.DoesNotExist:
+                    raise ValidationError("Invalid status ID provided")
+            else:
+                # Get first available status if none provided
+                status = OptionListItem.objects.filter(
                     option_list__slug='client-statuses'
-                )
-            except OptionListItem.DoesNotExist:
-                raise ValidationError("Invalid status ID provided")
+                ).first()
+                if not status:
+                    raise ValidationError("No client statuses available")
             
             # Validate primary language if provided
             primary_language = None
-            if data.primary_language_id:
+            if data.get('primary_language_id'):
                 try:
-                    primary_language = Language.objects.get(id=data.primary_language_id)
+                    primary_language = Language.objects.get(id=data['primary_language_id'])
                 except Language.DoesNotExist:
                     raise ValidationError("Invalid primary language ID provided")
             
+            # Validate gender if provided
+            gender = None
+            if data.get('gender_id'):
+                try:
+                    gender = OptionListItem.objects.get(
+                        id=data['gender_id'],
+                        option_list__slug='gender-identity'
+                    )
+                except OptionListItem.DoesNotExist:
+                    raise ValidationError("Invalid gender ID provided")
+            
+            # Validate cultural identity fields
+            iwi_hapu = None
+            if data.get('iwi_hapu_id'):
+                try:
+                    iwi_hapu = OptionListItem.objects.get(
+                        id=data['iwi_hapu_id'],
+                        option_list__slug='iwi-hapu'
+                    )
+                except OptionListItem.DoesNotExist:
+                    raise ValidationError("Invalid iwi/hapū ID provided")
+            
+            spiritual_needs = None
+            if data.get('spiritual_needs_id'):
+                try:
+                    spiritual_needs = OptionListItem.objects.get(
+                        id=data['spiritual_needs_id'],
+                        option_list__slug='spiritual-needs'
+                    )
+                except OptionListItem.DoesNotExist:
+                    raise ValidationError("Invalid spiritual needs ID provided")
+            
+            # Prepare client data excluding foreign key IDs
+            client_data = {
+                'first_name': data.get('first_name', ''),
+                'last_name': data.get('last_name', ''),
+                'preferred_name': data.get('preferred_name'),
+                'date_of_birth': data.get('date_of_birth'),
+                'email': data.get('email'),
+                'phone': data.get('phone'),
+                'address': data.get('address'),
+                'interpreter_needed': data.get('interpreter_needed', False),
+                'risk_level': data.get('risk_level', 'low'),
+                'consent_required': data.get('consent_required', True),
+                'incomplete_documentation': data.get('incomplete_documentation', False),
+                'cultural_identity': data.get('cultural_identity', {}),
+                'notes': data.get('notes'),
+                'extended_data': data.get('extended_data', {}),
+            }
+            
             # Create client
-            client_data = data.dict(exclude={'status_id', 'primary_language_id'})
             client = Client.objects.create(
                 status=status,
                 primary_language=primary_language,
+                gender=gender,
+                iwi_hapu=iwi_hapu,
+                spiritual_needs=spiritual_needs,
+                created_by=created_by_user,
+                updated_by=created_by_user,
                 **client_data
             )
+            
+            # Handle emergency contacts if provided
+            emergency_contacts = data.get('emergency_contacts', [])
+            if emergency_contacts:
+                ClientService._create_emergency_contacts(client, emergency_contacts, created_by_user)
             
             return client
     
@@ -80,7 +150,18 @@ class ClientService:
     @staticmethod
     def search_clients(search_params: ClientSearchSchema, limit: int = 50, offset: int = 0) -> Tuple[List[Client], int]:
         """Search clients with filters and pagination."""
-        queryset = Client.objects.select_related('status', 'primary_language')
+        from apps.referral_management.models import Referral
+        from django.db.models import Count, Q as DjangoQ
+        
+        # Subquery to count active referrals (non-closed) for each client
+        active_statuses = ['pending', 'new', 'in-progress', 'accepted']
+        
+        queryset = Client.objects.select_related('status', 'primary_language').annotate(
+            active_referral_count=Count(
+                'referrals',
+                filter=DjangoQ(referrals__status__slug__in=active_statuses)
+            )
+        )
         
         # Text search across name, email, phone
         if search_params.search:
@@ -264,3 +345,30 @@ class ClientService:
             errors.append("Risk level must be 'low', 'medium', or 'high'")
         
         return errors
+    
+    @staticmethod
+    def _create_emergency_contacts(client: Client, emergency_contacts_data: List[Dict[str, Any]], created_by_user: User = None):
+        """Create emergency contacts for a client."""
+        for contact_data in emergency_contacts_data:
+            if contact_data.get('first_name') and contact_data.get('last_name') and contact_data.get('relationship_id'):
+                try:
+                    relationship = OptionListItem.objects.get(
+                        id=contact_data['relationship_id'],
+                        option_list__slug='emergency-contact-relationships'
+                    )
+                    
+                    ClientEmergencyContact.objects.create(
+                        client=client,
+                        relationship=relationship,
+                        first_name=contact_data['first_name'],
+                        last_name=contact_data['last_name'],
+                        phone=contact_data.get('phone', ''),
+                        email=contact_data.get('email'),
+                        is_primary=contact_data.get('is_primary', False),
+                        priority_order=contact_data.get('priority_order', 1),
+                        created_by=created_by_user,
+                        updated_by=created_by_user
+                    )
+                except OptionListItem.DoesNotExist:
+                    # Skip invalid relationships but don't fail the entire operation
+                    continue

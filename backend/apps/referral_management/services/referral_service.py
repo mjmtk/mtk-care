@@ -72,9 +72,9 @@ class ReferralService:
         """
         from apps.optionlists.models import OptionListItem 
 
-        optionlist_fields = ['type', 'status', 'priority', 'service_type']
+        optionlist_fields = ['status', 'priority', 'service_type']
         
-        # Handle OptionListItem fields first
+        # Handle OptionListItem fields first (excluding 'type' which is now a string)
         for field_name in optionlist_fields:
             if field_name in data:
                 item_id = data.pop(field_name) # Use pop to remove it from data dict

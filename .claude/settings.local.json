@@ -9,7 +9,15 @@
       "Bash(curl:*)",
       "Bash(npx tsc:*)",
       "Bash(npm run build:*)",
-      "Bash(python manage.py:*)"
+      "Bash(python manage.py:*)",
+      "Bash(source:*)",
+      "Bash(rg:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(python3 manage.py makemigrations:*)",
+      "Bash(./scripts/generate_openapi_types.sh:*)",
+      "Bash(chmod:*)",
+      "Bash(python:*)"
     ],
     "deny": []
   }

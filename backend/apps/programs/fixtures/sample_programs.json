@@ -1,0 +1,132 @@
+[
+  {
+    "model": "programs.program",
+    "pk": "550e8400-e29b-41d4-a716-446655440001",
+    "fields": {
+      "name": "SWiS (Social Workers in Schools)",
+      "description": "Social Workers in Schools program providing support and intervention services to students and their families within the school environment.",
+      "status": "operational",
+      "start_date": "2024-01-01",
+      "end_date": null,
+      "referral_schema": {
+        "fields": [
+          {
+            "name": "school_name",
+            "type": "text",
+            "label": "School Name",
+            "required": true
+          },
+          {
+            "name": "year_level",
+            "type": "select",
+            "label": "Year Level",
+            "options": ["Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6", "Year 7", "Year 8", "Year 9", "Year 10", "Year 11", "Year 12", "Year 13"],
+            "required": false
+          },
+          {
+            "name": "teacher_contact",
+            "type": "text",
+            "label": "Primary Teacher Contact",
+            "required": false
+          }
+        ]
+      },
+      "extra_data": null,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z",
+      "is_deleted": false,
+      "deleted_at": null
+    }
+  },
+  {
+    "model": "programs.program",
+    "pk": "550e8400-e29b-41d4-a716-446655440002",
+    "fields": {
+      "name": "Domestic Violence Support Services",
+      "description": "Comprehensive support services for individuals and families affected by domestic violence, including counseling, safety planning, and advocacy.",
+      "status": "operational",
+      "start_date": "2024-01-01",
+      "end_date": null,
+      "referral_schema": {
+        "fields": [
+          {
+            "name": "safety_concern_level",
+            "type": "select",
+            "label": "Safety Concern Level",
+            "options": ["Low", "Medium", "High", "Critical"],
+            "required": true
+          },
+          {
+            "name": "accommodation_needed",
+            "type": "boolean",
+            "label": "Emergency Accommodation Needed",
+            "required": false
+          },
+          {
+            "name": "children_involved",
+            "type": "boolean",
+            "label": "Children Involved",
+            "required": false
+          },
+          {
+            "name": "police_involvement",
+            "type": "boolean",
+            "label": "Police Involvement",
+            "required": false
+          }
+        ]
+      },
+      "extra_data": null,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z",
+      "is_deleted": false,
+      "deleted_at": null
+    }
+  },
+  {
+    "model": "programs.program",
+    "pk": "550e8400-e29b-41d4-a716-446655440003",
+    "fields": {
+      "name": "Mental Health & Addiction Services",
+      "description": "Integrated mental health and addiction support services including assessment, counseling, treatment, and recovery support.",
+      "status": "operational",
+      "start_date": "2024-01-01",
+      "end_date": null,
+      "referral_schema": {
+        "fields": [
+          {
+            "name": "primary_concern",
+            "type": "select",
+            "label": "Primary Concern",
+            "options": ["Mental Health", "Substance Use", "Both", "Other"],
+            "required": true
+          },
+          {
+            "name": "substance_type",
+            "type": "multiselect",
+            "label": "Substances of Concern",
+            "options": ["Alcohol", "Cannabis", "Methamphetamine", "Opiates", "Prescription Drugs", "Other"],
+            "required": false
+          },
+          {
+            "name": "mental_health_history",
+            "type": "boolean",
+            "label": "Previous Mental Health Treatment",
+            "required": false
+          },
+          {
+            "name": "risk_assessment_needed",
+            "type": "boolean",
+            "label": "Risk Assessment Required",
+            "required": false
+          }
+        ]
+      },
+      "extra_data": null,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z",
+      "is_deleted": false,
+      "deleted_at": null
+    }
+  }
+]

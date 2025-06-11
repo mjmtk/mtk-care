@@ -109,6 +109,45 @@ export const columns: ColumnDef<Referral>[] = [
     enableHiding: false,
   },
   {
+    accessorKey: 'client',
+    accessorFn: (row) => {
+      if (row.client) {
+        const displayName = row.client.preferred_name || `${row.client.first_name} ${row.client.last_name}`.trim();
+        return displayName;
+      }
+      return row.client_type === 'new' ? 'New Client' : 
+             row.client_type === 'self' ? 'Self-Referral' : 'Unknown';
+    },
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='Client' />
+    ),
+    cell: ({ row }) => {
+      const referral = row.original;
+      if (referral.client) {
+        const displayName = referral.client.preferred_name || 
+                           `${referral.client.first_name} ${referral.client.last_name}`.trim();
+        return (
+          <div className='flex items-center gap-x-2'>
+            <UserIcon size={14} className='text-muted-foreground' />
+            <span className='max-w-32 truncate font-medium'>{displayName}</span>
+          </div>
+        );
+      }
+      
+      // For referrals without linked clients
+      const fallbackText = referral.client_type === 'new' ? 'New Client' : 
+                           referral.client_type === 'self' ? 'Self-Referral' : 'Unknown';
+      return (
+        <div className='flex items-center gap-x-2'>
+          <UserIcon size={14} className='text-muted-foreground opacity-50' />
+          <span className='max-w-32 truncate text-muted-foreground italic'>{fallbackText}</span>
+        </div>
+      );
+    },
+    meta: { className: 'w-40' },
+    enableSorting: true,
+  },
+  {
     accessorKey: 'reason',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Reason' />
@@ -165,7 +204,7 @@ export const columns: ColumnDef<Referral>[] = [
   },
   {
     accessorKey: 'type',
-    accessorFn: (row) => row.type.label,
+    accessorFn: (row) => row.type === 'incoming' ? 'Incoming' : 'Outgoing',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Type' />
     ),
@@ -174,7 +213,7 @@ export const columns: ColumnDef<Referral>[] = [
       return (
         <div className='flex items-center gap-x-2'>
           <BuildingIcon size={14} className='text-muted-foreground' />
-          <span className='text-sm'>{type.label}</span>
+          <span className='text-sm'>{type === 'incoming' ? 'Incoming' : 'Outgoing'}</span>
         </div>
       )
     },

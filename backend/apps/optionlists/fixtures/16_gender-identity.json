@@ -1,0 +1,193 @@
+[
+    {
+        "model": "optionlists.optionlist",
+        "pk": 16,
+        "fields": {
+            "name": "Gender Identity",
+            "slug": "gender-identity",
+            "description": "Gender identity options inclusive of diverse identities including Māori perspectives.",
+            "is_active": true,
+            "created_at": "2025-06-11T09:00:00Z",
+            "updated_at": "2025-06-11T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 1601,
+        "fields": {
+            "option_list": 16,
+            "name": "female",
+            "slug": "female",
+            "label": "Female",
+            "description": "Female gender identity.",
+            "is_active": true,
+            "sort_order": 1,
+            "metadata": {},
+            "created_at": "2025-06-11T09:00:00Z",
+            "updated_at": "2025-06-11T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 1602,
+        "fields": {
+            "option_list": 16,
+            "name": "male",
+            "slug": "male",
+            "label": "Male",
+            "description": "Male gender identity.",
+            "is_active": true,
+            "sort_order": 2,
+            "metadata": {},
+            "created_at": "2025-06-11T09:00:00Z",
+            "updated_at": "2025-06-11T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 1603,
+        "fields": {
+            "option_list": 16,
+            "name": "non_binary",
+            "slug": "non-binary",
+            "label": "Non-binary",
+            "description": "Non-binary gender identity - not exclusively male or female.",
+            "is_active": true,
+            "sort_order": 3,
+            "metadata": {},
+            "created_at": "2025-06-11T09:00:00Z",
+            "updated_at": "2025-06-11T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 1604,
+        "fields": {
+            "option_list": 16,
+            "name": "transgender_male",
+            "slug": "transgender-male",
+            "label": "Transgender Male",
+            "description": "Male gender identity, assigned female at birth.",
+            "is_active": true,
+            "sort_order": 4,
+            "metadata": {},
+            "created_at": "2025-06-11T09:00:00Z",
+            "updated_at": "2025-06-11T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 1605,
+        "fields": {
+            "option_list": 16,
+            "name": "transgender_female",
+            "slug": "transgender-female",
+            "label": "Transgender Female",
+            "description": "Female gender identity, assigned male at birth.",
+            "is_active": true,
+            "sort_order": 5,
+            "metadata": {},
+            "created_at": "2025-06-11T09:00:00Z",
+            "updated_at": "2025-06-11T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 1606,
+        "fields": {
+            "option_list": 16,
+            "name": "gender_fluid",
+            "slug": "gender-fluid",
+            "label": "Gender Fluid",
+            "description": "Gender identity that varies over time or depending on circumstances.",
+            "is_active": true,
+            "sort_order": 6,
+            "metadata": {},
+            "created_at": "2025-06-11T09:00:00Z",
+            "updated_at": "2025-06-11T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 1607,
+        "fields": {
+            "option_list": 16,
+            "name": "takatapui",
+            "slug": "takatapui",
+            "label": "Takatāpui",
+            "description": "Māori term for people who identify as having diverse gender identity, gender expression, or sexuality.",
+            "is_active": true,
+            "sort_order": 7,
+            "metadata": {
+                "cultural_context": "maori",
+                "pronunciation": "tah-kah-TAH-poo-ee"
+            },
+            "created_at": "2025-06-11T09:00:00Z",
+            "updated_at": "2025-06-11T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 1608,
+        "fields": {
+            "option_list": 16,
+            "name": "genderqueer",
+            "slug": "genderqueer",
+            "label": "Genderqueer",
+            "description": "Gender identity that does not fit within conventional gender distinctions.",
+            "is_active": true,
+            "sort_order": 8,
+            "metadata": {},
+            "created_at": "2025-06-11T09:00:00Z",
+            "updated_at": "2025-06-11T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 1609,
+        "fields": {
+            "option_list": 16,
+            "name": "agender",
+            "slug": "agender",
+            "label": "Agender",
+            "description": "Without gender identity or gender-neutral.",
+            "is_active": true,
+            "sort_order": 9,
+            "metadata": {},
+            "created_at": "2025-06-11T09:00:00Z",
+            "updated_at": "2025-06-11T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 1610,
+        "fields": {
+            "option_list": 16,
+            "name": "prefer_to_self_describe",
+            "slug": "prefer-to-self-describe",
+            "label": "Prefer to self-describe",
+            "description": "User prefers to describe their gender identity in their own words.",
+            "is_active": true,
+            "sort_order": 10,
+            "metadata": {},
+            "created_at": "2025-06-11T09:00:00Z",
+            "updated_at": "2025-06-11T09:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 1611,
+        "fields": {
+            "option_list": 16,
+            "name": "prefer_not_to_say",
+            "slug": "prefer-not-to-say",
+            "label": "Prefer not to say",
+            "description": "User prefers not to disclose gender identity.",
+            "is_active": true,
+            "sort_order": 11,
+            "metadata": {},
+            "created_at": "2025-06-11T09:00:00Z",
+            "updated_at": "2025-06-11T09:00:00Z"
+        }
+    }
+]

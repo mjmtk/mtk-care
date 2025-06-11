@@ -8,6 +8,11 @@ export interface OptionListItem {
   is_active: boolean;
 }
 
+export interface ReferralTypeChoice {
+  value: string;
+  label: string;
+}
+
 export interface UserAudit {
   id: string;
   email: string;
@@ -16,13 +21,13 @@ export interface UserAudit {
 }
 
 export interface ReferralCreate {
-  type_id: number;
+  type: string;
   status_id: number;
   priority_id: number;
   service_type_id: number;
   reason: string;
   client_type: 'existing' | 'new' | 'self';
-  // client_id?: string;  // Temporarily removed until client_management is implemented
+  client_id?: string;  // For existing clients
   referral_date: string; // ISO date string
   accepted_date?: string;
   completed_date?: string;
@@ -34,13 +39,13 @@ export interface ReferralCreate {
 }
 
 export interface ReferralUpdate {
-  type_id?: number;
+  type?: string;
   status_id?: number;
   priority_id?: number;
   service_type_id?: number;
   reason?: string;
   client_type?: 'existing' | 'new' | 'self';
-  // client_id?: string;  // Temporarily removed until client_management is implemented
+  client_id?: string;  // For existing clients
   referral_date?: string;
   accepted_date?: string;
   completed_date?: string;
@@ -51,15 +56,26 @@ export interface ReferralUpdate {
   external_organisation_contact_id?: string;
 }
 
+export interface ReferralClient {
+  id: string;
+  first_name: string;
+  last_name: string;
+  preferred_name?: string;
+  date_of_birth: string;
+  email?: string;
+  phone?: string;
+}
+
 export interface Referral {
   id: string;
-  type: OptionListItem;
+  type: string;
   status: OptionListItem;
   priority: OptionListItem;
   service_type: OptionListItem;
   reason: string;
   client_type: 'existing' | 'new' | 'self';
-  // client_id?: string;  // Temporarily removed until client_management is implemented
+  client_id?: string;  // For existing clients
+  client?: ReferralClient;  // Client details when available
   referral_date: string;
   accepted_date?: string;
   completed_date?: string;
@@ -75,7 +91,7 @@ export interface Referral {
 }
 
 export interface ReferralBatchDropdowns {
-  referral_types: OptionListItem[];
+  referral_types: ReferralTypeChoice[];
   referral_statuses: OptionListItem[];
   referral_priorities: OptionListItem[];
   referral_service_types: OptionListItem[];

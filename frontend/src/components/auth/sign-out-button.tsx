@@ -3,6 +3,7 @@
 import { signOut } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
+import { useAuthBypass } from '@/components/providers/auth-bypass-provider';
 
 interface SignOutButtonProps {
   /**
@@ -34,6 +35,7 @@ interface SignOutButtonProps {
 /**
  * A reusable sign-out button that handles the sign-out process.
  * It uses NextAuth's `signOut` function and redirects to the specified URL.
+ * In auth bypass mode, it also clears the bypass session.
  */
 export function SignOutButton({
   callbackUrl = '/',
@@ -42,7 +44,14 @@ export function SignOutButton({
   className = '',
   text,
 }: SignOutButtonProps) {
+  const { isAuthBypassMode, clearBypassSession } = useAuthBypass();
+
   const handleSignOut = () => {
+    if (isAuthBypassMode) {
+      // Clear bypass session first
+      clearBypassSession();
+    }
+    // Always call NextAuth signOut to handle both modes
     signOut({ callbackUrl });
   };
 

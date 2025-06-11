@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Users, Plus, Search } from 'lucide-react';
+import { Users, Plus, Search, Globe, Heart, Shield } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { ClientSearchDialog } from '@/components/clients/ClientSearchDialog';
 import { NewClientService } from '@/services/new-client-service';
@@ -192,6 +192,33 @@ export default function ClientsPage() {
                         {client.email && <div>Email: {client.email}</div>}
                         {client.phone && <div>Phone: {client.phone}</div>}
                         {client.status && <div>Status: {client.status.label || client.status.name}</div>}
+                        
+                        {/* Cultural Identity Indicators */}
+                        <div className="flex items-center gap-2 mt-2 flex-wrap">
+                          {client.primary_language && (
+                            <Badge variant="outline" className="flex items-center gap-1 text-xs">
+                              <Globe className="h-3 w-3" />
+                              {client.primary_language.name || client.primary_language}
+                            </Badge>
+                          )}
+                          {client.interpreter_needed && (
+                            <Badge variant="secondary" className="text-xs">
+                              Interpreter Required
+                            </Badge>
+                          )}
+                          {(client.iwi_hapu || client.cultural_identity?.iwi_hapu) && (
+                            <Badge variant="outline" className="flex items-center gap-1 text-xs">
+                              <Heart className="h-3 w-3 text-red-500" />
+                              {client.iwi_hapu?.label || client.cultural_identity?.iwi_hapu || 'Iwi/Hapū'}
+                            </Badge>
+                          )}
+                          {client.consent_required && (
+                            <Badge variant="secondary" className="flex items-center gap-1 text-xs">
+                              <Shield className="h-3 w-3" />
+                              Consent Required
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>

@@ -71,12 +71,12 @@ export function RoleSwitcher() {
             {isRoleSwitching ? (
               <>
                 <ShieldOff className="mr-2 h-3 w-3" />
-                Role Override Active
+                {currentRoles.length === 1 ? currentRoles[0] : `${currentRoles.length} roles`}
               </>
             ) : (
               <>
                 <Shield className="mr-2 h-3 w-3" />
-                Switch Role
+                {currentRoles.length === 1 ? currentRoles[0] : `${currentRoles.length} roles`}
               </>
             )}
           </Button>

@@ -86,7 +86,16 @@ router = Router(tags=["Clients"])
 
 @router.get("/", response=List[ClientListSchema], summary="List clients")
 @paginate
-def list_clients(request, filters: ClientSearchSchema = None):
+def list_clients(
+    request, 
+    search: str = None,
+    status_id: str = None,
+    risk_level: str = None,
+    primary_language_id: str = None,
+    interpreter_needed: bool = None,
+    consent_required: bool = None,
+    incomplete_documentation: bool = None
+):
     """
     List clients with optional filtering and pagination.
     
@@ -96,12 +105,20 @@ def list_clients(request, filters: ClientSearchSchema = None):
     - Age range
     - Boolean flags (interpreter needed, consent required, etc.)
     """
-    if filters is None:
-        filters = ClientSearchSchema()
-    
-    # Get pagination parameters from request
+    # Get pagination parameters from request (handled by @paginate decorator)
     limit = int(request.GET.get('limit', 25))
     offset = int(request.GET.get('offset', 0))
+    
+    # Create filters object from query parameters
+    filters = ClientSearchSchema(
+        search=search,
+        status_id=status_id,
+        risk_level=risk_level,
+        primary_language_id=primary_language_id,
+        interpreter_needed=interpreter_needed,
+        consent_required=consent_required,
+        incomplete_documentation=incomplete_documentation,
+    )
     
     clients, total_count = ClientService.search_clients(filters, limit, offset)
     
@@ -115,13 +132,19 @@ def create_client(request, data: ClientCreateSchema):
     Create a new client.
     
     Required fields:
-    - first_name, last_name, date_of_birth, status_id
+    - first_name, last_name, date_of_birth
     
     Optional fields:
-    - All other client fields
+    - All other client fields (status_id defaults to first available if not provided)
     """
     try:
-        client = ClientService.create_client(data)
+        # Convert schema to dict for service
+        client_data = data.dict()
+        
+        # Get user from request (for auth bypass mode or JWT auth)
+        user = getattr(request, 'auth', None) or getattr(request, 'user', None)
+        
+        client = ClientService.create_client(client_data, user)
         return serialize_client_for_detail(client)
     except ValidationError as e:
         raise HttpError(400, str(e))

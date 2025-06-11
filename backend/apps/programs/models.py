@@ -61,6 +61,11 @@ class Program(UUIDPKBaseModel):
     delivery_modes = models.ManyToManyField('optionlists.OptionListItem', related_name='program_delivery_modes', limit_choices_to={'option_list__slug': 'programs-delivery_modes'})
     locations = models.ManyToManyField('optionlists.OptionListItem', related_name='program_locations', limit_choices_to={'option_list__slug': 'programs-locations'})
     enrolment_schema = models.JSONField(blank=True, null=True)
+    referral_schema = models.JSONField(
+        blank=True, 
+        null=True,
+        help_text='JSON schema defining program-specific fields for referrals (e.g., school, year level for SWiS)'
+    )
     # assessment_forms = models.ManyToManyField('assessment_forms.AssessmentForm', through='ProgramAssessmentForm')
     extra_data = models.JSONField(blank=True, null=True)
 

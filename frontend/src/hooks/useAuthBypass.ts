@@ -3,7 +3,7 @@ import { useAuthBypass } from '@/components/providers/auth-bypass-provider';
 
 /**
  * Hook that provides session data with auth bypass support.
- * In bypass mode, returns mock session data.
+ * In bypass mode, returns mock session data unless logged out.
  * In normal mode, returns NextAuth session data.
  */
 export function useAuthBypassSession() {
@@ -13,7 +13,7 @@ export function useAuthBypassSession() {
   if (isAuthBypassMode) {
     return {
       data: mockSession,
-      status: 'authenticated' as const,
+      status: mockSession ? 'authenticated' as const : 'unauthenticated' as const,
       isAuthBypass: true,
     };
   }

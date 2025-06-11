@@ -12,7 +12,8 @@ from .schemas import (
     ReferralBatchDropdownsSchemaOut,
     ReferralStatusUpdateSchemaIn,
     OptionListItemSchemaOut,
-    ReferralListResponse
+    ReferralListResponse,
+    ProgramFormSchemaOut
 )
 from .services.referral_service import ReferralService
 from apps.optionlists.services import OptionListService
@@ -26,7 +27,7 @@ def list_referrals(request: HttpRequest, page: int = 1, limit: int = 20,
                   client_type: Optional[str] = None):
     """List all referrals with pagination and optional filtering."""
     queryset = Referral.objects.select_related(
-        'type', 'status', 'priority', 'service_type', 
+        'status', 'priority', 'service_type', 'client',
         'external_organisation', 'created_by', 'updated_by'
     ).all()
     
@@ -77,11 +78,36 @@ def create_referral(request: HttpRequest, payload: ReferralSchemaIn):
 @router.get("/batch-dropdowns", response=ReferralBatchDropdownsSchemaOut, auth=auth_required)
 def get_batch_dropdowns(request: HttpRequest):
     """Get all dropdown options needed for referral forms."""
+    # Hardcoded referral types instead of using optionlists
+    referral_types = [
+        {"value": "incoming", "label": "Incoming"},
+        {"value": "outgoing", "label": "Outgoing"}
+    ]
+    
+    # Hardcoded referral sources based on model choices
+    referral_sources = [
+        {"value": "external_agency", "label": "External Agency"},
+        {"value": "school", "label": "School"},
+        {"value": "self_referral", "label": "Self-Referral"},
+        {"value": "internal", "label": "Internal Transfer"},
+        {"value": "family", "label": "Family/Whānau"},
+        {"value": "other", "label": "Other"}
+    ]
+    
+    # Get active programs for program selection
+    from apps.programs.models import Program
+    programs = Program.objects.filter(
+        status__in=['operational', 'inactive'],
+        is_deleted=False
+    ).only('id', 'name', 'status')
+    
     return {
-        "referral_types": OptionListService.get_active_items_for_list_slug('referral-types'),
+        "referral_types": referral_types,
+        "referral_sources": referral_sources,
         "referral_statuses": OptionListService.get_active_items_for_list_slug('referral-statuses'),
         "referral_priorities": OptionListService.get_active_items_for_list_slug('referral-priorities'),
         "referral_service_types": OptionListService.get_active_items_for_list_slug('referral-service-types'),
+        "programs": [{"id": p.id, "name": p.name, "status": p.status} for p in programs]
     }
 
 @router.get("/{referral_id}", response=ReferralSchemaOut, auth=auth_required)
@@ -89,7 +115,7 @@ def get_referral(request: HttpRequest, referral_id: UUID):
     """Get a specific referral by ID."""
     referral = get_object_or_404(
         Referral.objects.select_related(
-            'type', 'status', 'priority', 'service_type', 
+            'status', 'priority', 'service_type', 'client',
             'external_organisation', 'created_by', 'updated_by'
         ), 
         id=referral_id
@@ -141,6 +167,40 @@ def update_referral_status(request: HttpRequest, referral_id: UUID, payload: Ref
     
     referral = get_object_or_404(Referral, id=referral_id)
     return ReferralService.update_referral_status(referral, payload.status_id, user)
+
+@router.get("/programs/{program_id}/form-schema", response=ProgramFormSchemaOut, auth=auth_required)
+def get_program_form_schema(request: HttpRequest, program_id: UUID):
+    """Get the form schema for a specific program's referral fields."""
+    from apps.programs.models import Program
+    
+    program = get_object_or_404(Program, id=program_id)
+    
+    # Default schema if program doesn't have custom referral_schema
+    default_fields = []
+    
+    # If program has custom referral_schema, use it
+    if program.referral_schema:
+        fields = []
+        for field_def in program.referral_schema.get('fields', []):
+            fields.append({
+                "name": field_def.get('name'),
+                "type": field_def.get('type', 'string'),
+                "label": field_def.get('label'),
+                "required": field_def.get('required', False),
+                "help_text": field_def.get('help_text'),
+                "choices": field_def.get('choices'),
+                "option_list_slug": field_def.get('option_list_slug'),
+                "validation": field_def.get('validation')
+            })
+    else:
+        # Use default fields for now - this could be enhanced later
+        fields = default_fields
+    
+    return {
+        "program_id": program.id,
+        "program_name": program.name,
+        "fields": fields
+    }
 
 @router.delete("/{referral_id}", auth=auth_required)
 def delete_referral(request: HttpRequest, referral_id: UUID):

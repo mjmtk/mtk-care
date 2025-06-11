@@ -77,7 +77,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/optionlists/{list_slug}/items/": {
+    "/api/v1/optionlists/{list_slug}/": {
         parameters: {
             query?: never;
             header?: never;
@@ -98,7 +98,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/users/me/": {
+    "/api/v1/users/me": {
         parameters: {
             query?: never;
             header?: never;
@@ -286,7 +286,7 @@ export interface paths {
         /**
          * Get Current User
          * @description Returns the current authenticated user's information and role.
-         *     Requires a valid JWT token in the Authorization header.
+         *     Requires authentication (via middleware in auth bypass mode or JWT token).
          */
         get: operations["apps_authentication_api_get_current_user"];
         put?: never;
@@ -497,6 +497,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/referrals/batch-dropdowns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Batch Dropdowns
+         * @description Get all dropdown options needed for referral forms.
+         */
+        get: operations["apps_referral_management_api_get_batch_dropdowns"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/referrals/{referral_id}": {
         parameters: {
             query?: never;
@@ -545,7 +565,7 @@ export interface paths {
         patch: operations["apps_referral_management_api_update_referral_status"];
         trace?: never;
     };
-    "/api/v1/referrals/batch-dropdowns/": {
+    "/api/v1/referrals/programs/{program_id}/form-schema": {
         parameters: {
             query?: never;
             header?: never;
@@ -553,10 +573,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get Batch Dropdowns
-         * @description Get all dropdown options needed for referral forms.
+         * Get Program Form Schema
+         * @description Get the form schema for a specific program's referral fields.
          */
-        get: operations["apps_referral_management_api_get_batch_dropdowns"];
+        get: operations["apps_referral_management_api_get_program_form_schema"];
         put?: never;
         post?: never;
         delete?: never;
@@ -589,10 +609,10 @@ export interface paths {
          * @description Create a new client.
          *
          *     Required fields:
-         *     - first_name, last_name, date_of_birth, status_id
+         *     - first_name, last_name, date_of_birth
          *
          *     Optional fields:
-         *     - All other client fields
+         *     - All other client fields (status_id defaults to first available if not provided)
          */
         post: operations["apps_client_management_api_create_client"];
         delete?: never;
@@ -727,6 +747,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/reference/countries/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List all active countries
+         * @description Retrieves all active countries for use in dropdowns and forms.
+         */
+        get: operations["apps_reference_data_api_list_countries"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reference/languages/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List all active languages
+         * @description Retrieves all active languages for use in dropdowns and forms.
+         */
+        get: operations["apps_reference_data_api_list_languages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -759,6 +819,28 @@ export interface components {
             description?: string | null;
             /** Level */
             level: number;
+            /**
+             * Is System Role
+             * @default false
+             */
+            is_system_role: boolean;
+            /**
+             * Is Active
+             * @default true
+             */
+            is_active: boolean;
+            /**
+             * Custom Permissions
+             * @default {}
+             */
+            custom_permissions: {
+                [key: string]: unknown;
+            };
+            /**
+             * Permissions
+             * @default []
+             */
+            permissions: string[];
         };
         /** UserOut */
         UserOut: {
@@ -1195,6 +1277,41 @@ export interface components {
             /** Notes */
             notes?: string | null;
         };
+        /** ProgramBasicSchemaOut */
+        ProgramBasicSchemaOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Status */
+            status: string;
+        };
+        /** ReferralClientSchemaOut */
+        ReferralClientSchemaOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** First Name */
+            first_name: string;
+            /** Last Name */
+            last_name: string;
+            /** Preferred Name */
+            preferred_name?: string | null;
+            /**
+             * Date Of Birth
+             * Format: date
+             */
+            date_of_birth: string;
+            /** Email */
+            email?: string | null;
+            /** Phone */
+            phone?: string | null;
+        };
         /** ReferralListResponse */
         ReferralListResponse: {
             /** Items */
@@ -1215,7 +1332,8 @@ export interface components {
              * Format: uuid
              */
             id: string;
-            type: components["schemas"]["OptionListItemSchemaOut"];
+            /** Type */
+            type: string;
             status: components["schemas"]["OptionListItemSchemaOut"];
             priority: components["schemas"]["OptionListItemSchemaOut"];
             service_type: components["schemas"]["OptionListItemSchemaOut"];
@@ -1223,6 +1341,9 @@ export interface components {
             reason: string;
             /** Client Type */
             client_type: string;
+            /** Client Id */
+            client_id?: string | null;
+            client?: components["schemas"]["ReferralClientSchemaOut"] | null;
             /**
              * Referral Date
              * Format: date
@@ -1242,6 +1363,15 @@ export interface components {
             external_organisation_id?: string | null;
             /** External Organisation Contact Id */
             external_organisation_contact_id?: string | null;
+            /** Referral Source */
+            referral_source: string;
+            /** External Reference Number */
+            external_reference_number?: string | null;
+            target_program?: components["schemas"]["ProgramBasicSchemaOut"] | null;
+            /** Program Data */
+            program_data: {
+                [key: string]: unknown;
+            };
             /**
              * Created At
              * Format: date-time
@@ -1257,14 +1387,14 @@ export interface components {
         };
         /** ReferralSchemaIn */
         ReferralSchemaIn: {
-            /** Type Id */
-            type_id: number;
+            /** Type */
+            type: string;
             /** Status Id */
             status_id: number;
             /** Priority Id */
             priority_id: number;
             /** Service Type Id */
-            service_type_id: number;
+            service_type_id?: number | null;
             /** Reason */
             reason: string;
             /**
@@ -1272,6 +1402,8 @@ export interface components {
              * @default new
              */
             client_type: string;
+            /** Client Id */
+            client_id?: string | null;
             /**
              * Referral Date
              * Format: date
@@ -1291,11 +1423,87 @@ export interface components {
             external_organisation_id?: string | null;
             /** External Organisation Contact Id */
             external_organisation_contact_id?: string | null;
+            /**
+             * Referral Source
+             * @default external_agency
+             */
+            referral_source: string;
+            /** External Reference Number */
+            external_reference_number?: string | null;
+            /** Target Program Id */
+            target_program_id?: string | null;
+            /**
+             * Program Data
+             * @default {}
+             */
+            program_data: {
+                [key: string]: unknown;
+            };
+            /** First Name */
+            first_name?: string | null;
+            /** Last Name */
+            last_name?: string | null;
+            /** Date Of Birth */
+            date_of_birth?: string | null;
+            /** Email */
+            email?: string | null;
+            /** Phone */
+            phone?: string | null;
+            /** Gender Id */
+            gender_id?: number | null;
+            /** Iwi Hapu Id */
+            iwi_hapu_id?: number | null;
+            /** Spiritual Needs Id */
+            spiritual_needs_id?: number | null;
+            /** Primary Language Id */
+            primary_language_id?: number | null;
+            /**
+             * Interpreter Needed
+             * @default false
+             */
+            interpreter_needed: boolean;
+            /** Emergency Contacts */
+            emergency_contacts?: {
+                [key: string]: unknown;
+            }[] | null;
+            /** Consent Records */
+            consent_records?: {
+                [key: string]: unknown;
+            }[] | null;
+        };
+        /** ReferralBatchDropdownsSchemaOut */
+        ReferralBatchDropdownsSchemaOut: {
+            /** Referral Types */
+            referral_types: components["schemas"]["ReferralTypeChoice"][];
+            /** Referral Sources */
+            referral_sources: components["schemas"]["ReferralSourceChoice"][];
+            /** Referral Statuses */
+            referral_statuses: components["schemas"]["OptionListItemSchemaOut"][];
+            /** Referral Priorities */
+            referral_priorities: components["schemas"]["OptionListItemSchemaOut"][];
+            /** Referral Service Types */
+            referral_service_types: components["schemas"]["OptionListItemSchemaOut"][];
+            /** Programs */
+            programs: components["schemas"]["ProgramBasicSchemaOut"][];
+        };
+        /** ReferralSourceChoice */
+        ReferralSourceChoice: {
+            /** Value */
+            value: string;
+            /** Label */
+            label: string;
+        };
+        /** ReferralTypeChoice */
+        ReferralTypeChoice: {
+            /** Value */
+            value: string;
+            /** Label */
+            label: string;
         };
         /** ReferralUpdateSchemaIn */
         ReferralUpdateSchemaIn: {
-            /** Type Id */
-            type_id?: number | null;
+            /** Type */
+            type?: string | null;
             /** Status Id */
             status_id?: number | null;
             /** Priority Id */
@@ -1306,6 +1514,8 @@ export interface components {
             reason?: string | null;
             /** Client Type */
             client_type?: string | null;
+            /** Client Id */
+            client_id?: string | null;
             /** Referral Date */
             referral_date?: string | null;
             /** Accepted Date */
@@ -1322,22 +1532,87 @@ export interface components {
             external_organisation_id?: string | null;
             /** External Organisation Contact Id */
             external_organisation_contact_id?: string | null;
+            /** Referral Source */
+            referral_source?: string | null;
+            /** External Reference Number */
+            external_reference_number?: string | null;
+            /** Target Program Id */
+            target_program_id?: string | null;
+            /** Program Data */
+            program_data?: {
+                [key: string]: unknown;
+            } | null;
+            /** First Name */
+            first_name?: string | null;
+            /** Last Name */
+            last_name?: string | null;
+            /** Date Of Birth */
+            date_of_birth?: string | null;
+            /** Email */
+            email?: string | null;
+            /** Phone */
+            phone?: string | null;
+            /** Gender Id */
+            gender_id?: number | null;
+            /** Iwi Hapu Id */
+            iwi_hapu_id?: number | null;
+            /** Spiritual Needs Id */
+            spiritual_needs_id?: number | null;
+            /** Primary Language Id */
+            primary_language_id?: number | null;
+            /** Interpreter Needed */
+            interpreter_needed?: boolean | null;
+            /** Emergency Contacts */
+            emergency_contacts?: {
+                [key: string]: unknown;
+            }[] | null;
+            /** Consent Records */
+            consent_records?: {
+                [key: string]: unknown;
+            }[] | null;
         };
         /** ReferralStatusUpdateSchemaIn */
         ReferralStatusUpdateSchemaIn: {
             /** Status Id */
             status_id: number;
         };
-        /** ReferralBatchDropdownsSchemaOut */
-        ReferralBatchDropdownsSchemaOut: {
-            /** Referral Types */
-            referral_types: components["schemas"]["OptionListItemSchemaOut"][];
-            /** Referral Statuses */
-            referral_statuses: components["schemas"]["OptionListItemSchemaOut"][];
-            /** Referral Priorities */
-            referral_priorities: components["schemas"]["OptionListItemSchemaOut"][];
-            /** Referral Service Types */
-            referral_service_types: components["schemas"]["OptionListItemSchemaOut"][];
+        /** FormFieldSchema */
+        FormFieldSchema: {
+            /** Name */
+            name: string;
+            /** Type */
+            type: string;
+            /** Label */
+            label: string;
+            /**
+             * Required
+             * @default false
+             */
+            required: boolean;
+            /** Help Text */
+            help_text?: string | null;
+            /** Choices */
+            choices?: {
+                [key: string]: string;
+            }[] | null;
+            /** Option List Slug */
+            option_list_slug?: string | null;
+            /** Validation */
+            validation?: {
+                [key: string]: unknown;
+            } | null;
+        };
+        /** ProgramFormSchemaOut */
+        ProgramFormSchemaOut: {
+            /**
+             * Program Id
+             * Format: uuid
+             */
+            program_id: string;
+            /** Program Name */
+            program_name: string;
+            /** Fields */
+            fields: components["schemas"]["FormFieldSchema"][];
         };
         /** Input */
         Input: {
@@ -1394,7 +1669,21 @@ export interface components {
             /** Incomplete Documentation */
             incomplete_documentation: boolean;
             status?: components["schemas"]["OptionListItemSchemaOut"] | null;
-            primary_language?: components["schemas"]["OptionListItemSchemaOut"] | null;
+            primary_language?: components["schemas"]["LanguageOut"] | null;
+            /**
+             * Active Referral Count
+             * @default 0
+             */
+            active_referral_count: number | null;
+        };
+        /** LanguageOut */
+        LanguageOut: {
+            /** Id */
+            id: number;
+            /** Code */
+            code: string;
+            /** Name */
+            name: string;
         };
         /** PagedClientListSchema */
         PagedClientListSchema: {
@@ -1402,47 +1691,6 @@ export interface components {
             items: components["schemas"]["ClientListSchema"][];
             /** Count */
             count: number;
-        };
-        /**
-         * ClientSearchSchema
-         * @description Simple schema for client search parameters.
-         */
-        ClientSearchSchema: {
-            /**
-             * Search
-             * @description Search term for name, email, or phone
-             */
-            search?: string | null;
-            /**
-             * Status Id
-             * @description Filter by status
-             */
-            status_id?: string | null;
-            /**
-             * Risk Level
-             * @description Filter by risk level
-             */
-            risk_level?: string | null;
-            /**
-             * Primary Language Id
-             * @description Filter by primary language
-             */
-            primary_language_id?: string | null;
-            /**
-             * Interpreter Needed
-             * @description Filter by interpreter requirement
-             */
-            interpreter_needed?: boolean | null;
-            /**
-             * Consent Required
-             * @description Filter by consent requirement
-             */
-            consent_required?: boolean | null;
-            /**
-             * Incomplete Documentation
-             * @description Filter by documentation status
-             */
-            incomplete_documentation?: boolean | null;
         };
         /**
          * ClientDetailSchema
@@ -1486,7 +1734,12 @@ export interface components {
             /** Incomplete Documentation */
             incomplete_documentation: boolean;
             status?: components["schemas"]["OptionListItemSchemaOut"] | null;
-            primary_language?: components["schemas"]["OptionListItemSchemaOut"] | null;
+            primary_language?: components["schemas"]["LanguageOut"] | null;
+            /**
+             * Active Referral Count
+             * @default 0
+             */
+            active_referral_count: number | null;
             /** Address */
             address?: string | null;
             /** Interpreter Needed */
@@ -1533,7 +1786,7 @@ export interface components {
              * Status Id
              * @description Client status option list item ID
              */
-            status_id: string;
+            status_id?: number | null;
             /**
              * Preferred Name
              * @description Preferred name
@@ -1555,10 +1808,15 @@ export interface components {
              */
             address?: string | null;
             /**
+             * Gender Id
+             * @description Gender identity option list item ID
+             */
+            gender_id?: number | null;
+            /**
              * Primary Language Id
              * @description Primary language option list item ID
              */
-            primary_language_id?: string | null;
+            primary_language_id?: number | null;
             /**
              * Interpreter Needed
              * @description Whether interpreter is needed
@@ -1591,6 +1849,16 @@ export interface components {
                 [key: string]: unknown;
             } | null;
             /**
+             * Iwi Hapu Id
+             * @description Iwi/Hapū affiliation option list item ID
+             */
+            iwi_hapu_id?: number | null;
+            /**
+             * Spiritual Needs Id
+             * @description Spiritual needs option list item ID
+             */
+            spiritual_needs_id?: number | null;
+            /**
              * Notes
              * @description Additional notes
              */
@@ -1602,6 +1870,13 @@ export interface components {
             extended_data?: {
                 [key: string]: unknown;
             } | null;
+            /**
+             * Emergency Contacts
+             * @description Emergency contact information
+             */
+            emergency_contacts?: {
+                [key: string]: unknown;
+            }[] | null;
         };
         /**
          * ClientUpdateSchema
@@ -1634,6 +1909,11 @@ export interface components {
              */
             email?: string | null;
             /**
+             * Gender Id
+             * @description Gender identity option list item ID
+             */
+            gender_id?: number | null;
+            /**
              * Phone
              * @description Primary phone number
              */
@@ -1647,12 +1927,12 @@ export interface components {
              * Status Id
              * @description Client status option list item ID
              */
-            status_id?: string | null;
+            status_id?: number | null;
             /**
              * Primary Language Id
              * @description Primary language option list item ID
              */
-            primary_language_id?: string | null;
+            primary_language_id?: number | null;
             /**
              * Interpreter Needed
              * @description Whether interpreter is needed
@@ -1681,6 +1961,16 @@ export interface components {
                 [key: string]: unknown;
             } | null;
             /**
+             * Iwi Hapu Id
+             * @description Iwi/Hapū affiliation option list item ID
+             */
+            iwi_hapu_id?: number | null;
+            /**
+             * Spiritual Needs Id
+             * @description Spiritual needs option list item ID
+             */
+            spiritual_needs_id?: number | null;
+            /**
              * Notes
              * @description Additional notes
              */
@@ -1692,6 +1982,13 @@ export interface components {
             extended_data?: {
                 [key: string]: unknown;
             } | null;
+            /**
+             * Emergency Contacts
+             * @description Emergency contact information
+             */
+            emergency_contacts?: {
+                [key: string]: unknown;
+            }[] | null;
         };
         /**
          * MessageSchema
@@ -1728,6 +2025,15 @@ export interface components {
             risk_distribution: {
                 [key: string]: number;
             };
+        };
+        /** CountryOut */
+        CountryOut: {
+            /** Id */
+            id: number;
+            /** Code */
+            code: string;
+            /** Name */
+            name: string;
         };
     };
     responses: never;
@@ -2795,6 +3101,26 @@ export interface operations {
             };
         };
     };
+    apps_referral_management_api_get_batch_dropdowns: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReferralBatchDropdownsSchemaOut"];
+                };
+            };
+        };
+    };
     apps_referral_management_api_get_referral: {
         parameters: {
             query?: never;
@@ -2889,11 +3215,13 @@ export interface operations {
             };
         };
     };
-    apps_referral_management_api_get_batch_dropdowns: {
+    apps_referral_management_api_get_program_form_schema: {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                program_id: string;
+            };
             cookie?: never;
         };
         requestBody?: never;
@@ -2904,7 +3232,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ReferralBatchDropdownsSchemaOut"];
+                    "application/json": components["schemas"]["ProgramFormSchemaOut"];
                 };
             };
         };
@@ -2912,6 +3240,13 @@ export interface operations {
     apps_client_management_api_list_clients: {
         parameters: {
             query?: {
+                search?: string;
+                status_id?: string;
+                risk_level?: string;
+                primary_language_id?: string;
+                interpreter_needed?: boolean;
+                consent_required?: boolean;
+                incomplete_documentation?: boolean;
                 limit?: number;
                 offset?: number;
             };
@@ -2919,11 +3254,7 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["ClientSearchSchema"];
-            };
-        };
+        requestBody?: never;
         responses: {
             /** @description OK */
             200: {
@@ -3114,6 +3445,46 @@ export interface operations {
                 };
                 content: {
                     "application/json": string[];
+                };
+            };
+        };
+    };
+    apps_reference_data_api_list_countries: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CountryOut"][];
+                };
+            };
+        };
+    };
+    apps_reference_data_api_list_languages: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LanguageOut"][];
                 };
             };
         };

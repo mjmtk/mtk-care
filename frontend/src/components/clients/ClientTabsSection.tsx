@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TimelineSection } from './TimelineSection';
 import { DocumentsSection } from './DocumentsSection';
 import { CarePlansSection } from './CarePlansSection';
+import { PersonalInfoSection } from './PersonalInfoSection';
 
 interface ClientTabsSectionProps {
   clientId: string;
@@ -21,12 +22,18 @@ export function ClientTabsSection({
       <CardContent className="p-0">
         <Tabs defaultValue="timeline" className="w-full">
           <div className="border-b px-4">
-            <TabsList className="grid w-full grid-cols-3 bg-transparent h-auto p-0">
+            <TabsList className="grid w-full grid-cols-4 bg-transparent h-auto p-0">
               <TabsTrigger 
                 value="timeline" 
                 className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none py-3"
               >
                 Timeline
+              </TabsTrigger>
+              <TabsTrigger 
+                value="personal"
+                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none py-3"
+              >
+                Personal Info
               </TabsTrigger>
               <TabsTrigger 
                 value="carePlans"
@@ -46,6 +53,13 @@ export function ClientTabsSection({
           <div className="p-4">
             <TabsContent value="timeline" className="mt-0">
               <TimelineSection 
+                clientId={clientId} 
+                canEditClient={canEditClient} 
+              />
+            </TabsContent>
+
+            <TabsContent value="personal" className="mt-0">
+              <PersonalInfoSection 
                 clientId={clientId} 
                 canEditClient={canEditClient} 
               />

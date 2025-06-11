@@ -1,0 +1,208 @@
+[
+    {
+        "model": "optionlists.optionlist",
+        "pk": 17,
+        "fields": {
+            "name": "Decline Reasons",
+            "slug": "decline-reasons",
+            "description": "Reasons for declining referrals in community services organizations.",
+            "is_active": true,
+            "created_at": "2025-06-11T10:00:00Z",
+            "updated_at": "2025-06-11T10:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 1701,
+        "fields": {
+            "option_list": 17,
+            "name": "client_not_contactable",
+            "slug": "client-not-contactable",
+            "label": "Client not contactable",
+            "description": "Unable to establish contact with the client after multiple attempts.",
+            "is_active": true,
+            "sort_order": 1,
+            "metadata": {},
+            "created_at": "2025-06-11T10:00:00Z",
+            "updated_at": "2025-06-11T10:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 1702,
+        "fields": {
+            "option_list": 17,
+            "name": "client_declined_services",
+            "slug": "client-declined-services",
+            "label": "Client declined services",
+            "description": "Client has voluntarily declined to receive the offered services.",
+            "is_active": true,
+            "sort_order": 2,
+            "metadata": {},
+            "created_at": "2025-06-11T10:00:00Z",
+            "updated_at": "2025-06-11T10:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 1703,
+        "fields": {
+            "option_list": 17,
+            "name": "client_moved_out_of_area",
+            "slug": "client-moved-out-of-area",
+            "label": "Client moved out of area",
+            "description": "Client has relocated outside of the service delivery area.",
+            "is_active": true,
+            "sort_order": 3,
+            "metadata": {},
+            "created_at": "2025-06-11T10:00:00Z",
+            "updated_at": "2025-06-11T10:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 1704,
+        "fields": {
+            "option_list": 17,
+            "name": "services_not_appropriate",
+            "slug": "services-not-appropriate",
+            "label": "Services not appropriate for client needs",
+            "description": "The available services do not match the client's specific needs or circumstances.",
+            "is_active": true,
+            "sort_order": 4,
+            "metadata": {},
+            "created_at": "2025-06-11T10:00:00Z",
+            "updated_at": "2025-06-11T10:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 1705,
+        "fields": {
+            "option_list": 17,
+            "name": "client_receiving_similar_services",
+            "slug": "client-receiving-similar-services",
+            "label": "Client already receiving similar services elsewhere",
+            "description": "Client is currently engaged with another service provider for similar support.",
+            "is_active": true,
+            "sort_order": 5,
+            "metadata": {},
+            "created_at": "2025-06-11T10:00:00Z",
+            "updated_at": "2025-06-11T10:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 1706,
+        "fields": {
+            "option_list": 17,
+            "name": "client_did_not_attend",
+            "slug": "client-did-not-attend",
+            "label": "Client did not attend scheduled appointments",
+            "description": "Client failed to attend multiple scheduled appointments without notice.",
+            "is_active": true,
+            "sort_order": 6,
+            "metadata": {},
+            "created_at": "2025-06-11T10:00:00Z",
+            "updated_at": "2025-06-11T10:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 1707,
+        "fields": {
+            "option_list": 17,
+            "name": "safety_concerns_for_staff",
+            "slug": "safety-concerns-for-staff",
+            "label": "Safety concerns for staff",
+            "description": "Health and safety concerns identified that pose risks to staff members.",
+            "is_active": true,
+            "sort_order": 7,
+            "metadata": {},
+            "created_at": "2025-06-11T10:00:00Z",
+            "updated_at": "2025-06-11T10:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 1708,
+        "fields": {
+            "option_list": 17,
+            "name": "program_at_capacity",
+            "slug": "program-at-capacity",
+            "label": "Program at capacity",
+            "description": "The program or service has reached maximum capacity and cannot accept new clients.",
+            "is_active": true,
+            "sort_order": 8,
+            "metadata": {},
+            "created_at": "2025-06-11T10:00:00Z",
+            "updated_at": "2025-06-11T10:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 1709,
+        "fields": {
+            "option_list": 17,
+            "name": "client_ineligible_for_program",
+            "slug": "client-ineligible-for-program",
+            "label": "Client ineligible for program",
+            "description": "Client does not meet the eligibility criteria for the specific program or service.",
+            "is_active": true,
+            "sort_order": 9,
+            "metadata": {},
+            "created_at": "2025-06-11T10:00:00Z",
+            "updated_at": "2025-06-11T10:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 1710,
+        "fields": {
+            "option_list": 17,
+            "name": "duplicate_referral",
+            "slug": "duplicate-referral",
+            "label": "Duplicate referral",
+            "description": "This referral duplicates an existing referral for the same client and services.",
+            "is_active": true,
+            "sort_order": 10,
+            "metadata": {},
+            "created_at": "2025-06-11T10:00:00Z",
+            "updated_at": "2025-06-11T10:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 1711,
+        "fields": {
+            "option_list": 17,
+            "name": "referrer_withdrew_referral",
+            "slug": "referrer-withdrew-referral",
+            "label": "Referrer withdrew referral",
+            "description": "The referring organization or individual has withdrawn the referral request.",
+            "is_active": true,
+            "sort_order": 11,
+            "metadata": {},
+            "created_at": "2025-06-11T10:00:00Z",
+            "updated_at": "2025-06-11T10:00:00Z"
+        }
+    },
+    {
+        "model": "optionlists.optionlistitem",
+        "pk": 1712,
+        "fields": {
+            "option_list": 17,
+            "name": "other_requires_explanation",
+            "slug": "other-requires-explanation",
+            "label": "Other (requires explanation)",
+            "description": "Decline reason not covered by standard options - additional explanation required.",
+            "is_active": true,
+            "sort_order": 12,
+            "metadata": {
+                "requires_explanation": true
+            },
+            "created_at": "2025-06-11T10:00:00Z",
+            "updated_at": "2025-06-11T10:00:00Z"
+        }
+    }
+]

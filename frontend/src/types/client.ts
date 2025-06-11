@@ -9,8 +9,13 @@ export interface Client {
   primaryLanguage: string;
   interpreterNeeded: boolean;
   culturalIdentity?: {
-    primaryIdentity: string;
+    primaryIdentity?: string;
+    iwiHapu?: string;
+    spiritualNeeds?: string;
   };
+  // New cultural identity fields (direct from backend)
+  iwi_hapu?: string;
+  spiritual_needs?: string;
   phone?: string;
   email?: string;
   address?: string;
@@ -19,6 +24,21 @@ export interface Client {
   riskLevel: 'high' | 'medium' | 'low';
   consentRequired: boolean;
   incompleteDocumentation: boolean;
+  status?: string;
+  notes?: string;
+  // Emergency contacts
+  emergencyContacts?: EmergencyContact[];
+}
+
+export interface EmergencyContact {
+  id?: string;
+  first_name: string;
+  last_name: string;
+  relationship?: string;
+  phone: string;
+  email?: string;
+  is_primary: boolean;
+  priority_order: number;
 }
 
 export interface TimelineActivity {

@@ -263,7 +263,7 @@ export default function ReferralDetailPage() {
                   <span className="text-sm font-medium">Type</span>
                 </div>
                 <div className="mt-2">
-                  <span className="text-sm">{referral.type.label}</span>
+                  <span className="text-sm">{referral.type === 'incoming' ? 'Incoming' : 'Outgoing'}</span>
                 </div>
               </CardContent>
             </Card>

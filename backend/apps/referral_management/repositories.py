@@ -52,7 +52,7 @@ class ReferralRepository:
             QuerySet: Filtered, searched, and ordered queryset of Referrals
         """
         queryset = Referral.objects.select_related(
-            'status', 'type', 'service_type'
+            'status', 'service_type'
         )
         
         # Apply filters
@@ -90,7 +90,7 @@ class ReferralRepository:
             Referral: The requested referral with all related objects
         """
         return Referral.objects.select_related( # type: ignore
-            'status', 'type', 'service_type', 'client'
+            'status', 'service_type', 'client', 'target_program'
         ).get(id=referral_id)
     
     @staticmethod
@@ -168,7 +168,7 @@ class ReferralRepository:
             Q(client__first_name__icontains=client_name) |
             Q(client__last_name__icontains=client_name)
         ).select_related(
-            'status', 'type', 'service_type', 'client'
+            'status', 'service_type', 'client'
         )
         
     @staticmethod
@@ -183,7 +183,7 @@ class ReferralRepository:
             QuerySet: Referrals for the specified client ID
         """
         return Referral.objects.filter(client_id=client_id).select_related(
-            'status', 'type', 'client'
+            'status', 'client'
         ).order_by('-referral_date')
     
     @staticmethod
@@ -204,7 +204,7 @@ class ReferralRepository:
             status__option_list__slug='referral-statuses',
             status__value='pending'
         ).select_related(
-            'status', 'type', 'client'
+            'status', 'client'
         ).order_by('-referral_date')
 
     @staticmethod
@@ -222,7 +222,7 @@ class ReferralRepository:
             status__value='pending',
             referral_date__lt=cutoff_date
         ).select_related(
-            'status', 'type', 'client'
+            'status', 'client'
         ).order_by('referral_date')
 
     @staticmethod
@@ -235,8 +235,8 @@ class ReferralRepository:
             QuerySet: Referrals for the specified service type
         """
         return Referral.objects.filter(
-            type__option_list__slug='service-types',
-            type__id=service_type_id
+            service_type__option_list__slug='referral-service-types',
+            service_type__id=service_type_id
         ).select_related(
-            'status', 'type', 'client'
+            'status', 'client'
         ).order_by('-referral_date')

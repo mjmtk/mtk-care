@@ -1,35 +1,165 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuthBypassSession, useAccessToken } from '@/hooks/useAuthBypass';
-import { ReferralService } from '@/services/referral-service';
-import type { Referral, ReferralUpdate, ReferralBatchDropdowns } from '@/types/referral';
+import { usePageContext } from '@/contexts/PageContext';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { ErrorDisplay } from '@/components/error-display';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Save, X } from 'lucide-react';
-import { format } from 'date-fns';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { ArrowLeft, FileText, Users, Calendar, Shield } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import type { SaveStatus } from '@/components/ui/save-status';
+import { ReferralService } from '@/services/referral-service';
+import { NewClientService } from '@/services/new-client-service';
+
+// Import the step components
+import { ReferralSourceStep } from '@/components/referrals/steps/ReferralSourceStep';
+import { ClientIdentificationStep } from '@/components/referrals/steps/ClientIdentificationStep';
+import { ConsentDocumentationStep } from '@/components/referrals/steps/ConsentDocumentationStep';
+import { ReferralDetailsStep } from '@/components/referrals/steps/ReferralDetailsStep';
+
+// Types from OpenAPI
+import type { components } from '@/types/openapi';
+
+type ReferralFormData = {
+  // Step 1: Referral Source & Basic Details
+  referral_source: string;
+  external_reference_number?: string;
+  external_organisation_name?: string;
+  target_program_id?: string;
+  type: string;
+  priority_id?: number;
+  referral_date: string;
+  
+  // Step 2: Client Information (Enhanced)
+  client_type: string;
+  client_id?: string;
+  // Basic client fields
+  first_name?: string;
+  last_name?: string;
+  date_of_birth?: string;
+  email?: string;
+  phone?: string;
+  gender_id?: number;
+  // Cultural identity
+  cultural_identity?: Record<string, any>;
+  iwi_hapu_id?: number;
+  spiritual_needs_id?: number;
+  primary_language_id?: number;
+  interpreter_needed?: boolean;
+  // Emergency contacts
+  emergency_contacts?: Array<{
+    relationship_id: number;
+    first_name: string;
+    last_name: string;
+    phone: string;
+    email?: string;
+    is_primary: boolean;
+    priority_order: number;
+  }>;
+  
+  // Step 3: Consent & Documentation
+  consent_records?: Array<{
+    consent_type_id: number;
+    status: string;
+    consent_date?: string;
+    notes?: string;
+  }>;
+  documents?: Array<{
+    file_name: string;
+    document_type_id: number;
+    folder_category: string;
+    description?: string;
+  }>;
+  
+  // Step 4: Referral Details
+  service_type_id?: number;
+  status_id?: number;
+  reason: string;
+  notes?: string;
+  accepted_date?: string;
+  completed_date?: string;
+  follow_up_date?: string;
+  client_consent_date?: string;
+  external_organisation_id?: string;
+  external_organisation_contact_id?: string;
+  program_data: Record<string, any>;
+};
+
+type StepStatus = 'pending' | 'current' | 'completed';
+
+interface Step {
+  id: number;
+  title: string;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+  status: StepStatus;
+}
 
 export default function EditReferralPage() {
   const params = useParams();
   const router = useRouter();
-  const [referral, setReferral] = useState<Referral | null>(null);
-  const [dropdowns, setDropdowns] = useState<ReferralBatchDropdowns | null>(null);
-  const [formData, setFormData] = useState<ReferralUpdate>({});
+  const { setPageInfo, clearPageInfo } = usePageContext();
+  const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isDraft, setIsDraft] = useState(true);
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  const [lastSaved, setLastSaved] = useState<Date | undefined>(undefined);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [referralId] = useState<string>(params.id as string);
+  const [dropdowns, setDropdowns] = useState<any>(null);
+  const [canEdit, setCanEdit] = useState(true);
+  
+  const [formData, setFormData] = useState<ReferralFormData>({
+    referral_source: '',
+    type: 'incoming',
+    client_type: 'new',
+    referral_date: new Date().toISOString().split('T')[0],
+    reason: '',
+    program_data: {},
+    target_program_id: undefined
+  });
+
+  const baseSteps: Step[] = useMemo(() => [
+    {
+      id: 1,
+      title: 'Referral Source',
+      description: 'Basic details and source',
+      icon: FileText,
+      status: 'current'
+    },
+    {
+      id: 2,
+      title: 'Client Information',
+      description: 'Client details & cultural identity',
+      icon: Users,
+      status: 'pending'
+    },
+    {
+      id: 3,
+      title: 'Consent & Documents',
+      description: 'Consent forms & documentation',
+      icon: Shield,
+      status: 'pending'
+    },
+    {
+      id: 4,
+      title: 'Referral Details',
+      description: 'Complete referral information',
+      icon: Calendar,
+      status: 'pending'
+    }
+  ], []);
+
   const { data: session, status } = useAuthBypassSession();
   const accessToken = useAccessToken();
 
-  const referralId = params.id as string;
-
+  // Load referral data and dropdown data on mount
   useEffect(() => {
     if (status === 'loading') return;
     if (!accessToken) return;
@@ -39,68 +169,222 @@ export default function EditReferralPage() {
         setIsLoading(true);
         setError(null);
         
-        // Load referral and dropdown data in parallel
+        // Load both referral and dropdown data
         const [referralData, dropdownData] = await Promise.all([
           ReferralService.getReferral(referralId),
           ReferralService.getBatchDropdowns()
         ]);
         
-        setReferral(referralData);
         setDropdowns(dropdownData);
         
-        // Initialize form with current data
-        setFormData({
-          type_id: referralData.type.id,
-          status_id: referralData.status.id,
+        // Check if referral can be edited
+        const canEditReferral = !['completed', 'enrolled', 'cancelled'].includes(referralData.status.slug.toLowerCase());
+        setCanEdit(canEditReferral);
+        
+        if (!canEditReferral) {
+          setError(`This referral cannot be edited because it has status: ${referralData.status.label}`);
+          return;
+        }
+        
+        // Convert referral data to form data format
+        const loadedFormData: ReferralFormData = {
+          referral_source: referralData.referral_source || 'external_agency',
+          external_reference_number: referralData.external_reference_number || '',
+          external_organisation_name: referralData.program_data?.external_organisation_name || '',
+          target_program_id: referralData.target_program?.id || '__none__',
+          type: referralData.type,
           priority_id: referralData.priority.id,
-          service_type_id: referralData.service_type.id,
-          reason: referralData.reason,
-          client_type: referralData.client_type,
           referral_date: referralData.referral_date,
-          accepted_date: referralData.accepted_date || undefined,
-          completed_date: referralData.completed_date || undefined,
-          follow_up_date: referralData.follow_up_date || undefined,
-          client_consent_date: referralData.client_consent_date || undefined,
-          notes: referralData.notes || undefined,
-          external_organisation_id: referralData.external_organisation_id || undefined,
-          external_organisation_contact_id: referralData.external_organisation_contact_id || undefined,
-        });
+          client_type: referralData.client_type,
+          client_id: referralData.client_id || undefined,
+          service_type_id: referralData.service_type.id,
+          status_id: referralData.status.id,
+          reason: referralData.reason,
+          notes: referralData.notes || '',
+          accepted_date: referralData.accepted_date || '',
+          completed_date: referralData.completed_date || '',
+          follow_up_date: referralData.follow_up_date || '',
+          client_consent_date: referralData.client_consent_date || '',
+          external_organisation_id: referralData.external_organisation_id || '',
+          external_organisation_contact_id: referralData.external_organisation_contact_id || '',
+          program_data: referralData.program_data || {}
+        };
+        
+        // If referral has an existing client, fetch the client data to populate the form
+        if (referralData.client_id && referralData.client_type === 'existing') {
+          try {
+            const clientData = await NewClientService.getClient(referralData.client_id);
+            console.log('Loaded client data:', clientData);
+            
+            // Populate form with client data
+            loadedFormData.first_name = clientData.first_name;
+            loadedFormData.last_name = clientData.last_name;
+            loadedFormData.date_of_birth = clientData.date_of_birth;
+            loadedFormData.email = clientData.email || '';
+            loadedFormData.phone = clientData.phone || '';
+            loadedFormData.gender_id = clientData.gender?.id;
+            loadedFormData.primary_language_id = clientData.primary_language?.id;
+            loadedFormData.interpreter_needed = clientData.interpreter_needed;
+            loadedFormData.cultural_identity = clientData.cultural_identity;
+            loadedFormData.iwi_hapu_id = clientData.iwi_hapu?.id;
+            loadedFormData.spiritual_needs_id = clientData.spiritual_needs?.id;
+            
+            // Load emergency contacts if available
+            if (clientData.emergency_contacts) {
+              loadedFormData.emergency_contacts = clientData.emergency_contacts.map((contact: any) => ({
+                relationship_id: contact.relationship.id,
+                first_name: contact.first_name,
+                last_name: contact.last_name,
+                phone: contact.phone,
+                email: contact.email || '',
+                is_primary: contact.is_primary,
+                priority_order: contact.priority_order
+              }));
+            }
+          } catch (err) {
+            console.error('Failed to load client data:', err);
+            // Don't fail the entire load if client fetch fails
+          }
+        }
+        
+        setFormData(loadedFormData);
+        
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load referral data');
       } finally {
         setIsLoading(false);
       }
     };
-
+    
     loadData();
   }, [referralId, status, accessToken]);
 
-  const handleInputChange = (field: keyof ReferralUpdate, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value || undefined
+  // Set page info on mount
+  useEffect(() => {
+    return () => clearPageInfo(); // Clear on unmount
+  }, [clearPageInfo]);
+
+  // Memoize the updated steps to prevent infinite re-renders
+  const steps = useMemo(() => {
+    return baseSteps.map(step => ({
+      ...step,
+      status: step.id < currentStep ? 'completed' : 
+              step.id === currentStep ? 'current' : 'pending'
     }));
+  }, [baseSteps, currentStep]);
+
+  // Update page context based on current step
+  useEffect(() => {
+    setPageInfo({
+      title: 'Edit Referral',
+      subtitle: 'Update referral information and timeline',
+      saveStatus,
+      lastSaved,
+      steps,
+      currentStep
+    });
+  }, [currentStep, saveStatus, lastSaved, steps, setPageInfo]);
+
+  const handleDataChange = (newData: Partial<ReferralFormData>) => {
+    setFormData(prev => ({ ...prev, ...newData }));
+    setHasUnsavedChanges(true);
+    setSaveStatus('idle'); // Show unsaved changes indicator
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!referral) return;
+  const handleStepComplete = async (stepData: Partial<ReferralFormData>) => {
+    const updatedFormData = { ...formData, ...stepData };
+    setFormData(updatedFormData);
+    setHasUnsavedChanges(true);
+    setSaveStatus('saving');
     
     try {
-      setIsSaving(true);
-      setError(null);
+      // If we're completing step 2 and creating a new client, create the client first
+      if (currentStep === 2 && updatedFormData.client_type === 'new' && 
+          updatedFormData.first_name && updatedFormData.last_name) {
+        
+        const clientData = {
+          first_name: updatedFormData.first_name,
+          last_name: updatedFormData.last_name,
+          date_of_birth: updatedFormData.date_of_birth || '',
+          email: updatedFormData.email || '',
+          phone: updatedFormData.phone || '',
+          risk_level: 'low',
+          primary_language_id: null,
+          cultural_identity: {},
+          consent_required: false,
+          interpreter_needed: false,
+          status_id: null,
+          extended_data: {}
+        };
+
+        console.log('Creating new client...', clientData);
+        const newClient = await NewClientService.createClient(clientData);
+        console.log('Client created:', newClient);
+        
+        // Update form data with the new client ID
+        updatedFormData.client_id = newClient.id;
+        updatedFormData.client_type = 'existing';
+        setFormData(updatedFormData);
+      }
+
+      // Save the referral changes
+      await saveChanges(updatedFormData);
       
-      // Remove undefined values
-      const updateData = Object.fromEntries(
-        Object.entries(formData).filter(([_, value]) => value !== undefined && value !== '')
-      ) as ReferralUpdate;
+      setSaveStatus('saved');
+      setLastSaved(new Date());
+      setHasUnsavedChanges(false);
       
-      await ReferralService.updateReferral(referral.id, updateData);
-      router.push(`/dashboard/referrals/${referral.id}`);
+      if (currentStep < 4) {
+        setCurrentStep(prev => prev + 1);
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update referral');
-    } finally {
-      setIsSaving(false);
+      setSaveStatus('error');
+      setError(err instanceof Error ? err.message : 'Failed to save step data');
+      console.error('Step completion error:', err);
+    }
+  };
+
+  // Save changes function
+  const saveChanges = useCallback(async (data: ReferralFormData) => {
+    try {
+      // Update existing referral
+      const updateData = {
+        client_id: data.client_id || null,
+        referral_source: data.referral_source,
+        external_reference_number: data.external_reference_number || null,
+        target_program_id: data.target_program_id === '__none__' ? null : data.target_program_id,
+        type: data.type,
+        priority_id: data.priority_id || null,
+        referral_date: data.referral_date,
+        reason: data.reason || '',
+        notes: data.notes || null,
+        service_type_id: data.service_type_id || null,
+        status_id: data.status_id || null,
+        program_data: {
+          ...data.program_data,
+          external_organisation_name: data.external_organisation_name || null
+        },
+        accepted_date: data.accepted_date || null,
+        completed_date: data.completed_date || null,
+        follow_up_date: data.follow_up_date || null,
+        client_consent_date: data.client_consent_date || null,
+        external_organisation_id: data.external_organisation_id || null,
+        external_organisation_contact_id: data.external_organisation_contact_id || null,
+        client_type: data.client_type || 'new'
+      };
+
+      console.log('Updating referral...', updateData);
+      const updatedReferral = await ReferralService.updateReferral(referralId, updateData);
+      console.log('Referral updated:', updatedReferral);
+    } catch (err) {
+      console.error('Save changes error:', err);
+      throw err;
+    }
+  }, [referralId]);
+
+  const handlePreviousStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(prev => prev - 1);
     }
   };
 
@@ -108,288 +392,139 @@ export default function EditReferralPage() {
     router.push(`/dashboard/referrals/${referralId}`);
   };
 
+  const handleSaveDraft = async () => {
+    if (!hasUnsavedChanges && !isSaving) return;
+    
+    setIsSaving(true);
+    setSaveStatus('saving');
+    try {
+      await saveChanges(formData);
+      
+      setSaveStatus('saved');
+      setLastSaved(new Date());
+      setHasUnsavedChanges(false);
+      setIsDraft(true);
+    } catch (err) {
+      setSaveStatus('error');
+      setError(err instanceof Error ? err.message : 'Failed to save changes');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSubmitReferral = async () => {
+    setIsSaving(true);
+    setSaveStatus('saving');
+    try {
+      // First save the current state
+      await saveChanges(formData);
+      
+      // Then redirect back to referral detail
+      router.push(`/dashboard/referrals/${referralId}`);
+    } catch (err) {
+      setSaveStatus('error');
+      setError(err instanceof Error ? err.message : 'Failed to save referral');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const renderCurrentStep = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <ReferralSourceStep
+            data={formData}
+            onComplete={handleStepComplete}
+            onCancel={handleCancel}
+          />
+        );
+      case 2:
+        return (
+          <ClientIdentificationStep
+            data={formData}
+            onComplete={handleStepComplete}
+            onPrevious={handlePreviousStep}
+            onDataChange={handleDataChange}
+          />
+        );
+      case 3:
+        return (
+          <ConsentDocumentationStep
+            data={formData}
+            onComplete={handleStepComplete}
+            onPrevious={handlePreviousStep}
+            onDataChange={handleDataChange}
+          />
+        );
+      case 4:
+        return (
+          <ReferralDetailsStep
+            data={formData}
+            onComplete={handleStepComplete}
+            onPrevious={handlePreviousStep}
+            onSaveDraft={handleSaveDraft}
+            onSubmit={handleSubmitReferral}
+            isSaving={isSaving}
+            hasUnsavedChanges={hasUnsavedChanges}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
   if (isLoading) {
     return (
-      <div className="container mx-auto py-10">
-        <div className="max-w-4xl mx-auto">
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-            <div className="space-y-2">
-              <div className="h-10 bg-gray-200 rounded"></div>
-              <div className="h-10 bg-gray-200 rounded"></div>
-              <div className="h-32 bg-gray-200 rounded"></div>
+      <div className="max-w-4xl mx-auto space-y-6">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="animate-pulse space-y-4">
+              <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+              <div className="space-y-2">
+                <div className="h-10 bg-gray-200 rounded"></div>
+                <div className="h-10 bg-gray-200 rounded"></div>
+              </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
-  if (error && !referral) {
+  if (error && !canEdit) {
     return (
-      <div className="container mx-auto py-10">
-        <div className="max-w-4xl mx-auto">
-          <ErrorDisplay message={error} />
-          <Button onClick={() => router.push('/dashboard/referrals')} className="mt-4">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Referrals
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  if (!referral || !dropdowns) {
-    return (
-      <div className="container mx-auto py-10">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold">Referral not found</h2>
-            <p className="text-muted-foreground mt-2">The referral you're trying to edit doesn't exist.</p>
-            <Button onClick={() => router.push('/dashboard/referrals')} className="mt-4">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Referrals
-            </Button>
-          </div>
-        </div>
+      <div className="max-w-4xl mx-auto space-y-6">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-center space-y-4">
+              <Alert className="bg-yellow-50 border-yellow-200">
+                <AlertDescription className="text-yellow-800">
+                  {error}
+                </AlertDescription>
+              </Alert>
+              <Button onClick={handleCancel} className="flex items-center space-x-2">
+                <ArrowLeft className="h-4 w-4" />
+                <span>Back to Referral</span>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
     <ErrorBoundary>
-      <div className="container mx-auto py-10">
-        <div className="max-w-4xl mx-auto space-y-6">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Button 
-                variant="ghost" 
-                onClick={handleCancel}
-                className="p-2"
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-              <div>
-                <h1 className="text-3xl font-bold">Edit Referral</h1>
-                <p className="text-muted-foreground">
-                  Update referral information and timeline
-                </p>
-              </div>
-            </div>
-          </div>
+      <div className="max-w-4xl mx-auto space-y-6">
+        {error && (
+          <ErrorDisplay message={error} />
+        )}
 
-          {error && (
-            <ErrorDisplay message={error} />
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Basic Information Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Basic Information</CardTitle>
-                <CardDescription>
-                  Core referral details and categorization
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="type">Referral Type *</Label>
-                    <Select
-                      value={formData.type_id?.toString()}
-                      onValueChange={(value) => handleInputChange('type_id', parseInt(value))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select referral type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {dropdowns.referral_types.map((type) => (
-                          <SelectItem key={type.id} value={type.id.toString()}>
-                            {type.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="status">Status *</Label>
-                    <Select
-                      value={formData.status_id?.toString()}
-                      onValueChange={(value) => handleInputChange('status_id', parseInt(value))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {dropdowns.referral_statuses.map((status) => (
-                          <SelectItem key={status.id} value={status.id.toString()}>
-                            {status.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="priority">Priority *</Label>
-                    <Select
-                      value={formData.priority_id?.toString()}
-                      onValueChange={(value) => handleInputChange('priority_id', parseInt(value))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select priority" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {dropdowns.referral_priorities.map((priority) => (
-                          <SelectItem key={priority.id} value={priority.id.toString()}>
-                            {priority.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="service_type">Service Type *</Label>
-                    <Select
-                      value={formData.service_type_id?.toString()}
-                      onValueChange={(value) => handleInputChange('service_type_id', parseInt(value))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select service type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {dropdowns.referral_service_types.map((serviceType) => (
-                          <SelectItem key={serviceType.id} value={serviceType.id.toString()}>
-                            {serviceType.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="client_type">Client Type *</Label>
-                    <Select
-                      value={formData.client_type}
-                      onValueChange={(value) => handleInputChange('client_type', value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select client type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="existing">Existing Client</SelectItem>
-                        <SelectItem value="new">New Client</SelectItem>
-                        <SelectItem value="self">Self-Referral</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="reason">Reason for Referral *</Label>
-                  <Textarea
-                    id="reason"
-                    value={formData.reason || ''}
-                    onChange={(e) => handleInputChange('reason', e.target.value)}
-                    placeholder="Describe the reason for this referral, presenting concerns, and any relevant background information..."
-                    className="min-h-[120px]"
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="notes">Additional Notes</Label>
-                  <Textarea
-                    id="notes"
-                    value={formData.notes || ''}
-                    onChange={(e) => handleInputChange('notes', e.target.value)}
-                    placeholder="Any additional notes, special considerations, or follow-up requirements..."
-                    className="min-h-[80px]"
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Timeline Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Timeline & Dates</CardTitle>
-                <CardDescription>
-                  Track important dates in the referral process
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="referral_date">Referral Date *</Label>
-                    <Input
-                      id="referral_date"
-                      type="date"
-                      value={formData.referral_date || ''}
-                      onChange={(e) => handleInputChange('referral_date', e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="accepted_date">Accepted Date</Label>
-                    <Input
-                      id="accepted_date"
-                      type="date"
-                      value={formData.accepted_date || ''}
-                      onChange={(e) => handleInputChange('accepted_date', e.target.value)}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="client_consent_date">Client Consent Date</Label>
-                    <Input
-                      id="client_consent_date"
-                      type="date"
-                      value={formData.client_consent_date || ''}
-                      onChange={(e) => handleInputChange('client_consent_date', e.target.value)}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="follow_up_date">Follow-up Date</Label>
-                    <Input
-                      id="follow_up_date"
-                      type="date"
-                      value={formData.follow_up_date || ''}
-                      onChange={(e) => handleInputChange('follow_up_date', e.target.value)}
-                    />
-                  </div>
-
-                  <div className="space-y-2 md:col-span-2">
-                    <Label htmlFor="completed_date">Completed Date</Label>
-                    <Input
-                      id="completed_date"
-                      type="date"
-                      value={formData.completed_date || ''}
-                      onChange={(e) => handleInputChange('completed_date', e.target.value)}
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Action Buttons */}
-            <div className="flex justify-end space-x-4">
-              <Button type="button" variant="outline" onClick={handleCancel}>
-                <X className="mr-2 h-4 w-4" />
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isSaving}>
-                <Save className="mr-2 h-4 w-4" />
-                {isSaving ? 'Saving...' : 'Save Changes'}
-              </Button>
-            </div>
-          </form>
+        {/* Current Step Content */}
+        <div className="min-h-[400px]">
+          {renderCurrentStep()}
         </div>
       </div>
     </ErrorBoundary>

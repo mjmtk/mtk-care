@@ -222,15 +222,84 @@ class Document(UUIDPKBaseModel):
     """
     Represents a document with metadata for SharePoint integration.
     Utilises a UUID primary key and includes audit and soft delete features.
+    
+    SharePoint Folder Structure:
+    /Clients/{client_uuid}/Referrals/{referral_uuid}/consent-forms/
+    /Clients/{client_uuid}/Referrals/{referral_uuid}/assessments/
+    /Clients/{client_uuid}/General/id-documents/
     """
-    # Note: Client relationship removed temporarily to enable migrations
-    # Will be added back in a future migration when client_management app is available
+    
+    # Basic File Information
     file_name = models.CharField(max_length=255, verbose_name=_("File Name"))
+    original_filename = models.CharField(
+        max_length=255, 
+        null=True, 
+        blank=True,
+        verbose_name=_("Original Filename"),
+        help_text=_("Original filename before any sanitization")
+    )
+    file_size = models.PositiveBigIntegerField(
+        null=True,
+        blank=True, 
+        verbose_name=_("File Size"),
+        help_text=_("File size in bytes")
+    )
+    mime_type = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        verbose_name=_("MIME Type")
+    )
+    
+    # SharePoint Integration
     sharepoint_id = models.CharField(
         max_length=255,
+        null=True,
+        blank=True,
         help_text=_('SharePoint unique file ID or URL'),
         verbose_name=_("SharePoint ID")
     )
+    sharepoint_url = models.URLField(
+        max_length=500,
+        null=True,
+        blank=True,
+        verbose_name=_("SharePoint URL"),
+        help_text=_("Direct URL to the file in SharePoint")
+    )
+    
+    # Folder Structure for SharePoint Organization
+    client_id = models.UUIDField(
+        null=True,
+        blank=True,
+        verbose_name=_("Client ID"),
+        help_text=_("UUID of the client this document belongs to")
+    )
+    referral_id = models.UUIDField(
+        null=True,
+        blank=True,
+        verbose_name=_("Referral ID"),
+        help_text=_("UUID of the referral this document belongs to (if referral-specific)")
+    )
+    folder_category = models.CharField(
+        max_length=50,
+        choices=[
+            ('consent-forms', _('Consent Forms')),
+            ('assessments', _('Assessments')),
+            ('care-plans', _('Care Plans')),
+            ('id-documents', _('ID Documents')),
+            ('medical-records', _('Medical Records')),
+            ('court-orders', _('Court Orders')),
+            ('school-reports', _('School Reports')),
+            ('referral-letters', _('Referral Letters')),
+            ('general', _('General')),
+            ('other', _('Other')),
+        ],
+        default='general',
+        verbose_name=_("Folder Category"),
+        help_text=_("Category for SharePoint folder organization")
+    )
+    
+    # Document Classification
     type = models.ForeignKey(
         'optionlists.OptionListItem',
         on_delete=models.PROTECT,
@@ -240,32 +309,158 @@ class Document(UUIDPKBaseModel):
         blank=True,
         verbose_name=_("Document Type")
     )
-    status = models.ForeignKey(
-        'optionlists.OptionListItem',
-        on_delete=models.PROTECT,
-        related_name='document_statuses',
-        limit_choices_to={'option_list__slug': 'document-statuses'},
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ('pending', _('Pending Upload')),
+            ('uploading', _('Uploading')),
+            ('uploaded', _('Uploaded Successfully')),
+            ('failed', _('Upload Failed')),
+            ('archived', _('Archived')),
+            ('deleted', _('Deleted')),
+        ],
+        default='pending',
+        verbose_name=_("Upload Status")
+    )
+    
+    # Document Content and Security
+    is_confidential = models.BooleanField(
+        default=False,
+        verbose_name=_("Confidential"),
+        help_text=_("Whether this document contains confidential information")
+    )
+    access_level = models.CharField(
+        max_length=20,
+        choices=[
+            ('public', _('Public')),
+            ('internal', _('Internal Only')),
+            ('restricted', _('Restricted Access')),
+            ('confidential', _('Confidential')),
+        ],
+        default='internal',
+        verbose_name=_("Access Level")
+    )
+    
+    # Version Control
+    version = models.CharField(
+        max_length=20,
+        default='1.0',
+        verbose_name=_("Version"),
+        help_text=_("Document version for tracking changes")
+    )
+    is_latest_version = models.BooleanField(
+        default=True,
+        verbose_name=_("Is Latest Version")
+    )
+    superseded_by = models.ForeignKey(
+        'self',
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        verbose_name=_("Document Status")
+        related_name='supersedes',
+        verbose_name=_("Superseded By"),
+        help_text=_("Document that replaces this one")
+    )
+    
+    # Additional Metadata
+    description = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name=_("Description"),
+        help_text=_("Brief description of the document content")
+    )
+    tags = models.JSONField(
+        default=list,
+        blank=True,
+        verbose_name=_("Tags"),
+        help_text=_("List of tags for document categorization")
     )
     metadata = models.JSONField(
+        default=dict,
+        blank=True,
+        verbose_name=_("Additional Metadata"),
+        help_text=_("Flexible metadata for extensibility")
+    )
+    
+    # Upload Tracking
+    upload_error = models.TextField(
         blank=True,
         null=True,
-        help_text=_('Flexible metadata for extensibility'),
-        verbose_name=_("Metadata")
+        verbose_name=_("Upload Error"),
+        help_text=_("Error message if upload failed")
     )
-    # 'created_at' (formerly uploaded_at) and 'created_by' (formerly uploaded_by) are inherited from AuditSoftDeleteBaseModel.
-    # 'id', 'updated_at', 'updated_by', soft-delete fields, and 'last_synced_at' are also inherited.
+    uploaded_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_("Uploaded At"),
+        help_text=_("When the file was successfully uploaded to SharePoint")
+    )
+    
+    def __str__(self):
+        return f"{self.file_name} ({self.get_status_display()})"
+    
+    @property
+    def sharepoint_folder_path(self) -> str:
+        """Generate the SharePoint folder path based on client/referral structure."""
+        if not self.client_id:
+            return f"Documents/Unassigned/{self.folder_category}/"
+        
+        base_path = f"Clients/{self.client_id}/"
+        
+        if self.referral_id:
+            # Referral-specific document
+            return f"{base_path}Referrals/{self.referral_id}/{self.folder_category}/"
+        else:
+            # General client document
+            return f"{base_path}General/{self.folder_category}/"
+    
+    @property
+    def full_sharepoint_path(self) -> str:
+        """Get the complete SharePoint path including filename."""
+        return f"{self.sharepoint_folder_path}{self.file_name}"
+    
+    @property
+    def file_size_formatted(self) -> str:
+        """Return formatted file size in human-readable format."""
+        if not self.file_size:
+            return "Unknown"
+        
+        # Convert bytes to human readable format
+        for unit in ['B', 'KB', 'MB', 'GB']:
+            if self.file_size < 1024.0:
+                return f"{self.file_size:.1f} {unit}"
+            self.file_size /= 1024.0
+        return f"{self.file_size:.1f} TB"
+    
+    def mark_uploaded(self, sharepoint_id: str = None, sharepoint_url: str = None):
+        """Mark document as successfully uploaded with SharePoint details."""
+        self.status = 'uploaded'
+        self.uploaded_at = timezone.now()
+        if sharepoint_id:
+            self.sharepoint_id = sharepoint_id
+        if sharepoint_url:
+            self.sharepoint_url = sharepoint_url
+        self.save(update_fields=['status', 'uploaded_at', 'sharepoint_id', 'sharepoint_url'])
+    
+    def mark_failed(self, error_message: str):
+        """Mark document upload as failed with error message."""
+        self.status = 'failed'
+        self.upload_error = error_message
+        self.save(update_fields=['status', 'upload_error'])
 
     class Meta:
         verbose_name = _('Document')
         verbose_name_plural = _('Documents')
         ordering = ['-created_at']
         app_label = 'common'
-
-    def __str__(self):
-        return f"{self.file_name}"
+        indexes = [
+            models.Index(fields=['client_id']),
+            models.Index(fields=['referral_id']),
+            models.Index(fields=['status']),
+            models.Index(fields=['folder_category']),
+            models.Index(fields=['type']),
+            models.Index(fields=['is_latest_version']),
+        ]
 
 # # ==========================================
 # # REFERENCE TABLES FOR CLIENT

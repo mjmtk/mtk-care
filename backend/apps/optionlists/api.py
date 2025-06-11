@@ -21,7 +21,7 @@ def create_optionlists_router():
     #     # For now, passing it as is. The service layer's get_by_slug expects 'Any'.
     #     return OptionListService.get_options_for_client_batch_dropdowns(organization_id=organization_id)
 
-    @router.get("/{list_slug}/items/", response=List[OptionListItemSchemaOut], summary="List all active items for a specific OptionList by its slug")
+    @router.get("/{list_slug}/", response=List[OptionListItemSchemaOut], summary="List all active items for a specific OptionList by its slug")
     def list_option_list_items_by_slug(request, list_slug: str):
         """
         Retrieves all active items for a given OptionList slug (e.g., 'external-organisation-types').

@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import { Plus, Filter } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Badge } from '@/components/ui/badge'
 import { ReferralsDataTable } from './data-table'
 import { columns } from './columns'
 import { Referral, ReferralListResponse, ReferralListParams } from '@/types/referral'
@@ -23,6 +25,8 @@ async function fetchReferrals(params?: ReferralListParams): Promise<ReferralList
   }
 }
 
+type StatusFilter = 'all' | 'draft' | 'active' | 'completed';
+
 function ReferralsPageContent() {
   const router = useRouter()
   const [referrals, setReferrals] = useState<Referral[]>([])
@@ -30,6 +34,7 @@ function ReferralsPageContent() {
   const [currentPage, setCurrentPage] = useState(1)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
   const { data: session, status } = useAuthBypassSession()
   const accessToken = useAccessToken()
 
@@ -52,7 +57,23 @@ function ReferralsPageContent() {
       try {
         setIsLoading(true)
         setError(null)
-        const response = await fetchReferrals({ page: currentPage, limit: 20 })
+        
+        // Build filter parameters
+        const params: ReferralListParams = { 
+          page: currentPage, 
+          limit: 20 
+        };
+        
+        // Add status filter if not 'all'
+        if (statusFilter === 'draft') {
+          (params as any).status = 'draft';
+        } else if (statusFilter === 'active') {
+          (params as any).status = 'active';
+        } else if (statusFilter === 'completed') {
+          (params as any).status = 'completed';
+        }
+        
+        const response = await fetchReferrals(params)
         setReferrals(response.items || [])
         setTotalCount(response.total || 0)
       } catch (err) {
@@ -63,7 +84,7 @@ function ReferralsPageContent() {
     }
 
     loadReferrals()
-  }, [status, accessToken, currentPage])
+  }, [status, accessToken, currentPage, statusFilter])
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
@@ -133,7 +154,7 @@ function ReferralsPageContent() {
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Referrals</h2>
           <p className="text-muted-foreground">
-            Manage referrals and track their progress. Total: {totalCount}
+            Manage referrals and track their progress
           </p>
         </div>
         <div className="flex gap-2">
@@ -148,15 +169,41 @@ function ReferralsPageContent() {
         </div>
       </div>
       
-      <div className="space-y-4">
-        <ReferralsDataTable 
-          data={referrals} 
-          columns={columns}
-          totalCount={totalCount}
-          currentPage={currentPage}
-          onPageChange={handlePageChange}
-        />
-      </div>
+      <Tabs value={statusFilter} onValueChange={(value) => {
+        setStatusFilter(value as StatusFilter);
+        setCurrentPage(1); // Reset to first page when filter changes
+      }}>
+        <TabsList className="grid w-full max-w-md grid-cols-4">
+          <TabsTrigger value="all" className="text-xs">
+            All
+            {statusFilter === 'all' && <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">{totalCount}</Badge>}
+          </TabsTrigger>
+          <TabsTrigger value="draft" className="text-xs">
+            Drafts
+            {statusFilter === 'draft' && <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">{totalCount}</Badge>}
+          </TabsTrigger>
+          <TabsTrigger value="active" className="text-xs">
+            Active
+            {statusFilter === 'active' && <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">{totalCount}</Badge>}
+          </TabsTrigger>
+          <TabsTrigger value="completed" className="text-xs">
+            Completed
+            {statusFilter === 'completed' && <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">{totalCount}</Badge>}
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value={statusFilter} className="mt-6">
+          <div className="space-y-4">
+            <ReferralsDataTable 
+              data={referrals} 
+              columns={columns}
+              totalCount={totalCount}
+              currentPage={currentPage}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

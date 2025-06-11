@@ -1,0 +1,182 @@
+[
+  {
+    "model": "optionlists.optionlist",
+    "pk": 18,
+    "fields": {
+      "name": "Emergency Contact Relationships",
+      "slug": "emergency-contact-relationships",
+      "description": "Types of relationships for emergency contacts",
+      "is_active": true,
+      "created_at": "2025-06-11T00:00:00Z",
+      "updated_at": "2025-06-11T00:00:00Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 1801,
+    "fields": {
+      "option_list": 18,
+      "label": "Parent",
+      "slug": "parent",
+      "description": "Biological or adoptive parent",
+      "sort_order": 1,
+      "is_active": true,
+      "created_at": "2025-06-11T00:00:00Z",
+      "updated_at": "2025-06-11T00:00:00Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 1802,
+    "fields": {
+      "option_list": 18,
+      "label": "Guardian/Caregiver",
+      "slug": "guardian",
+      "description": "Legal guardian or primary caregiver",
+      "sort_order": 2,
+      "is_active": true,
+      "created_at": "2025-06-11T00:00:00Z",
+      "updated_at": "2025-06-11T00:00:00Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 1803,
+    "fields": {
+      "option_list": 18,
+      "label": "Whānau",
+      "slug": "whanau",
+      "description": "Extended family or whānau member",
+      "sort_order": 3,
+      "is_active": true,
+      "created_at": "2025-06-11T00:00:00Z",
+      "updated_at": "2025-06-11T00:00:00Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 1804,
+    "fields": {
+      "option_list": 18,
+      "label": "Spouse/Partner",
+      "slug": "spouse",
+      "description": "Married partner or significant other",
+      "sort_order": 4,
+      "is_active": true,
+      "created_at": "2025-06-11T00:00:00Z",
+      "updated_at": "2025-06-11T00:00:00Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 1805,
+    "fields": {
+      "option_list": 18,
+      "label": "Sibling",
+      "slug": "sibling",
+      "description": "Brother or sister",
+      "sort_order": 5,
+      "is_active": true,
+      "created_at": "2025-06-11T00:00:00Z",
+      "updated_at": "2025-06-11T00:00:00Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 1806,
+    "fields": {
+      "option_list": 18,
+      "label": "Grandparent",
+      "slug": "grandparent",
+      "description": "Grandmother or grandfather",
+      "sort_order": 6,
+      "is_active": true,
+      "created_at": "2025-06-11T00:00:00Z",
+      "updated_at": "2025-06-11T00:00:00Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 1807,
+    "fields": {
+      "option_list": 18,
+      "label": "Extended Family",
+      "slug": "extended-family",
+      "description": "Cousin, aunt, uncle, or other extended family",
+      "sort_order": 7,
+      "is_active": true,
+      "created_at": "2025-06-11T00:00:00Z",
+      "updated_at": "2025-06-11T00:00:00Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 1808,
+    "fields": {
+      "option_list": 18,
+      "label": "Friend",
+      "slug": "friend",
+      "description": "Close friend or family friend",
+      "sort_order": 8,
+      "is_active": true,
+      "created_at": "2025-06-11T00:00:00Z",
+      "updated_at": "2025-06-11T00:00:00Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 1809,
+    "fields": {
+      "option_list": 18,
+      "label": "Social Worker",
+      "slug": "social-worker",
+      "description": "Assigned social worker",
+      "sort_order": 9,
+      "is_active": true,
+      "created_at": "2025-06-11T00:00:00Z",
+      "updated_at": "2025-06-11T00:00:00Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 1810,
+    "fields": {
+      "option_list": 18,
+      "label": "Case Manager",
+      "slug": "case-manager",
+      "description": "Assigned case manager",
+      "sort_order": 10,
+      "is_active": true,
+      "created_at": "2025-06-11T00:00:00Z",
+      "updated_at": "2025-06-11T00:00:00Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 1811,
+    "fields": {
+      "option_list": 18,
+      "label": "Foster Parent",
+      "slug": "foster-parent",
+      "description": "Foster care provider",
+      "sort_order": 11,
+      "is_active": true,
+      "created_at": "2025-06-11T00:00:00Z",
+      "updated_at": "2025-06-11T00:00:00Z"
+    }
+  },
+  {
+    "model": "optionlists.optionlistitem",
+    "pk": 1812,
+    "fields": {
+      "option_list": 18,
+      "label": "Other",
+      "slug": "other",
+      "description": "Other relationship not listed",
+      "sort_order": 12,
+      "is_active": true,
+      "created_at": "2025-06-11T00:00:00Z",
+      "updated_at": "2025-06-11T00:00:00Z"
+    }
+  }
+]

@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DataTableColumnHeader } from '@/components/ui/data-table-column-header'
 import { Referral } from '@/types/referral'
-import { CalendarIcon, UserIcon, BuildingIcon, AlertTriangleIcon, CheckCircleIcon, ClockIcon, MoreHorizontal, Eye, Edit, Trash2 } from 'lucide-react'
+import { CalendarIcon, UserIcon, BuildingIcon, AlertTriangleIcon, CheckCircleIcon, ClockIcon, MoreHorizontal, Eye, Edit, Trash2, AlertCircle, ShieldCheck } from 'lucide-react'
 import { format } from 'date-fns'
 import { Button } from '@/components/ui/button'
 import {
@@ -36,12 +36,25 @@ const getStatusVariant = (status: string): "default" | "secondary" | "destructiv
   return 'outline'
 }
 
-// Helper function to get priority badge variant
-const getPriorityVariant = (priority: string): "default" | "secondary" | "destructive" | "outline" => {
+// Helper function to get priority badge variant and custom colors
+const getPriorityStyle = (priority: string) => {
   const lowerPriority = priority.toLowerCase()
-  if (lowerPriority.includes('high') || lowerPriority.includes('urgent')) return 'destructive'
-  if (lowerPriority.includes('medium')) return 'secondary'
-  return 'outline'
+  if (lowerPriority.includes('high') || lowerPriority.includes('urgent')) {
+    return {
+      variant: 'outline' as const,
+      className: 'bg-red-100 text-red-700 border-red-200 hover:bg-red-150'
+    }
+  }
+  if (lowerPriority.includes('medium')) {
+    return {
+      variant: 'outline' as const, 
+      className: 'bg-yellow-100 text-yellow-700 border-yellow-200 hover:bg-yellow-150'
+    }
+  }
+  return {
+    variant: 'outline' as const,
+    className: ''
+  }
 }
 
 // Helper function to get client type icon
@@ -74,7 +87,7 @@ export const columns: ColumnDef<Referral>[] = [
     ),
     meta: {
       className: cn(
-        'sticky md:table-cell left-0 z-10 rounded-tl',
+        'sticky md:table-cell left-0 z-10 rounded-tl w-12',
         'bg-background transition-colors duration-200 group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted'
       ),
     },
@@ -92,7 +105,9 @@ export const columns: ColumnDef<Referral>[] = [
   {
     accessorKey: 'id',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='ID' />
+      <div className='text-center'>
+        <DataTableColumnHeader column={column} title='ID' />
+      </div>
     ),
     cell: ({ row }) => (
       <div className='max-w-24 font-mono text-sm truncate'>
@@ -103,10 +118,11 @@ export const columns: ColumnDef<Referral>[] = [
       className: cn(
         'drop-shadow-[0_1px_2px_rgb(0_0_0_/_0.1)] dark:drop-shadow-[0_1px_2px_rgb(255_255_255_/_0.1)] lg:drop-shadow-none',
         'bg-background transition-colors duration-200 group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted',
-        'sticky left-6 md:table-cell'
+        'sticky left-12 md:table-cell w-20 z-10'
       ),
     },
     enableHiding: false,
+    initiallyHidden: true,
   },
   {
     accessorKey: 'client',
@@ -119,7 +135,9 @@ export const columns: ColumnDef<Referral>[] = [
              row.client_type === 'self' ? 'Self-Referral' : 'Unknown';
     },
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Client' />
+      <div className='flex justify-center'>
+        <DataTableColumnHeader column={column} title='Client' className='ml-3' />
+      </div>
     ),
     cell: ({ row }) => {
       const referral = row.original;
@@ -127,9 +145,8 @@ export const columns: ColumnDef<Referral>[] = [
         const displayName = referral.client.preferred_name || 
                            `${referral.client.first_name} ${referral.client.last_name}`.trim();
         return (
-          <div className='flex items-center gap-x-2'>
-            <UserIcon size={14} className='text-muted-foreground' />
-            <span className='max-w-32 truncate font-medium'>{displayName}</span>
+          <div className='flex items-center justify-center'>
+            <span className='max-w-36 truncate font-medium text-sm'>{displayName}</span>
           </div>
         );
       }
@@ -138,75 +155,115 @@ export const columns: ColumnDef<Referral>[] = [
       const fallbackText = referral.client_type === 'new' ? 'New Client' : 
                            referral.client_type === 'self' ? 'Self-Referral' : 'Unknown';
       return (
-        <div className='flex items-center gap-x-2'>
-          <UserIcon size={14} className='text-muted-foreground opacity-50' />
-          <span className='max-w-32 truncate text-muted-foreground italic'>{fallbackText}</span>
+        <div className='flex items-center justify-center'>
+          <span className='max-w-36 truncate text-muted-foreground italic text-sm'>{fallbackText}</span>
         </div>
       );
     },
-    meta: { className: 'w-40' },
+    meta: { className: 'w-40 min-w-40' },
     enableSorting: true,
+  },
+  {
+    id: 'consent_status',
+    header: ({ column }) => (
+      <div className='text-center'>
+        <DataTableColumnHeader column={column} title='Consent' />
+      </div>
+    ),
+    cell: ({ row }) => {
+      const referral = row.original;
+      const hasConsent = referral.client_consent_date || 
+                        (referral.consent_records && referral.consent_records.length > 0);
+      
+      if (hasConsent) {
+        return (
+          <div className='flex items-center justify-center'>
+            <ShieldCheck size={14} className='text-green-600' />
+          </div>
+        );
+      } else {
+        return (
+          <div className='flex items-center justify-center'>
+            <AlertCircle size={14} className='text-amber-500' />
+          </div>
+        );
+      }
+    },
+    meta: { className: 'w-20 min-w-20 text-center' },
+    enableSorting: false,
+    enableColumnFilter: false,
   },
   {
     accessorKey: 'reason',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Reason' />
+      <div className='text-center'>
+        <DataTableColumnHeader column={column} title='Reason' />
+      </div>
     ),
     cell: ({ row }) => (
       <div className='max-w-48 truncate font-medium'>{row.getValue('reason')}</div>
     ),
-    meta: { className: 'w-48' },
+    meta: { className: 'w-48 min-w-48' },
+    enableHiding: true,
+    initiallyHidden: true, // Hide by default
   },
   {
     accessorKey: 'status',
     accessorFn: (row) => row.status.label,
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Status' />
+      <div className='flex justify-center'>
+        <DataTableColumnHeader column={column} title='Status' className='ml-3' />
+      </div>
     ),
     cell: ({ row }) => {
       const status = row.original.status
       const variant = getStatusVariant(status.label)
       return (
-        <div className='flex space-x-2'>
-          <Badge variant={variant} className='capitalize'>
+        <div className='flex justify-center'>
+          <Badge variant={variant} className='capitalize text-xs px-3 py-1 whitespace-nowrap'>
             {status.label}
           </Badge>
         </div>
       )
     },
+    meta: { className: 'w-32 min-w-32 text-center' },
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id))
     },
-    enableSorting: false,
+    enableSorting: true,
   },
   {
     accessorKey: 'priority',
     accessorFn: (row) => row.priority.label,
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Priority' />
+      <div className='text-center'>
+        <DataTableColumnHeader column={column} title='Priority' />
+      </div>
     ),
     cell: ({ row }) => {
       const priority = row.original.priority
-      const variant = getPriorityVariant(priority.label)
+      const priorityStyle = getPriorityStyle(priority.label)
       return (
-        <div className='flex items-center gap-x-2'>
-          <AlertTriangleIcon size={14} className='text-muted-foreground' />
-          <Badge variant={variant} className='capitalize'>
+        <div className='flex justify-center'>
+          <Badge variant={priorityStyle.variant} className={`capitalize text-xs px-3 py-1 whitespace-nowrap ${priorityStyle.className}`}>
             {priority.label}
           </Badge>
         </div>
       )
     },
+    meta: { className: 'w-28 min-w-28 text-center' },
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id))
     },
-    enableSorting: false,
+    enableSorting: true,
   },
   {
     accessorKey: 'type',
     accessorFn: (row) => row.type === 'incoming' ? 'Incoming' : 'Outgoing',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Type' />
+      <div className='text-center'>
+        <DataTableColumnHeader column={column} title='Type' />
+      </div>
     ),
     cell: ({ row }) => {
       const type = row.original.type
@@ -221,11 +278,14 @@ export const columns: ColumnDef<Referral>[] = [
       return value.includes(row.getValue(id))
     },
     enableSorting: false,
+    initiallyHidden: true,
   },
   {
     accessorKey: 'client_type',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Client Type' />
+      <div className='text-center'>
+        <DataTableColumnHeader column={column} title='Client Type' />
+      </div>
     ),
     cell: ({ row }) => {
       const clientType = row.getValue<string>('client_type')
@@ -241,44 +301,157 @@ export const columns: ColumnDef<Referral>[] = [
       return value.includes(row.getValue(id))
     },
     enableSorting: false,
+    initiallyHidden: true,
   },
   {
-    accessorKey: 'referral_date',
+    accessorKey: 'referral_source',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Referral Date' />
+      <div className='text-center'>
+        <DataTableColumnHeader column={column} title='Referring Agency' />
+      </div>
     ),
     cell: ({ row }) => {
-      const date = row.getValue<string>('referral_date')
+      const referralSource = row.getValue<string>('referral_source')
+      const formatSource = (source: string) => {
+        const sourceMap: Record<string, string> = {
+          'external_agency': 'External Agency',
+          'self_referral': 'Self Referral',
+          'family_referral': 'Family Referral',
+          'school': 'School',
+          'healthcare': 'Healthcare Provider',
+          'police': 'Police',
+          'court': 'Court',
+          'other': 'Other'
+        };
+        return sourceMap[source] || source.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+      };
       return (
-        <div className='flex items-center gap-x-2'>
-          <CalendarIcon size={14} className='text-muted-foreground' />
-          <span className='text-sm'>{formatDate(date)}</span>
+        <div className='flex items-center justify-center gap-x-2'>
+          <BuildingIcon size={14} className='text-muted-foreground flex-shrink-0' />
+          <span className='text-sm truncate max-w-36'>{formatSource(referralSource)}</span>
         </div>
       )
     },
-  },
-  {
-    accessorKey: 'service_type',
-    accessorFn: (row) => row.service_type.label,
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Service Type' />
-    ),
-    cell: ({ row }) => {
-      const serviceType = row.original.service_type
-      return (
-        <div className='max-w-32 truncate text-sm'>{serviceType.label}</div>
-      )
-    },
+    meta: { className: 'w-36 min-w-36 text-center' },
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id))
     },
     enableSorting: false,
   },
   {
+    id: 'referring_organization',
+    header: ({ column }) => (
+      <div className='text-center'>
+        <DataTableColumnHeader column={column} title='Organization' />
+      </div>
+    ),
+    cell: ({ row }) => {
+      const referral = row.original;
+      
+      // Check program_data for external organization name
+      const externalOrgName = referral.program_data?.external_organisation_name;
+      
+      // If we have an external organization name, show it
+      if (externalOrgName && externalOrgName.trim()) {
+        return (
+          <div className='flex items-center justify-center gap-x-2'>
+            <BuildingIcon size={14} className='text-muted-foreground flex-shrink-0' />
+            <span className='text-sm truncate max-w-40'>{externalOrgName}</span>
+          </div>
+        );
+      }
+      
+      // Otherwise show generic text based on referral source
+      const sourceMap: Record<string, string> = {
+        'external_agency': 'External Agency',
+        'self_referral': 'Self Referral', 
+        'family_referral': 'Family',
+        'school': 'School',
+        'healthcare': 'Healthcare',
+        'police': 'Police',
+        'court': 'Court',
+        'other': 'Other'
+      };
+      
+      const genericName = sourceMap[referral.referral_source] || 'Unknown';
+      
+      return (
+        <div className='flex items-center justify-center gap-x-2'>
+          <BuildingIcon size={14} className='text-muted-foreground opacity-50 flex-shrink-0' />
+          <span className='text-sm text-muted-foreground italic truncate max-w-40'>{genericName}</span>
+        </div>
+      );
+    },
+    enableSorting: false,
+    accessorFn: (row) => {
+      // For sorting/filtering, use external org name if available, otherwise generic name
+      const externalOrgName = row.program_data?.external_organisation_name;
+      if (externalOrgName && externalOrgName.trim()) {
+        return externalOrgName;
+      }
+      
+      const sourceMap: Record<string, string> = {
+        'external_agency': 'External Agency',
+        'self_referral': 'Self Referral',
+        'family_referral': 'Family', 
+        'school': 'School',
+        'healthcare': 'Healthcare',
+        'police': 'Police',
+        'court': 'Court',
+        'other': 'Other'
+      };
+      
+      return sourceMap[row.referral_source] || 'Unknown';
+    },
+    meta: { className: 'w-44 min-w-44 text-center' },
+  },
+  {
+    accessorKey: 'referral_date',
+    header: ({ column }) => (
+      <div className='text-center'>
+        <DataTableColumnHeader column={column} title='Referral Date' />
+      </div>
+    ),
+    cell: ({ row }) => {
+      const date = row.getValue<string>('referral_date')
+      return (
+        <div className='flex items-center justify-center gap-x-2'>
+          <CalendarIcon size={14} className='text-muted-foreground flex-shrink-0' />
+          <span className='text-sm whitespace-nowrap'>{formatDate(date)}</span>
+        </div>
+      )
+    },
+    meta: { className: 'w-36 min-w-36 text-center' },
+  },
+  {
+    accessorKey: 'service_type',
+    accessorFn: (row) => row.service_type?.label || '',
+    header: ({ column }) => (
+      <div className='text-center'>
+        <DataTableColumnHeader column={column} title='Service Type' />
+      </div>
+    ),
+    cell: ({ row }) => {
+      const serviceType = row.original.service_type
+      return (
+        <div className='max-w-32 truncate text-sm'>
+          {serviceType?.label || <span className="text-gray-400 italic">Not set</span>}
+        </div>
+      )
+    },
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id))
+    },
+    enableSorting: false,
+    initiallyHidden: true,
+  },
+  {
     accessorKey: 'created_by',
     accessorFn: (row) => `${row.created_by.first_name} ${row.created_by.last_name}`.trim() || row.created_by.email,
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Created By' />
+      <div className='text-center'>
+        <DataTableColumnHeader column={column} title='Created By' />
+      </div>
     ),
     cell: ({ row }) => {
       const createdBy = row.original.created_by
@@ -288,11 +461,14 @@ export const columns: ColumnDef<Referral>[] = [
       )
     },
     enableSorting: false,
+    initiallyHidden: true,
   },
   {
     accessorKey: 'created_at',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Created' />
+      <div className='text-center'>
+        <DataTableColumnHeader column={column} title='Created' />
+      </div>
     ),
     cell: ({ row }) => {
       const date = row.getValue<string>('created_at')
@@ -303,9 +479,16 @@ export const columns: ColumnDef<Referral>[] = [
         </div>
       )
     },
+    initiallyHidden: true,
   },
   {
     id: 'actions',
+    header: () => (
+      <div className='text-center'>
+        Actions
+      </div>
+    ),
+    meta: { className: 'w-16 min-w-16 text-center' },
     cell: ({ row }) => {
       const referral = row.original
       
@@ -313,9 +496,9 @@ export const columns: ColumnDef<Referral>[] = [
         <div className="flex justify-end">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
+              <Button variant="ghost" className="h-7 w-7 p-0">
                 <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
+                <MoreHorizontal className="h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">

@@ -40,12 +40,12 @@ export function DataTableFacetedFilter<TData, TValue>({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant='outline' size='sm' className='h-8 border-dashed'>
-          <PlusCircledIcon className='h-4 w-4' />
+        <Button variant='outline' size='sm' className='h-10 border-dashed text-base'>
+          <PlusCircledIcon className='h-5 w-5' />
           {title}
           {selectedValues?.size > 0 && (
             <>
-              <Separator orientation='vertical' className='mx-2 h-4' />
+              <Separator orientation='vertical' className='mx-2 h-5' />
               <Badge
                 variant='secondary'
                 className='rounded-sm px-1 font-normal lg:hidden'
@@ -78,7 +78,7 @@ export function DataTableFacetedFilter<TData, TValue>({
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className='w-[200px] p-0' align='start'>
+      <PopoverContent className='w-[240px] p-0' align='start'>
         <Command>
           <CommandInput placeholder={title} />
           <CommandList>
@@ -100,6 +100,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                         filterValues.length ? filterValues : undefined
                       )
                     }}
+                    className="flex items-center space-x-2"
                   >
                     <div
                       className={cn(
@@ -114,12 +115,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                     {option.icon && (
                       <option.icon className='text-muted-foreground h-4 w-4' />
                     )}
-                    <span>{option.label}</span>
-                    {facets?.get(option.value) && (
-                      <span className='ml-auto flex h-4 w-4 items-center justify-center font-mono text-xs'>
-                        {facets.get(option.value)}
-                      </span>
-                    )}
+                    <span className="flex-1">{option.label}</span>
                   </CommandItem>
                 )
               })}

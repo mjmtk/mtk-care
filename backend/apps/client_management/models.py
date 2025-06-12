@@ -306,7 +306,8 @@ class ClientEmergencyContact(UUIDPKBaseModel):
         verbose_name = _('Emergency Contact')
         verbose_name_plural = _('Emergency Contacts')
         ordering = ['client', 'priority_order', 'last_name', 'first_name']
-        unique_together = [['client', 'priority_order']]
+        # Note: unique_together removed - using partial unique index that excludes soft-deleted records
+        # See migration 0009_fix_emergency_contact_unique_constraint.py
         indexes = [
             models.Index(fields=['client', 'priority_order']),
             models.Index(fields=['client', 'is_primary']),

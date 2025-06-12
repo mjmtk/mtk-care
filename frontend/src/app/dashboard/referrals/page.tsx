@@ -2,15 +2,15 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, Filter } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { ReferralsDataTable } from './data-table'
 import { columns } from './columns'
 import { Referral, ReferralListResponse, ReferralListParams } from '@/types/referral'
 import { useAuthBypassSession, useAccessToken } from '@/hooks/useAuthBypass'
+import { usePageContext } from '@/contexts/PageContext'
 import { ReferralService } from '@/services/referral-service'
 import { ErrorBoundary } from '@/components/error-boundary'
 
@@ -25,16 +25,16 @@ async function fetchReferrals(params?: ReferralListParams): Promise<ReferralList
   }
 }
 
-type StatusFilter = 'all' | 'draft' | 'active' | 'completed';
-
 function ReferralsPageContent() {
   const router = useRouter()
+  const { setPageInfo, clearPageInfo } = usePageContext()
   const [referrals, setReferrals] = useState<Referral[]>([])
   const [totalCount, setTotalCount] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
   const [isLoading, setIsLoading] = useState(true)
+  const [isPaginating, setIsPaginating] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
   const { data: session, status } = useAuthBypassSession()
   const accessToken = useAccessToken()
 
@@ -45,6 +45,17 @@ function ReferralsPageContent() {
     hasAccessToken: !!accessToken,
   });
 
+  // Set page title in top bar
+  useEffect(() => {
+    setPageInfo({
+      title: 'Referrals',
+      subtitle: 'Manage referrals and track their progress'
+    });
+    
+    return () => clearPageInfo();
+  }, [setPageInfo, clearPageInfo]);
+
+  // Separate effect for initial load and status filter changes
   useEffect(() => {
     // Only load referrals if auth is ready
     if (status === 'loading') return // Wait for auth to complete
@@ -58,20 +69,15 @@ function ReferralsPageContent() {
         setIsLoading(true)
         setError(null)
         
+        // Reset to first page when filter changes
+        const pageToLoad = 1;
+        setCurrentPage(1);
+        
         // Build filter parameters
         const params: ReferralListParams = { 
-          page: currentPage, 
-          limit: 20 
+          page: pageToLoad, 
+          limit: pageSize 
         };
-        
-        // Add status filter if not 'all'
-        if (statusFilter === 'draft') {
-          (params as any).status = 'draft';
-        } else if (statusFilter === 'active') {
-          (params as any).status = 'active';
-        } else if (statusFilter === 'completed') {
-          (params as any).status = 'completed';
-        }
         
         const response = await fetchReferrals(params)
         setReferrals(response.items || [])
@@ -84,10 +90,58 @@ function ReferralsPageContent() {
     }
 
     loadReferrals()
-  }, [status, accessToken, currentPage, statusFilter])
+  }, [status, accessToken]) // Removed statusFilter and pageSize from dependencies
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
+    
+    if (status !== 'loading' && accessToken) {
+      const loadReferrals = async () => {
+        try {
+          setIsPaginating(true)
+          setError(null)
+          
+          // Build filter parameters
+          const params: ReferralListParams = { page, limit: pageSize };
+          
+          const response = await fetchReferrals(params)
+          setReferrals(response.items || [])
+          setTotalCount(response.total || 0)
+        } catch (err) {
+          setError(err instanceof Error ? err.message : 'An error occurred while fetching referrals')
+        } finally {
+          setIsPaginating(false)
+        }
+      }
+      loadReferrals()
+    }
+  }
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize)
+    setCurrentPage(1) // Reset to first page when page size changes
+    
+    // Immediately trigger API call for page size change
+    if (status !== 'loading' && accessToken) {
+      const loadReferrals = async () => {
+        try {
+          setIsPaginating(true)
+          setError(null)
+          
+          // Build filter parameters with new page size
+          const params: ReferralListParams = { page: 1, limit: newPageSize };
+          
+          const response = await fetchReferrals(params)
+          setReferrals(response.items || [])
+          setTotalCount(response.total || 0)
+        } catch (err) {
+          setError(err instanceof Error ? err.message : 'An error occurred while fetching referrals')
+        } finally {
+          setIsPaginating(false)
+        }
+      }
+      loadReferrals()
+    }
   }
 
   const handleRefresh = () => {
@@ -96,7 +150,7 @@ function ReferralsPageContent() {
         try {
           setIsLoading(true)
           setError(null)
-          const response = await fetchReferrals({ page: currentPage, limit: 20 })
+          const response = await fetchReferrals({ page: currentPage, limit: pageSize })
           setReferrals(response.items || [])
           setTotalCount(response.total || 0)
         } catch (err) {
@@ -111,7 +165,7 @@ function ReferralsPageContent() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-10">
+      <div className="space-y-6">
         <Card>
           <CardHeader>
             <CardTitle>Referrals</CardTitle>
@@ -129,7 +183,7 @@ function ReferralsPageContent() {
 
   if (error) {
     return (
-      <div className="container mx-auto py-10">
+      <div className="space-y-6">
         <Card>
           <CardHeader>
             <CardTitle>Referrals</CardTitle>
@@ -149,61 +203,34 @@ function ReferralsPageContent() {
   }
 
   return (
-    <div className="container mx-auto py-10">
-      <div className="mb-6 flex flex-wrap items-center justify-between space-y-2">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight">Referrals</h2>
-          <p className="text-muted-foreground">
-            Manage referrals and track their progress
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm">
-            <Filter className="mr-2 h-4 w-4" />
-            Filter
-          </Button>
-          <Button size="sm" onClick={() => router.push('/dashboard/referrals/new')}>
-            <Plus className="mr-2 h-4 w-4" />
-            New Referral
-          </Button>
-        </div>
+    <div className="space-y-6">
+      <div className="flex justify-end">
+        <Button size="sm" onClick={() => router.push('/dashboard/referrals/new')}>
+          <Plus className="mr-2 h-4 w-4" />
+          New Referral
+        </Button>
       </div>
       
-      <Tabs value={statusFilter} onValueChange={(value) => {
-        setStatusFilter(value as StatusFilter);
-        setCurrentPage(1); // Reset to first page when filter changes
-      }}>
-        <TabsList className="grid w-full max-w-md grid-cols-4">
-          <TabsTrigger value="all" className="text-xs">
-            All
-            {statusFilter === 'all' && <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">{totalCount}</Badge>}
-          </TabsTrigger>
-          <TabsTrigger value="draft" className="text-xs">
-            Drafts
-            {statusFilter === 'draft' && <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">{totalCount}</Badge>}
-          </TabsTrigger>
-          <TabsTrigger value="active" className="text-xs">
-            Active
-            {statusFilter === 'active' && <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">{totalCount}</Badge>}
-          </TabsTrigger>
-          <TabsTrigger value="completed" className="text-xs">
-            Completed
-            {statusFilter === 'completed' && <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">{totalCount}</Badge>}
-          </TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value={statusFilter} className="mt-6">
-          <div className="space-y-4">
-            <ReferralsDataTable 
-              data={referrals} 
-              columns={columns}
-              totalCount={totalCount}
-              currentPage={currentPage}
-              onPageChange={handlePageChange}
-            />
+      <div className="relative">
+        {/* Pagination loading overlay */}
+        {isPaginating && (
+          <div className="absolute inset-0 bg-background/50 z-10 flex items-center justify-center">
+            <div className="flex items-center space-x-2 bg-background border rounded-lg px-4 py-2 shadow-sm">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+              <span className="text-sm text-muted-foreground">Loading...</span>
+            </div>
           </div>
-        </TabsContent>
-      </Tabs>
+        )}
+        <ReferralsDataTable 
+          data={referrals} 
+          columns={columns}
+          totalCount={totalCount}
+          currentPage={currentPage}
+          pageSize={pageSize}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+        />
+      </div>
     </div>
   )
 }

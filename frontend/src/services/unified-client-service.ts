@@ -3,6 +3,7 @@
  */
 import { Client as ClientType, TimelineActivity } from '@/types/client';
 import { NewClientService } from './new-client-service';
+import { EmergencyContactsService } from './emergency-contacts-service';
 import { mockClientService } from './mock-client-service';
 import type { components } from '@/types/openapi';
 
@@ -11,7 +12,24 @@ type ClientDetailSchema = components['schemas']['ClientDetailSchema'];
 /**
  * Transform API client data to display client format
  */
-function transformApiClientToDisplayClient(apiClient: ClientDetailSchema): ClientType {
+async function transformApiClientToDisplayClient(apiClient: ClientDetailSchema): Promise<ClientType> {
+  // Fetch emergency contacts separately
+  let emergencyContacts = [];
+  try {
+    const contacts = await EmergencyContactsService.getClientEmergencyContacts(String(apiClient.id));
+    emergencyContacts = contacts.map(contact => ({
+      first_name: contact.first_name,
+      last_name: contact.last_name,
+      relationship: contact.relationship?.label || 'Unknown',
+      phone: contact.phone,
+      email: contact.email || undefined,
+      is_primary: contact.is_primary,
+      priority_order: contact.priority_order
+    }));
+  } catch (error) {
+    console.error('Failed to fetch emergency contacts:', error);
+  }
+
   return {
     id: String(apiClient.id),
     firstName: apiClient.first_name,
@@ -22,8 +40,14 @@ function transformApiClientToDisplayClient(apiClient: ClientDetailSchema): Clien
     primaryLanguage: String(apiClient.primary_language?.name || 'Unknown'),
     interpreterNeeded: Boolean(apiClient.interpreter_needed),
     culturalIdentity: {
-      primaryIdentity: 'Not specified' // Simplified
+      primaryIdentity: 'Not specified', // Will be set based on other cultural data
+      spiritualNeeds: apiClient.spiritual_needs?.label || undefined,
+      iwiHapu: apiClient.iwi_hapu?.label || undefined,
+      customData: apiClient.cultural_identity || {}
     },
+    // Also include direct fields for backward compatibility
+    iwi_hapu: apiClient.iwi_hapu?.label || undefined,
+    spiritual_needs: apiClient.spiritual_needs?.label || undefined,
     phone: apiClient.phone || undefined,
     email: apiClient.email || undefined,
     address: apiClient.address || undefined,
@@ -31,7 +55,8 @@ function transformApiClientToDisplayClient(apiClient: ClientDetailSchema): Clien
     _episodeResponsibleStaffIds: ['staff-1'], // TODO: Map from API when available
     riskLevel: 'low', // Simplified
     consentRequired: Boolean(apiClient.consent_required),
-    incompleteDocumentation: Boolean(apiClient.incomplete_documentation)
+    incompleteDocumentation: Boolean(apiClient.incomplete_documentation),
+    emergencyContacts: emergencyContacts
   };
 }
 
@@ -74,7 +99,10 @@ export const unifiedClientService = {
       if (isRealClientId(id)) {
         console.log(`[UnifiedClientService] Fetching real client ${id} from API`);
         const apiClient = await NewClientService.getClient(id);
-        return transformApiClientToDisplayClient(apiClient);
+        console.log(`[UnifiedClientService] Raw API client data:`, apiClient);
+        console.log(`[UnifiedClientService] iwi_hapu:`, apiClient.iwi_hapu);
+        console.log(`[UnifiedClientService] spiritual_needs:`, apiClient.spiritual_needs);
+        return await transformApiClientToDisplayClient(apiClient);
       } else {
         console.log(`[UnifiedClientService] Using mock client data for ${id}`);
         return await mockClientService.getClient(id);

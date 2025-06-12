@@ -109,12 +109,27 @@ class ReferralRepository:
         data['created_by'] = created_by_user
         data['updated_by'] = created_by_user # For creation, creator is also updater
 
-        # Ensure foreign key fields are model instances if they are passed as IDs
-        # Django's Model.objects.create() can often handle FKs if passed as IDs,
-        # but explicit conversion can be safer depending on model/serializer setup.
-        # For now, assuming validated_data from serializer provides IDs that Django can handle.
+        # Filter out fields that are not direct model fields (e.g., related fields)
+        # These will be handled separately in the service layer
+        excluded_fields = [
+            'consent_records',      # Reverse FK relationship
+            'emergency_contacts',   # Related field
+            'first_name',          # Client field, not referral field
+            'last_name',           # Client field, not referral field  
+            'date_of_birth',       # Client field, not referral field
+            'email',               # Client field, not referral field
+            'phone',               # Client field, not referral field
+            'gender_id',           # Client field, not referral field
+            'primary_language_id', # Client field, not referral field
+            'interpreter_needed',  # Client field, not referral field
+            'iwi_hapu_id',        # Client field, not referral field
+            'spiritual_needs_id',  # Client field, not referral field
+        ]
+        
+        # Create a clean data dict with only referral model fields
+        referral_data = {k: v for k, v in data.items() if k not in excluded_fields}
 
-        return Referral.objects.create(**data)
+        return Referral.objects.create(**referral_data)
     
     @staticmethod
     def update_referral(referral: Referral, updated_by_user: User) -> Referral:

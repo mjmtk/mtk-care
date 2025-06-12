@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Save, Send, FileText, Globe, Paperclip, Calendar } from 'lucide-react';
+import { ArrowLeft, Save, Send, FileText, Globe, Paperclip, Calendar, CheckCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { apiRequest } from '@/services/api-request';
 import { ReferralService } from '@/services/referral-service';
@@ -37,11 +38,14 @@ export function ReferralDetailsStep({
   isSaving,
   hasUnsavedChanges = false
 }: ReferralDetailsStepProps) {
+  const router = useRouter();
   const [dropdowns, setDropdowns] = useState<BatchDropdowns | null>(null);
   const [programFields, setProgramFields] = useState<FormFieldSchema[]>([]);
   const [isLoadingProgram, setIsLoadingProgram] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   
   const {
     register,
@@ -228,6 +232,9 @@ export function ReferralDetailsStep({
 
   const onFormSubmit = async (formData: any) => {
     try {
+      setIsSubmitting(true);
+      setError(null);
+      
       // Combine all form data including program-specific data
       const completeData = {
         ...data, // Previous step data
@@ -235,11 +242,43 @@ export function ReferralDetailsStep({
         program_data: formData.program_data || {}
       };
 
+      // Clean date fields to prevent validation errors
+      const cleanDateValue = (value: any) => {
+        if (!value || value === '' || value === undefined) return null;
+        if (typeof value === 'string' && value.length < 10) return null;
+        return value;
+      };
+
+      const cleanedData = {
+        ...completeData,
+        completed_date: cleanDateValue(completeData.completed_date),
+        accepted_date: cleanDateValue(completeData.accepted_date),
+        follow_up_date: cleanDateValue(completeData.follow_up_date),
+        client_consent_date: cleanDateValue(completeData.client_consent_date),
+        referral_date: cleanDateValue(completeData.referral_date) || new Date().toISOString().split('T')[0],
+      };
+
+      console.log('=== SUBMIT REFERRAL (ReferralDetailsStep) ===');
+      console.log('Original data completed_date:', completeData.completed_date);
+      console.log('Original data client_consent_date:', completeData.client_consent_date);
+      console.log('Cleaned data completed_date:', cleanedData.completed_date);
+      console.log('Cleaned data client_consent_date:', cleanedData.client_consent_date);
+
       // Create the referral
-      const createdReferral = await ReferralService.createReferral(completeData);
-      onComplete(completeData);
+      const createdReferral = await ReferralService.createReferral(cleanedData);
+      
+      // Show success state briefly
+      setShowSuccess(true);
+      
+      // Redirect to the newly created referral detail page after a brief delay
+      setTimeout(() => {
+        router.push(`/dashboard/referrals/${createdReferral.id}?success=created`);
+      }, 1500);
+      
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create referral');
+      console.error('Submit referral error:', err);
+      setIsSubmitting(false);
     }
   };
 
@@ -445,9 +484,24 @@ export function ReferralDetailsStep({
         </Alert>
       )}
 
+      {/* Success State */}
+      {showSuccess && (
+        <Alert className="bg-green-50 border-green-200">
+          <CheckCircle className="h-4 w-4 text-green-600" />
+          <AlertDescription className="text-green-800">
+            Referral created successfully! Redirecting to referral details...
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Action Buttons */}
       <div className="flex justify-between">
-        <Button type="button" variant="outline" onClick={onPrevious}>
+        <Button 
+          type="button" 
+          variant="outline" 
+          onClick={onPrevious}
+          disabled={isSubmitting || showSuccess}
+        >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Client
         </Button>
@@ -456,18 +510,27 @@ export function ReferralDetailsStep({
             type="button" 
             variant="outline" 
             onClick={onSaveDraft}
-            disabled={isSaving || !hasUnsavedChanges}
+            disabled={isSaving || !hasUnsavedChanges || isSubmitting || showSuccess}
           >
             <Save className="h-4 w-4 mr-2" />
             {isSaving ? 'Saving...' : hasUnsavedChanges ? 'Save Draft' : 'Draft Saved'}
           </Button>
           <Button 
             type="submit" 
-            disabled={isSaving}
-            className="bg-green-600 hover:bg-green-700"
+            disabled={isSaving || isSubmitting || showSuccess}
+            className={showSuccess ? "bg-green-600" : "bg-green-600 hover:bg-green-700"}
           >
-            <Send className="h-4 w-4 mr-2" />
-            {isSaving ? 'Submitting...' : 'Submit Referral'}
+            {showSuccess ? (
+              <>
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Success!
+              </>
+            ) : (
+              <>
+                <Send className="h-4 w-4 mr-2" />
+                {isSubmitting ? 'Submitting...' : 'Submit Referral'}
+              </>
+            )}
           </Button>
         </div>
       </div>

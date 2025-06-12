@@ -14,6 +14,7 @@ import { ArrowRight, ArrowLeft, Search, Users, UserPlus, AlertCircle, CheckCircl
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { NewClientService } from '@/services/new-client-service';
+import { EmergencyContactsService, type EmergencyContact } from '@/services/emergency-contacts-service';
 import { apiRequest } from '@/services/api-request';
 import type { components } from '@/types/openapi';
 
@@ -26,15 +27,7 @@ interface ClientIdentificationStepProps {
 
 type ClientListSchema = components['schemas']['ClientListSchema'];
 
-interface EmergencyContact {
-  relationship_id: number;
-  first_name: string;
-  last_name: string;
-  phone: string;
-  email?: string;
-  is_primary: boolean;
-  priority_order: number;
-}
+// Use the EmergencyContact interface from the service
 
 export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataChange }: ClientIdentificationStepProps) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -82,6 +75,54 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
       interpreter_needed: data.interpreter_needed || false
     }
   });
+
+  // Initialize component state based on existing data
+  useEffect(() => {
+    // If we have existing client data, set the appropriate state
+    if (data.client_id && data.client_type === 'existing') {
+      // For existing clients, create a selectedClient object
+      setSelectedClient({
+        id: data.client_id,
+        first_name: data.first_name || '',
+        last_name: data.last_name || '',
+        email: data.email || '',
+        phone: data.phone || '',
+        date_of_birth: data.date_of_birth || ''
+      });
+      setShowClientForm(false);
+      setIsCreatingNew(false);
+    } else if (data.client_type === 'new' && data.first_name && data.last_name) {
+      // For new clients with data, show the client form
+      setShowClientForm(true);
+      setIsCreatingNew(true);
+      setSelectedClient(null);
+    }
+  }, [data]);
+
+  // Sync form values when data prop changes (for referral edit page)
+  useEffect(() => {
+    // Update form values when new data comes in (e.g. when editing existing referral)
+    if (data.iwi_hapu_id !== undefined) {
+      setValue('iwi_hapu_id', data.iwi_hapu_id);
+    }
+    if (data.spiritual_needs_id !== undefined) {
+      setValue('spiritual_needs_id', data.spiritual_needs_id);
+    }
+    if (data.primary_language_id !== undefined) {
+      setValue('primary_language_id', data.primary_language_id);
+    }
+    if (data.gender_id !== undefined) {
+      setValue('gender_id', data.gender_id);
+    }
+    if (data.interpreter_needed !== undefined) {
+      setValue('interpreter_needed', data.interpreter_needed);
+    }
+    
+    // Sync emergency contacts
+    if (data.emergency_contacts) {
+      setEmergencyContacts(data.emergency_contacts);
+    }
+  }, [data.iwi_hapu_id, data.spiritual_needs_id, data.primary_language_id, data.gender_id, data.interpreter_needed, data.emergency_contacts, setValue]);
 
   // Load dropdown options
   useEffect(() => {
@@ -145,7 +186,7 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
     return () => clearTimeout(timeoutId);
   }, [searchTerm]);
 
-  const handleSelectClient = (client: ClientListSchema) => {
+  const handleSelectClient = async (client: ClientListSchema) => {
     setSelectedClient(client);
     setValue('client_type', 'existing');
     setValue('client_id', client.id);
@@ -153,6 +194,16 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
     setValue('last_name', client.last_name);
     setShowClientForm(false);
     setIsCreatingNew(false);
+    
+    // Load emergency contacts for the selected client
+    try {
+      const contacts = await EmergencyContactsService.getClientEmergencyContacts(client.id);
+      setEmergencyContacts(contacts);
+      onDataChange?.({ emergency_contacts: contacts });
+    } catch (error) {
+      console.error('Failed to load emergency contacts:', error);
+      // Don't fail the selection, just log the error
+    }
   };
 
   const handleCreateNewClient = () => {
@@ -204,18 +255,84 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
     onDataChange?.({ emergency_contacts: updatedContacts });
   };
 
-  const onSubmit = (formData: any) => {
-    const completeData = {
-      ...formData,
-      emergency_contacts: emergencyContacts,
-      cultural_identity: {
-        iwi_hapu_id: formData.iwi_hapu_id,
-        spiritual_needs_id: formData.spiritual_needs_id,
-        primary_language_id: formData.primary_language_id,
-        interpreter_needed: formData.interpreter_needed
+  const onSubmit = async (formData: any) => {
+    console.log('=== ClientIdentificationStep onSubmit called ===');
+    console.log('Form data received:', formData);
+    console.log('Selected client:', selectedClient);
+    
+    try {
+      // If we have a client (existing or newly created), save emergency contacts and cultural identity
+      const clientId = formData.client_id || selectedClient?.id;
+      console.log('Client ID to use:', clientId);
+      
+      if (clientId) {
+        console.log('Client ID exists, proceeding to save data...');
+        // Save emergency contacts directly via emergency contacts API
+        if (emergencyContacts.length > 0) {
+          console.log('Saving emergency contacts for client:', clientId);
+          await EmergencyContactsService.replaceAllEmergencyContacts(clientId, emergencyContacts);
+        }
+        
+        // Save cultural identity directly via client API
+        const culturalData = {
+          cultural_identity: formData.cultural_identity || {},
+          primary_language_id: formData.primary_language_id || null,
+          interpreter_needed: formData.interpreter_needed || false,
+          iwi_hapu_id: formData.iwi_hapu_id || null,
+          spiritual_needs_id: formData.spiritual_needs_id || null
+        };
+        
+        console.log('Cultural data to save:', culturalData);
+        console.log('Form data iwi_hapu_id:', formData.iwi_hapu_id);
+        console.log('Form data spiritual_needs_id:', formData.spiritual_needs_id);
+        
+        // Save gender separately via regular client update endpoint since it's not cultural identity
+        if (formData.gender_id) {
+          console.log('Saving gender for client:', clientId);
+          await apiRequest({
+            url: `v1/clients/${clientId}`,
+            method: 'PATCH',
+            data: { gender_id: formData.gender_id }
+          });
+        }
+        
+        // Always try to save cultural identity data
+        console.log('Saving cultural identity for client:', clientId);
+        console.log('Cultural data being sent:', culturalData);
+        try {
+          const result = await EmergencyContactsService.updateClientCulturalIdentity(clientId, culturalData);
+          console.log('Cultural identity saved successfully');
+          console.log('Updated client data returned:', result);
+          console.log('Full result object keys:', Object.keys(result));
+          console.log('Returned iwi_hapu_id:', result.iwi_hapu_id);
+          console.log('Returned spiritual_needs_id:', result.spiritual_needs_id);
+          console.log('result.iwi_hapu:', result.iwi_hapu);
+          console.log('result.spiritual_needs:', result.spiritual_needs);
+        } catch (error) {
+          console.error('Failed to save cultural identity:', error);
+        }
+      } else {
+        console.log('No client ID found, skipping emergency contacts and cultural identity save');
       }
-    };
-    onComplete(completeData);
+      
+      console.log('Client data processing complete, calling onComplete...');
+      
+      // Complete the step with referral-specific data only
+      const completeData = {
+        ...formData,
+        // Don't include emergency_contacts or cultural data in referral data
+        // as they're now saved directly to the client
+      };
+      
+      console.log('Calling onComplete with data:', completeData);
+      onComplete(completeData);
+    } catch (error) {
+      console.error('Error saving client data:', error);
+      // Still complete the step but show a warning
+      alert('Warning: There was an issue saving emergency contacts or cultural identity. Please check the client record.');
+      console.log('Completing step with original form data due to error');
+      onComplete(formData);
+    }
   };
 
   if (isLoadingOptions) {

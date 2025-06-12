@@ -36,6 +36,35 @@ export interface ReferralCreate {
   notes?: string;
   external_organisation_id?: string;
   external_organisation_contact_id?: string;
+  
+  // New client fields (for when client_type is 'new')
+  first_name?: string;
+  last_name?: string;
+  date_of_birth?: string;
+  email?: string;
+  phone?: string;
+  gender_id?: number;
+  
+  // Cultural identity fields
+  iwi_hapu_id?: number;
+  spiritual_needs_id?: number;
+  primary_language_id?: number;
+  interpreter_needed?: boolean;
+  
+  // Emergency contacts and consent records
+  emergency_contacts?: Array<{
+    name: string;
+    relationship_id: number;
+    phone?: string;
+    email?: string;
+    is_primary: boolean;
+  }>;
+  consent_records?: Array<{
+    consent_type_id: number;
+    status: string;
+    date_given?: string;
+    notes?: string;
+  }>;
 }
 
 export interface ReferralUpdate {
@@ -54,6 +83,35 @@ export interface ReferralUpdate {
   notes?: string;
   external_organisation_id?: string;
   external_organisation_contact_id?: string;
+  
+  // New client fields (for when client_type is 'new')
+  first_name?: string;
+  last_name?: string;
+  date_of_birth?: string;
+  email?: string;
+  phone?: string;
+  gender_id?: number;
+  
+  // Cultural identity fields
+  iwi_hapu_id?: number;
+  spiritual_needs_id?: number;
+  primary_language_id?: number;
+  interpreter_needed?: boolean;
+  
+  // Emergency contacts and consent records
+  emergency_contacts?: Array<{
+    name: string;
+    relationship_id: number;
+    phone?: string;
+    email?: string;
+    is_primary: boolean;
+  }>;
+  consent_records?: Array<{
+    consent_type_id: number;
+    status: string;
+    date_given?: string;
+    notes?: string;
+  }>;
 }
 
 export interface ReferralClient {

@@ -239,12 +239,16 @@ export default function NewReferralPage() {
           email: updatedFormData.email || '',
           phone: updatedFormData.phone || '',
           risk_level: 'low',
-          primary_language_id: null,
-          cultural_identity: {},
+          primary_language_id: updatedFormData.primary_language_id || null,
+          cultural_identity: updatedFormData.cultural_identity || {},
           consent_required: false,
-          interpreter_needed: false,
+          interpreter_needed: updatedFormData.interpreter_needed || false,
           status_id: null,
-          extended_data: {}
+          extended_data: {},
+          gender_id: updatedFormData.gender_id || null,
+          iwi_hapu_id: updatedFormData.iwi_hapu_id || null,
+          spiritual_needs_id: updatedFormData.spiritual_needs_id || null,
+          emergency_contacts: updatedFormData.emergency_contacts || []
         };
 
         console.log('Creating new client...', clientData);
@@ -274,29 +278,65 @@ export default function NewReferralPage() {
     }
   };
 
+  // Helper function to clean data for API submission
+  const cleanDataForAPI = (data: ReferralFormData) => {
+    // Convert empty strings to null for optional UUID and date fields
+    const cleanValue = (value: any) => {
+      if (value === '' || value === undefined || value === null) return null;
+      return value;
+    };
+    
+    // Special cleaning for date fields - ensure they're either valid dates or null
+    const cleanDateValue = (value: any) => {
+      if (!value || value === '' || value === undefined) return null;
+      // Check if it's a valid date string (YYYY-MM-DD format)
+      if (typeof value === 'string' && value.length < 10) return null;
+      return value;
+    };
+
+    return {
+      ...data,
+      completed_date: cleanDateValue(data.completed_date),
+      accepted_date: cleanDateValue(data.accepted_date),
+      follow_up_date: cleanDateValue(data.follow_up_date),
+      client_consent_date: cleanDateValue(data.client_consent_date),
+      referral_date: cleanDateValue(data.referral_date) || new Date().toISOString().split('T')[0], // Default to today if empty
+      external_organisation_id: cleanValue(data.external_organisation_id),
+      external_organisation_contact_id: cleanValue(data.external_organisation_contact_id),
+      external_reference_number: cleanValue(data.external_reference_number),
+      notes: cleanValue(data.notes),
+      // Clean target_program_id
+      target_program_id: data.target_program_id === '__none__' || data.target_program_id === '' ? null : data.target_program_id
+    };
+  };
+
   // Save draft function
   const saveDraft = useCallback(async (data: ReferralFormData) => {
     try {
+      const cleanedData = cleanDataForAPI(data);
       if (draftReferralId) {
         // Update existing draft - use optional fields
         const updateData = {
-          client_id: data.client_id || null,
-          referral_source: data.referral_source,
-          external_reference_number: data.external_reference_number || null,
-          target_program_id: data.target_program_id === '__none__' ? null : data.target_program_id,
-          type: data.type,
-          priority_id: data.priority_id || null,
-          referral_date: data.referral_date,
-          reason: data.reason || '',
-          notes: data.notes || null,
-          service_type_id: data.service_type_id || null,
-          program_data: data.program_data || {},
-          accepted_date: data.accepted_date || null,
-          completed_date: data.completed_date || null,
-          follow_up_date: data.follow_up_date || null,
-          client_consent_date: data.client_consent_date || null,
-          external_organisation_id: data.external_organisation_id || null,
-          external_organisation_contact_id: data.external_organisation_contact_id || null
+          client_id: cleanedData.client_id || null,
+          referral_source: cleanedData.referral_source,
+          external_reference_number: cleanedData.external_reference_number,
+          target_program_id: cleanedData.target_program_id,
+          type: cleanedData.type,
+          priority_id: cleanedData.priority_id || null,
+          referral_date: cleanedData.referral_date,
+          reason: cleanedData.reason || '',
+          notes: cleanedData.notes,
+          service_type_id: cleanedData.service_type_id || null,
+          program_data: cleanedData.program_data || {},
+          accepted_date: cleanedData.accepted_date,
+          completed_date: cleanedData.completed_date,
+          follow_up_date: cleanedData.follow_up_date,
+          client_consent_date: cleanedData.client_consent_date,
+          external_organisation_id: cleanedData.external_organisation_id,
+          external_organisation_contact_id: cleanedData.external_organisation_contact_id,
+          
+          // Only include consent records (emergency contacts and cultural fields handled separately)
+          consent_records: cleanedData.consent_records || []
         };
 
         console.log('Updating draft referral...', updateData);
@@ -336,32 +376,52 @@ export default function NewReferralPage() {
         }
 
         const createData = {
-          client_id: data.client_id || null,
-          referral_source: data.referral_source,
-          external_reference_number: data.external_reference_number || null,
-          target_program_id: data.target_program_id === '__none__' ? null : data.target_program_id,
-          type: data.type,
+          client_id: cleanedData.client_id || null,
+          referral_source: cleanedData.referral_source,
+          external_reference_number: cleanedData.external_reference_number,
+          target_program_id: cleanedData.target_program_id,
+          type: cleanedData.type,
           priority_id: defaultPriority,
-          referral_date: data.referral_date,
-          reason: data.reason || 'Draft referral - details to be completed',
-          notes: data.notes || null,
+          referral_date: cleanedData.referral_date,
+          reason: cleanedData.reason || 'Draft referral - details to be completed',
+          notes: cleanedData.notes,
           status_id: defaultStatus,
           service_type_id: defaultServiceType,
           program_data: {
-            ...data.program_data,
+            ...cleanedData.program_data,
             // Store the organisation name in program_data if provided
-            external_organisation_name: data.external_organisation_name || null
+            external_organisation_name: cleanedData.external_organisation_name || null
           },
-          accepted_date: data.accepted_date || null,
-          completed_date: data.completed_date || null,
-          follow_up_date: data.follow_up_date || null,
-          client_consent_date: data.client_consent_date || null,
-          external_organisation_id: data.external_organisation_id || null,
-          external_organisation_contact_id: data.external_organisation_contact_id || null,
-          client_type: data.client_type || 'new'
+          accepted_date: cleanedData.accepted_date,
+          completed_date: cleanedData.completed_date,
+          follow_up_date: cleanedData.follow_up_date,
+          client_consent_date: cleanedData.client_consent_date,
+          external_organisation_id: cleanedData.external_organisation_id,
+          external_organisation_contact_id: cleanedData.external_organisation_contact_id,
+          client_type: cleanedData.client_type || 'new',
+          
+          // Only include consent records (emergency contacts and cultural fields handled separately)
+          consent_records: cleanedData.consent_records || [],
+          
+          // Include client fields when creating a new client (but not emergency contacts)
+          ...(cleanedData.client_type === 'new' && {
+            first_name: cleanedData.first_name,
+            last_name: cleanedData.last_name,
+            date_of_birth: cleanedData.date_of_birth,
+            email: cleanedData.email,
+            phone: cleanedData.phone
+          })
         };
 
         console.log('Creating new draft referral with data:', createData);
+        console.log('Completed date value:', createData.completed_date, 'Type:', typeof createData.completed_date);
+        console.log('All date fields:', {
+          referral_date: createData.referral_date,
+          accepted_date: createData.accepted_date,
+          completed_date: createData.completed_date,
+          follow_up_date: createData.follow_up_date,
+          client_consent_date: createData.client_consent_date
+        });
         const newReferral = await ReferralService.createReferral(createData);
         console.log('Draft created:', newReferral);
         setDraftReferralId(newReferral.id);

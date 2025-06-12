@@ -176,3 +176,19 @@ class ClientEmergencyContactSchemaOut(UUIDPKBaseModelSchema):
     # Audit fields
     created_at: datetime
     updated_at: datetime
+
+
+class EmergencyContactsReplaceSchema(Schema):
+    """Schema for replacing all emergency contacts for a client."""
+    
+    emergency_contacts: List[ClientEmergencyContactSchemaIn] = Field(..., description="List of emergency contacts to replace existing ones")
+
+
+class ClientCulturalUpdateSchema(Schema):
+    """Schema for updating client cultural identity information."""
+    
+    cultural_identity: Optional[Dict[str, Any]] = Field(None, description="Cultural identity information")
+    iwi_hapu_id: Optional[int] = Field(None, description="Iwi/Hapū affiliation option list item ID")
+    spiritual_needs_id: Optional[int] = Field(None, description="Spiritual needs option list item ID")
+    primary_language_id: Optional[int] = Field(None, description="Primary language option list item ID")
+    interpreter_needed: Optional[bool] = Field(None, description="Whether interpreter is needed")

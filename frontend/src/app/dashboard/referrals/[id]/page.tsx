@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useAuthBypassSession, useAccessToken } from '@/hooks/useAuthBypass';
+import { usePageContext } from '@/contexts/PageContext';
 import { ReferralService } from '@/services/referral-service';
 import type { Referral } from '@/types/referral';
 import { ErrorBoundary } from '@/components/error-boundary';
@@ -11,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   ArrowLeft, 
   Edit, 
@@ -25,7 +27,10 @@ import {
   Phone,
   Mail,
   MapPin,
-  Users
+  Users,
+  UserCheck,
+  Cake,
+  Heart
 } from 'lucide-react';
 import { format } from 'date-fns';
 import {
@@ -49,6 +54,40 @@ const formatDate = (dateString: string) => {
   }
 };
 
+// Helper function to calculate age from date of birth
+const calculateAge = (dateOfBirth: string) => {
+  try {
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    
+    return age;
+  } catch {
+    return null;
+  }
+};
+
+// Helper function to format referral source for display
+const formatReferralSource = (source: string) => {
+  const sourceMap: Record<string, string> = {
+    'external_agency': 'External Agency',
+    'self_referral': 'Self Referral',
+    'family_referral': 'Family Referral',
+    'school': 'School',
+    'healthcare': 'Healthcare Provider',
+    'police': 'Police',
+    'court': 'Court',
+    'other': 'Other'
+  };
+  
+  return sourceMap[source] || source.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+};
+
 // Helper function to get status badge variant
 const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
   const lowerStatus = status.toLowerCase();
@@ -69,14 +108,41 @@ const getPriorityVariant = (priority: string): "default" | "secondary" | "destru
 export default function ReferralDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { setPageInfo, clearPageInfo } = usePageContext();
   const [referral, setReferral] = useState<Referral | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const { data: session, status } = useAuthBypassSession();
   const accessToken = useAccessToken();
 
   const referralId = params.id as string;
+  const successParam = searchParams.get('success');
+
+  // Set page title in top bar
+  useEffect(() => {
+    setPageInfo({
+      title: 'Referral Details',
+      subtitle: 'View and manage referral information'
+    });
+    
+    return () => clearPageInfo();
+  }, [setPageInfo, clearPageInfo]);
+
+  // Handle success message from URL parameter
+  useEffect(() => {
+    if (successParam === 'created') {
+      setShowSuccessMessage(true);
+      // Hide success message after 5 seconds
+      setTimeout(() => setShowSuccessMessage(false), 5000);
+      
+      // Clean URL by removing the success parameter
+      const newUrl = window.location.pathname;
+      window.history.replaceState(null, '', newUrl);
+    }
+  }, [successParam]);
 
   useEffect(() => {
     if (status === 'loading') return;
@@ -179,7 +245,17 @@ export default function ReferralDetailPage() {
     <ErrorBoundary>
       <div className="container mx-auto py-10">
         <div className="max-w-4xl mx-auto space-y-6">
-          {/* Header with navigation and actions */}
+          {/* Success Message */}
+          {showSuccessMessage && (
+            <Alert className="bg-green-50 border-green-200">
+              <CheckCircle className="h-4 w-4 text-green-600" />
+              <AlertDescription className="text-green-800">
+                Referral created successfully! You can now view and manage the referral details.
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* Header with client information and actions */}
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Button 
@@ -189,9 +265,36 @@ export default function ReferralDetailPage() {
               >
                 <ArrowLeft className="h-4 w-4" />
               </Button>
-              <div>
-                <h1 className="text-3xl font-bold">Referral Details</h1>
-                <p className="text-muted-foreground">
+              <div className="space-y-1">
+                {/* Client Name as Primary Heading */}
+                <h1 className="text-3xl font-bold">
+                  {referral.client ? 
+                    `${referral.client.first_name} ${referral.client.last_name}` : 
+                    'Unknown Client'
+                  }
+                </h1>
+                
+                {/* Client Details & Referral Source */}
+                <div className="flex items-center space-x-4 text-muted-foreground">
+                  {referral.client?.date_of_birth && (
+                    <div className="flex items-center space-x-1">
+                      <Cake className="h-4 w-4" />
+                      <span className="text-sm">
+                        Age {calculateAge(referral.client.date_of_birth)} • Born {format(new Date(referral.client.date_of_birth), 'MMM d, yyyy')}
+                      </span>
+                    </div>
+                  )}
+                  
+                  <div className="flex items-center space-x-1">
+                    <Building className="h-4 w-4" />
+                    <span className="text-sm">
+                      Referred by {formatReferralSource(referral.referral_source)}
+                    </span>
+                  </div>
+                </div>
+                
+                {/* Creation Info */}
+                <p className="text-sm text-muted-foreground">
                   Created {formatDate(referral.created_at)} by {referral.created_by.first_name} {referral.created_by.last_name}
                 </p>
               </div>
@@ -311,7 +414,7 @@ export default function ReferralDetailPage() {
               <div>
                 <h3 className="text-lg font-semibold mb-2">Service Information</h3>
                 <p className="text-sm text-muted-foreground">
-                  <strong>Service Type:</strong> {referral.service_type.label}
+                  <strong>Service Type:</strong> {referral.service_type?.label || 'Not set'}
                 </p>
               </div>
             </CardContent>

@@ -13,6 +13,10 @@ The system supports community services including counselling for alcohol and oth
 
 ## Critical Information
 
+### Instructions to AI Assistant
+
+- Never run the dev servers. I will do it.
+
 ### API Versioning Standard (IMPORTANT)
 
 **All API endpoints use `/api/v1/` prefix**. This was decided on June 6, 2025, to resolve inconsistencies.

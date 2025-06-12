@@ -14,6 +14,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import type { SaveStatus } from '@/components/ui/save-status';
 import { ReferralService } from '@/services/referral-service';
 import { NewClientService } from '@/services/new-client-service';
+import { EmergencyContactsService } from '@/services/emergency-contacts-service';
 
 // Import the step components
 import { ReferralSourceStep } from '@/components/referrals/steps/ReferralSourceStep';
@@ -178,43 +179,56 @@ export default function EditReferralPage() {
         setDropdowns(dropdownData);
         
         // Check if referral can be edited
-        const canEditReferral = !['completed', 'enrolled', 'cancelled'].includes(referralData.status.slug.toLowerCase());
+        const canEditReferral = referralData.status ? 
+          !['completed', 'enrolled', 'cancelled'].includes(referralData.status.slug.toLowerCase()) : 
+          true; // Allow editing if status is null
         setCanEdit(canEditReferral);
         
         if (!canEditReferral) {
-          setError(`This referral cannot be edited because it has status: ${referralData.status.label}`);
+          setError(`This referral cannot be edited because it has status: ${referralData.status?.label || 'Unknown'}`);
           return;
         }
         
         // Convert referral data to form data format
         const loadedFormData: ReferralFormData = {
           referral_source: referralData.referral_source || 'external_agency',
-          external_reference_number: referralData.external_reference_number || '',
-          external_organisation_name: referralData.program_data?.external_organisation_name || '',
+          external_reference_number: referralData.external_reference_number || undefined,
+          external_organisation_name: referralData.program_data?.external_organisation_name || undefined,
           target_program_id: referralData.target_program?.id || '__none__',
           type: referralData.type,
-          priority_id: referralData.priority.id,
+          priority_id: referralData.priority?.id || 0,
           referral_date: referralData.referral_date,
           client_type: referralData.client_type,
           client_id: referralData.client_id || undefined,
-          service_type_id: referralData.service_type.id,
-          status_id: referralData.status.id,
+          service_type_id: referralData.service_type?.id || 0,
+          status_id: referralData.status?.id || 0,
           reason: referralData.reason,
-          notes: referralData.notes || '',
-          accepted_date: referralData.accepted_date || '',
-          completed_date: referralData.completed_date || '',
-          follow_up_date: referralData.follow_up_date || '',
-          client_consent_date: referralData.client_consent_date || '',
-          external_organisation_id: referralData.external_organisation_id || '',
-          external_organisation_contact_id: referralData.external_organisation_contact_id || '',
+          notes: referralData.notes || undefined,
+          accepted_date: referralData.accepted_date || undefined,
+          completed_date: referralData.completed_date || undefined,
+          follow_up_date: referralData.follow_up_date || undefined,
+          client_consent_date: referralData.client_consent_date || undefined,
+          external_organisation_id: referralData.external_organisation_id || undefined,
+          external_organisation_contact_id: referralData.external_organisation_contact_id || undefined,
           program_data: referralData.program_data || {}
         };
         
-        // If referral has an existing client, fetch the client data to populate the form
-        if (referralData.client_id && referralData.client_type === 'existing') {
+        // If referral has a client, fetch the client data to populate the form
+        if (referralData.client_id) {
           try {
-            const clientData = await NewClientService.getClient(referralData.client_id);
+            const [clientData, emergencyContacts] = await Promise.all([
+              NewClientService.getClient(referralData.client_id),
+              EmergencyContactsService.getClientEmergencyContacts(referralData.client_id)
+            ]);
             console.log('Loaded client data:', clientData);
+            console.log('Client iwi_hapu:', clientData.iwi_hapu);
+            console.log('Client spiritual_needs:', clientData.spiritual_needs);
+            console.log('Client iwi_hapu_id:', clientData.iwi_hapu_id);
+            console.log('Client spiritual_needs_id:', clientData.spiritual_needs_id);
+            console.log('Loaded emergency contacts:', emergencyContacts);
+            
+            // Ensure client_type is set to 'existing' when we have a client
+            loadedFormData.client_type = 'existing';
             
             // Populate form with client data
             loadedFormData.first_name = clientData.first_name;
@@ -222,24 +236,26 @@ export default function EditReferralPage() {
             loadedFormData.date_of_birth = clientData.date_of_birth;
             loadedFormData.email = clientData.email || '';
             loadedFormData.phone = clientData.phone || '';
-            loadedFormData.gender_id = clientData.gender?.id;
-            loadedFormData.primary_language_id = clientData.primary_language?.id;
-            loadedFormData.interpreter_needed = clientData.interpreter_needed;
-            loadedFormData.cultural_identity = clientData.cultural_identity;
-            loadedFormData.iwi_hapu_id = clientData.iwi_hapu?.id;
-            loadedFormData.spiritual_needs_id = clientData.spiritual_needs?.id;
+            loadedFormData.gender_id = clientData.gender?.id || undefined;
+            loadedFormData.primary_language_id = clientData.primary_language?.id || undefined;
+            loadedFormData.interpreter_needed = clientData.interpreter_needed || false;
+            loadedFormData.cultural_identity = clientData.cultural_identity || {};
+            loadedFormData.iwi_hapu_id = clientData.iwi_hapu?.id || undefined;
+            loadedFormData.spiritual_needs_id = clientData.spiritual_needs?.id || undefined;
             
-            // Load emergency contacts if available
-            if (clientData.emergency_contacts) {
-              loadedFormData.emergency_contacts = clientData.emergency_contacts.map((contact: any) => ({
-                relationship_id: contact.relationship.id,
-                first_name: contact.first_name,
-                last_name: contact.last_name,
-                phone: contact.phone,
+            // Load emergency contacts from dedicated API
+            if (emergencyContacts && emergencyContacts.length > 0) {
+              loadedFormData.emergency_contacts = emergencyContacts.map((contact: any) => ({
+                relationship_id: contact.relationship?.id || 0,
+                first_name: contact.first_name || '',
+                last_name: contact.last_name || '',
+                phone: contact.phone || '',
                 email: contact.email || '',
-                is_primary: contact.is_primary,
-                priority_order: contact.priority_order
+                is_primary: contact.is_primary || false,
+                priority_order: contact.priority_order || 1
               }));
+            } else {
+              loadedFormData.emergency_contacts = [];
             }
           } catch (err) {
             console.error('Failed to load client data:', err);
@@ -344,33 +360,79 @@ export default function EditReferralPage() {
     }
   };
 
+  // Helper function to clean data for API submission
+  const cleanDataForAPI = (data: ReferralFormData) => {
+    // Convert empty strings to null for optional UUID and date fields
+    const cleanValue = (value: any) => {
+      if (value === '' || value === undefined || value === null) return null;
+      return value;
+    };
+    
+    // Special cleaning for date fields - ensure they're either valid dates or null
+    const cleanDateValue = (value: any) => {
+      if (!value || value === '' || value === undefined) return null;
+      // Check if it's a valid date string (YYYY-MM-DD format)
+      if (typeof value === 'string' && value.length < 10) return null;
+      return value;
+    };
+
+    console.log('=== CLEANING DATA FOR API ===');
+    console.log('Before cleaning - completed_date:', data.completed_date);
+    console.log('Before cleaning - client_consent_date:', data.client_consent_date);
+    
+    const cleaned = {
+      ...data,
+      completed_date: cleanDateValue(data.completed_date),
+      accepted_date: cleanDateValue(data.accepted_date),
+      follow_up_date: cleanDateValue(data.follow_up_date),
+      client_consent_date: cleanDateValue(data.client_consent_date),
+      referral_date: cleanDateValue(data.referral_date) || new Date().toISOString().split('T')[0], // Default to today if empty
+      external_organisation_id: cleanValue(data.external_organisation_id),
+      external_organisation_contact_id: cleanValue(data.external_organisation_contact_id),
+      external_reference_number: cleanValue(data.external_reference_number),
+      notes: cleanValue(data.notes),
+      // Clean target_program_id
+      target_program_id: data.target_program_id === '__none__' || data.target_program_id === '' ? null : data.target_program_id
+    };
+    
+    console.log('After cleaning - completed_date:', cleaned.completed_date);
+    console.log('After cleaning - client_consent_date:', cleaned.client_consent_date);
+    
+    return cleaned;
+  };
+
   // Save changes function
   const saveChanges = useCallback(async (data: ReferralFormData) => {
     try {
+      const cleanedData = cleanDataForAPI(data);
+      
       // Update existing referral
       const updateData = {
-        client_id: data.client_id || null,
-        referral_source: data.referral_source,
-        external_reference_number: data.external_reference_number || null,
-        target_program_id: data.target_program_id === '__none__' ? null : data.target_program_id,
-        type: data.type,
-        priority_id: data.priority_id || null,
-        referral_date: data.referral_date,
-        reason: data.reason || '',
-        notes: data.notes || null,
-        service_type_id: data.service_type_id || null,
-        status_id: data.status_id || null,
+        client_id: cleanedData.client_id || null,
+        referral_source: cleanedData.referral_source,
+        external_reference_number: cleanedData.external_reference_number,
+        target_program_id: cleanedData.target_program_id,
+        type: cleanedData.type,
+        priority_id: cleanedData.priority_id || null,
+        referral_date: cleanedData.referral_date,
+        reason: cleanedData.reason || '',
+        notes: cleanedData.notes,
+        service_type_id: cleanedData.service_type_id || null,
+        status_id: cleanedData.status_id || null,
         program_data: {
-          ...data.program_data,
-          external_organisation_name: data.external_organisation_name || null
+          ...cleanedData.program_data,
+          external_organisation_name: cleanedData.external_organisation_name || null
         },
-        accepted_date: data.accepted_date || null,
-        completed_date: data.completed_date || null,
-        follow_up_date: data.follow_up_date || null,
-        client_consent_date: data.client_consent_date || null,
-        external_organisation_id: data.external_organisation_id || null,
-        external_organisation_contact_id: data.external_organisation_contact_id || null,
-        client_type: data.client_type || 'new'
+        accepted_date: cleanedData.accepted_date,
+        completed_date: cleanedData.completed_date,
+        follow_up_date: cleanedData.follow_up_date,
+        client_consent_date: cleanedData.client_consent_date,
+        external_organisation_id: cleanedData.external_organisation_id,
+        external_organisation_contact_id: cleanedData.external_organisation_contact_id,
+        client_type: cleanedData.client_type || 'new',
+        
+        // Only include consent records (emergency contacts and cultural fields handled separately)
+        consent_records: cleanedData.consent_records || []
       };
 
       console.log('Updating referral...', updateData);
@@ -417,6 +479,11 @@ export default function EditReferralPage() {
     setSaveStatus('saving');
     try {
       // First save the current state
+      console.log('=== SUBMIT REFERRAL ===');
+      console.log('Current form data:', formData);
+      console.log('completed_date:', formData.completed_date, 'Type:', typeof formData.completed_date);
+      console.log('client_consent_date:', formData.client_consent_date, 'Type:', typeof formData.client_consent_date);
+      
       await saveChanges(formData);
       
       // Then redirect back to referral detail
@@ -424,6 +491,7 @@ export default function EditReferralPage() {
     } catch (err) {
       setSaveStatus('error');
       setError(err instanceof Error ? err.message : 'Failed to save referral');
+      console.error('Submit error:', err);
     } finally {
       setIsSaving(false);
     }

@@ -73,7 +73,19 @@ def create_referral(request: HttpRequest, payload: ReferralSchemaIn):
             }
         )
     
-    return ReferralService.create_referral(payload.dict(), user)
+    try:
+        referral = ReferralService.create_referral(payload.dict(), user)
+        
+        # Refresh from database to ensure all relations are properly loaded
+        referral.refresh_from_db()
+        
+        return referral
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error creating referral: {e}")
+        logger.error(f"Payload data: {payload.dict()}")
+        raise
 
 @router.get("/batch-dropdowns", response=ReferralBatchDropdownsSchemaOut, auth=auth_required)
 def get_batch_dropdowns(request: HttpRequest):

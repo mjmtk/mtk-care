@@ -99,13 +99,17 @@ class ReferralClientSchemaOut(Schema):
 
 # Output schemas for referral data
 class ReferralSchemaOut(Schema):
-    model_config = {"from_attributes": True}
+    model_config = {
+        "from_attributes": True,
+        "exclude_unset": True,
+        "use_enum_values": True
+    }
     
     id: UUID
     type: str
     status: "OptionListItemSchemaOut"
     priority: "OptionListItemSchemaOut"
-    service_type: "OptionListItemSchemaOut"
+    service_type: Optional["OptionListItemSchemaOut"] = None
     reason: str
     client_type: str
     client_id: Optional[UUID] = None

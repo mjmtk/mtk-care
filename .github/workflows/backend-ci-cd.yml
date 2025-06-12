@@ -80,3 +80,17 @@ jobs:
           app-name: 'mtkcare-backend'
           slot-name: 'Production'
           package: release.zip # Deploy the zip file directly
+
+      - name: Run Django Migrations
+        run: |
+          echo "Running Django migrations on Azure Web App..."
+          az webapp ssh --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --name mtkcare-backend \
+            --command "cd /home/site/wwwroot && python manage.py migrate --noinput"
+          
+      - name: Verify Migrations
+        run: |
+          echo "Verifying migrations were applied..."
+          az webapp ssh --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --name mtkcare-backend \
+            --command "cd /home/site/wwwroot && python manage.py showmigrations --list | grep '\[X\]' | tail -10"

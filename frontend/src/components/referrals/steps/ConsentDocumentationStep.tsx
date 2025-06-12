@@ -57,6 +57,8 @@ interface DocumentRecord {
   document_type_id: number;
   folder_category: string;
   description?: string;
+  file?: File;
+  uploaded_file_url?: string;
 }
 
 export function ConsentDocumentationStep({ data, onComplete, onPrevious, onDataChange }: ConsentDocumentationStepProps) {
@@ -184,11 +186,35 @@ export function ConsentDocumentationStep({ data, onComplete, onPrevious, onDataC
       file_name: '',
       document_type_id: 0,
       folder_category: 'consent-forms',
-      description: ''
+      description: '',
+      file: undefined,
+      uploaded_file_url: undefined
     };
     const updatedDocs = [...documents, newDoc];
     setDocuments(updatedDocs);
     onDataChange({ documents: updatedDocs });
+  }, [documents, onDataChange]);
+
+  const handleFileUpload = useCallback(async (index: number, file: File) => {
+    try {
+      const updatedDocs = [...documents];
+      updatedDocs[index].file = file;
+      updatedDocs[index].file_name = file.name;
+      setDocuments(updatedDocs);
+      onDataChange({ documents: updatedDocs });
+      
+      // TODO: Implement proper file upload handling
+      // For now, just store the file reference locally without uploading
+      console.log('File selected for upload (upload disabled):', file.name);
+      
+    } catch (error) {
+      console.error('Failed to handle file:', error);
+      // Remove the file if handling failed
+      const updatedDocs = [...documents];
+      updatedDocs[index].file = undefined;
+      updatedDocs[index].file_name = '';
+      setDocuments(updatedDocs);
+    }
   }, [documents, onDataChange]);
 
   const updateDocument = useCallback((index: number, field: keyof DocumentRecord, value: any) => {
@@ -425,12 +451,29 @@ export function ConsentDocumentationStep({ data, onComplete, onPrevious, onDataC
                     </div>
 
                     <div className="space-y-2">
-                      <Label className="text-sm font-medium">File Name</Label>
-                      <Input
-                        placeholder="e.g., consent_form_signed.pdf"
-                        value={doc.file_name}
-                        onChange={(e) => updateDocument(index, 'file_name', e.target.value)}
-                      />
+                      <Label className="text-sm font-medium">Upload File</Label>
+                      <div className="flex items-center space-x-2">
+                        <Input
+                          type="file"
+                          accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              handleFileUpload(index, file);
+                            }
+                          }}
+                          className="file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                        />
+                        {doc.uploaded_file_url && (
+                          <Badge className="bg-green-100 text-green-800">
+                            <Check className="h-3 w-3 mr-1" />
+                            Uploaded
+                          </Badge>
+                        )}
+                      </div>
+                      {doc.file_name && (
+                        <p className="text-sm text-gray-600">Selected: {doc.file_name}</p>
+                      )}
                     </div>
                   </div>
 

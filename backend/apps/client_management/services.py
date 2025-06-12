@@ -282,7 +282,9 @@ class ClientService:
         """Get a client by ID with related objects."""
         try:
             return Client.objects.select_related(
-                'status', 'primary_language'
+                'status', 'primary_language', 'gender', 'iwi_hapu', 'spiritual_needs'
+            ).prefetch_related(
+                'emergency_contacts', 'emergency_contacts__relationship'
             ).get(id=client_id)
         except Client.DoesNotExist:
             return None

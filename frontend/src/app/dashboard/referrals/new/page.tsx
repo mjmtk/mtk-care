@@ -572,6 +572,8 @@ export default function NewReferralPage() {
             onComplete={handleStepComplete}
             onPrevious={handlePreviousStep}
             onDataChange={handleDataChange}
+            clientId={formData.client_id}
+            referralId={draftReferralId}
           />
         );
       case 4:

@@ -14,6 +14,7 @@ import { ArrowLeft, ArrowRight, Shield, FileText, Upload, Check, X, Calendar, Al
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { apiRequest } from '@/services/api-request';
 import type { components } from '@/types/openapi';
+import { DocumentUpload, type DocumentRecord } from '@/components/documents/DocumentUpload';
 
 // Debounce utility function
 function debounce<T extends (...args: any[]) => any>(func: T, wait: number): (...args: Parameters<T>) => void {
@@ -29,6 +30,8 @@ interface ConsentDocumentationStepProps {
   onComplete: (data: any) => void;
   onPrevious: () => void;
   onDataChange: (data: any) => void;
+  clientId?: string;
+  referralId?: string;
 }
 
 type ConsentType = {
@@ -52,20 +55,21 @@ interface ConsentRecord {
   notes?: string;
 }
 
-interface DocumentRecord {
-  file_name: string;
-  document_type_id: number;
-  folder_category: string;
-  description?: string;
-  file?: File;
-  uploaded_file_url?: string;
-}
+// Using DocumentRecord from DocumentUpload component
 
-export function ConsentDocumentationStep({ data, onComplete, onPrevious, onDataChange }: ConsentDocumentationStepProps) {
+export function ConsentDocumentationStep({ data, onComplete, onPrevious, onDataChange, clientId, referralId }: ConsentDocumentationStepProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [consentTypes, setConsentTypes] = useState<ConsentType[]>([]);
   const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([]);
+  
+  // Debug logging
+  console.log('ConsentDocumentationStep props:', { 
+    clientId, 
+    referralId, 
+    dataClientId: data.client_id,
+    dataClientType: data.client_type 
+  });
   
   // Initialize state from props only once
   const [consentRecords, setConsentRecords] = useState<ConsentRecord[]>(() => data.consent_records || []);
@@ -181,54 +185,11 @@ export function ConsentDocumentationStep({ data, onComplete, onPrevious, onDataC
     onDataChange({ consent_records: updatedConsents });
   }, [consentRecords, onDataChange]);
 
-  const addDocument = useCallback(() => {
-    const newDoc: DocumentRecord = {
-      file_name: '',
-      document_type_id: 0,
-      folder_category: 'consent-forms',
-      description: '',
-      file: undefined,
-      uploaded_file_url: undefined
-    };
-    const updatedDocs = [...documents, newDoc];
+  // Document handling is now managed by DocumentUpload component
+  const handleDocumentsChange = useCallback((updatedDocs: DocumentRecord[]) => {
     setDocuments(updatedDocs);
     onDataChange({ documents: updatedDocs });
-  }, [documents, onDataChange]);
-
-  const handleFileUpload = useCallback(async (index: number, file: File) => {
-    try {
-      const updatedDocs = [...documents];
-      updatedDocs[index].file = file;
-      updatedDocs[index].file_name = file.name;
-      setDocuments(updatedDocs);
-      onDataChange({ documents: updatedDocs });
-      
-      // TODO: Implement proper file upload handling
-      // For now, just store the file reference locally without uploading
-      console.log('File selected for upload (upload disabled):', file.name);
-      
-    } catch (error) {
-      console.error('Failed to handle file:', error);
-      // Remove the file if handling failed
-      const updatedDocs = [...documents];
-      updatedDocs[index].file = undefined;
-      updatedDocs[index].file_name = '';
-      setDocuments(updatedDocs);
-    }
-  }, [documents, onDataChange]);
-
-  const updateDocument = useCallback((index: number, field: keyof DocumentRecord, value: any) => {
-    const updatedDocs = [...documents];
-    (updatedDocs[index] as any)[field] = value;
-    setDocuments(updatedDocs);
-    onDataChange({ documents: updatedDocs });
-  }, [documents, onDataChange]);
-
-  const removeDocument = useCallback((index: number) => {
-    const updatedDocs = documents.filter((_, i) => i !== index);
-    setDocuments(updatedDocs);
-    onDataChange({ documents: updatedDocs });
-  }, [documents, onDataChange]);
+  }, [onDataChange]);
 
   const getConsentStatusIcon = useCallback((status: string) => {
     switch (status) {
@@ -405,99 +366,32 @@ export function ConsentDocumentationStep({ data, onComplete, onPrevious, onDataC
           </div>
 
           {/* Document Upload Section */}
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">Supporting Documents</h3>
-              <Button type="button" onClick={addDocument} variant="outline">
-                <Upload className="h-4 w-4 mr-2" />
-                Add Document
-              </Button>
+          {(clientId || data.client_id) && (
+            <DocumentUpload
+              clientId={clientId || data.client_id}
+              referralId={referralId || undefined}
+              documents={documents}
+              onDocumentsChange={handleDocumentsChange}
+              documentTypes={documentTypes}
+              allowedCategories={['consent-forms', 'assessments', 'care-plans', 'referral-letters', 'general']}
+              showDescription={true}
+              maxFiles={5}
+              acceptedFileTypes=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+            />
+          )}
+          
+          {!(clientId || data.client_id) && (
+            <div className="space-y-6">
+              <div className="text-center py-8 text-amber-600 bg-amber-50 rounded-lg border border-amber-200">
+                <AlertCircle className="h-12 w-12 mx-auto mb-3 text-amber-400" />
+                <p className="font-medium">Document Upload Not Available</p>
+                <p className="text-sm">Complete the client identification step to enable document uploads</p>
+                <p className="text-xs text-gray-500 mt-2">
+                  Debug: clientId={clientId}, data.client_id={data.client_id}
+                </p>
+              </div>
             </div>
-
-            <div className="space-y-4">
-              {documents.map((doc, index) => (
-                <div key={index} className="p-6 bg-gray-50 rounded-2xl border border-gray-200">
-                  <div className="flex items-start justify-between mb-4">
-                    <FileText className="h-5 w-5 text-gray-400 mt-1" />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeDocument(index)}
-                      className="text-gray-400 hover:text-red-600"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium">Document Type</Label>
-                      <Select 
-                        value={doc.document_type_id.toString()} 
-                        onValueChange={(value) => updateDocument(index, 'document_type_id', parseInt(value))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select document type..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {documentTypes.map((docType) => (
-                            <SelectItem key={docType.id} value={docType.id.toString()}>
-                              {docType.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium">Upload File</Label>
-                      <div className="flex items-center space-x-2">
-                        <Input
-                          type="file"
-                          accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                              handleFileUpload(index, file);
-                            }
-                          }}
-                          className="file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                        />
-                        {doc.uploaded_file_url && (
-                          <Badge className="bg-green-100 text-green-800">
-                            <Check className="h-3 w-3 mr-1" />
-                            Uploaded
-                          </Badge>
-                        )}
-                      </div>
-                      {doc.file_name && (
-                        <p className="text-sm text-gray-600">Selected: {doc.file_name}</p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="mt-4 space-y-2">
-                    <Label className="text-sm font-medium">Description</Label>
-                    <Textarea
-                      placeholder="Brief description of this document..."
-                      value={doc.description || ''}
-                      onChange={(e) => updateDocument(index, 'description', e.target.value)}
-                      className="h-16"
-                    />
-                  </div>
-                </div>
-              ))}
-
-              {documents.length === 0 && (
-                <div className="text-center py-8 text-gray-500">
-                  <FileText className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-                  <p>No documents added yet</p>
-                  <p className="text-sm">Click "Add Document" to upload supporting files</p>
-                </div>
-              )}
-            </div>
-          </div>
+          )}
 
         </CardContent>
       </Card>

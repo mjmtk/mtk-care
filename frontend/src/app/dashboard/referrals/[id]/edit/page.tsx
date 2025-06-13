@@ -523,6 +523,8 @@ export default function EditReferralPage() {
             onComplete={handleStepComplete}
             onPrevious={handlePreviousStep}
             onDataChange={handleDataChange}
+            clientId={formData.client_id}
+            referralId={params.id}
           />
         );
       case 4:

@@ -8,10 +8,19 @@ export interface Document {
   mime_type?: string;
   sharepoint_id?: string;
   sharepoint_url?: string;
+  sharepoint_unique_id?: string;
+  sharepoint_etag?: string;
+  sharepoint_server_relative_url?: string;
+  sharepoint_web_url?: string;
+  sharepoint_download_url?: string;
   client_id?: string;
   referral_id?: string;
   folder_category: string;
-  type?: any;
+  type?: {
+    id: number;
+    label: string;
+    value: string;
+  };
   status: 'pending' | 'uploading' | 'uploaded' | 'failed' | 'archived' | 'deleted';
   is_confidential: boolean;
   access_level: 'public' | 'internal' | 'restricted' | 'confidential';
@@ -54,17 +63,25 @@ export interface DocumentUpdateData {
   metadata?: any;
   sharepoint_id?: string;
   sharepoint_url?: string;
+  sharepoint_unique_id?: string;
+  sharepoint_server_relative_url?: string;
+  sharepoint_etag?: string;
+  uploaded_at?: string;
   upload_error?: string;
 }
 
 export class DocumentService {
   /**
-   * List all documents, optionally filtered by client
+   * List all documents, optionally filtered by client and/or referral
    */
-  static async listDocuments(clientId?: string): Promise<Document[]> {
-    const params = clientId ? `?client_id=${clientId}` : '';
+  static async listDocuments(clientId?: string, referralId?: string): Promise<Document[]> {
+    const params = new URLSearchParams();
+    if (clientId) params.append('client_id', clientId);
+    if (referralId) params.append('referral_id', referralId);
+    
+    const queryString = params.toString();
     return await apiRequest({
-      url: `v1/documents/${params}`,
+      url: `v1/documents/${queryString ? `?${queryString}` : ''}`,
       method: 'GET'
     });
   }
@@ -174,5 +191,27 @@ export class DocumentService {
    */
   static getMimeType(file: File): string {
     return file.type || 'application/octet-stream';
+  }
+
+  /**
+   * Get secure access URL for a document
+   */
+  static async getDocumentAccessUrl(documentId: string, action: 'view' | 'download' | 'preview' = 'view'): Promise<string> {
+    const response = await apiRequest({
+      url: `v1/documents/${documentId}/access?action=${action}`,
+      method: 'GET'
+    });
+    return response.url;
+  }
+
+  /**
+   * Get client folder URLs
+   */
+  static async getClientFolderUrls(clientId: string): Promise<{ client_folder: string; folder_structure: string[] }> {
+    const response = await apiRequest({
+      url: `v1/documents/client/${clientId}/folders`,
+      method: 'GET'
+    });
+    return response;
   }
 }

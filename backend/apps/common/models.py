@@ -251,20 +251,48 @@ class Document(UUIDPKBaseModel):
         verbose_name=_("MIME Type")
     )
     
-    # SharePoint Integration
+    # Enhanced SharePoint Integration
     sharepoint_id = models.CharField(
         max_length=255,
         null=True,
         blank=True,
-        help_text=_('SharePoint unique file ID or URL'),
+        help_text=_('SharePoint unique file ID or URL (legacy)'),
         verbose_name=_("SharePoint ID")
     )
-    sharepoint_url = models.URLField(
+    sharepoint_unique_id = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text=_('SharePoint GUID for the file'),
+        verbose_name=_("SharePoint Unique ID")
+    )
+    sharepoint_etag = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text=_('SharePoint ETag for version tracking'),
+        verbose_name=_("SharePoint ETag")
+    )
+    sharepoint_server_relative_url = models.CharField(
         max_length=500,
         null=True,
         blank=True,
-        verbose_name=_("SharePoint URL"),
-        help_text=_("Direct URL to the file in SharePoint")
+        help_text=_('Server-relative URL for API access'),
+        verbose_name=_("SharePoint Server Relative URL")
+    )
+    sharepoint_web_url = models.URLField(
+        max_length=500,
+        null=True,
+        blank=True,
+        verbose_name=_("SharePoint Web URL"),
+        help_text=_("URL to view file in SharePoint web interface")
+    )
+    sharepoint_download_url = models.URLField(
+        max_length=500,
+        null=True,
+        blank=True,
+        verbose_name=_("SharePoint Download URL"),
+        help_text=_("Direct download URL (may expire)")
     )
     
     # Folder Structure for SharePoint Organization
@@ -280,23 +308,30 @@ class Document(UUIDPKBaseModel):
         verbose_name=_("Referral ID"),
         help_text=_("UUID of the referral this document belongs to (if referral-specific)")
     )
+    class DocumentCategory(models.TextChoices):
+        # Referral-specific documents (stored in referrals/{referral_id}/)
+        CONSENT_FORM = 'consent_form', _('Consent Form')
+        ASSESSMENT = 'assessment', _('Assessment Report')
+        CARE_PLAN = 'care_plan', _('Care Plan')
+        REFERRAL_LETTER = 'referral_letter', _('Referral Letter')
+        
+        # Client general documents (stored in other-documents/{category}/)
+        ID_DOCUMENT = 'id_document', _('Identification Document')
+        MEDICAL_RECORD = 'medical_record', _('Medical Record')
+        COURT_ORDER = 'court_order', _('Court Order')
+        SCHOOL_REPORT = 'school_report', _('School Report')
+        INSURANCE_DOCUMENT = 'insurance_document', _('Insurance Document')
+        
+        # General categories
+        GENERAL = 'general', _('General Document')
+        OTHER = 'other', _('Other Document')
+    
     folder_category = models.CharField(
         max_length=50,
-        choices=[
-            ('consent-forms', _('Consent Forms')),
-            ('assessments', _('Assessments')),
-            ('care-plans', _('Care Plans')),
-            ('id-documents', _('ID Documents')),
-            ('medical-records', _('Medical Records')),
-            ('court-orders', _('Court Orders')),
-            ('school-reports', _('School Reports')),
-            ('referral-letters', _('Referral Letters')),
-            ('general', _('General')),
-            ('other', _('Other')),
-        ],
-        default='general',
-        verbose_name=_("Folder Category"),
-        help_text=_("Category for SharePoint folder organization")
+        choices=DocumentCategory.choices,
+        default=DocumentCategory.GENERAL,
+        verbose_name=_("Document Category"),
+        help_text=_("Category determines SharePoint folder organization")
     )
     
     # Document Classification
@@ -399,20 +434,49 @@ class Document(UUIDPKBaseModel):
     def __str__(self):
         return f"{self.file_name} ({self.get_status_display()})"
     
+    def get_category_folder(self) -> str:
+        """Get the appropriate folder name for the document category."""
+        category_folders = {
+            self.DocumentCategory.CONSENT_FORM: 'consent-forms',
+            self.DocumentCategory.ASSESSMENT: 'assessments', 
+            self.DocumentCategory.CARE_PLAN: 'care-plans',
+            self.DocumentCategory.REFERRAL_LETTER: 'referral-letters',
+            self.DocumentCategory.ID_DOCUMENT: 'identification',
+            self.DocumentCategory.MEDICAL_RECORD: 'medical-records',
+            self.DocumentCategory.COURT_ORDER: 'court-orders',
+            self.DocumentCategory.SCHOOL_REPORT: 'school-reports',
+            self.DocumentCategory.INSURANCE_DOCUMENT: 'insurance',
+            self.DocumentCategory.GENERAL: 'general',
+            self.DocumentCategory.OTHER: 'other',
+        }
+        return category_folders.get(self.folder_category, 'general')
+
     @property
     def sharepoint_folder_path(self) -> str:
-        """Generate the SharePoint folder path based on client/referral structure."""
-        if not self.client_id:
-            return f"Documents/Unassigned/{self.folder_category}/"
+        """Generate the SharePoint folder path based on client/referral structure.
         
-        base_path = f"Clients/{self.client_id}/"
+        Improved Structure:
+        /<client-id>/
+            /referrals/
+                /<referral-id>/          # All referral documents together
+                    - consent-form.pdf
+                    - assessment.docx
+            /other-documents/
+                /identification/         # ID documents
+                /medical-records/       # Medical records
+                /court-orders/          # Legal documents
+                etc.
+        """
+        if not self.client_id:
+            return f"Unassigned/"
         
         if self.referral_id:
-            # Referral-specific document
-            return f"{base_path}Referrals/{self.referral_id}/{self.folder_category}/"
+            # Referral-specific document: all in referral folder
+            return f"{self.client_id}/referrals/{self.referral_id}/"
         else:
-            # General client document
-            return f"{base_path}General/{self.folder_category}/"
+            # Client general document: organized by category
+            category_folder = self.get_category_folder()
+            return f"{self.client_id}/other-documents/{category_folder}/"
     
     @property
     def full_sharepoint_path(self) -> str:
@@ -460,6 +524,86 @@ class Document(UUIDPKBaseModel):
             models.Index(fields=['folder_category']),
             models.Index(fields=['type']),
             models.Index(fields=['is_latest_version']),
+            models.Index(fields=['sharepoint_unique_id']),
+        ]
+
+
+class DocumentAuditLog(UUIDPKBaseModel):
+    """
+    Audit trail for document access and operations.
+    Tracks all document-related activities for compliance and security.
+    """
+    
+    class ActionType(models.TextChoices):
+        UPLOADED = 'uploaded', _('Document Uploaded')
+        VIEWED = 'viewed', _('Document Viewed')
+        DOWNLOADED = 'downloaded', _('Document Downloaded')
+        UPDATED = 'updated', _('Document Updated')
+        DELETED = 'deleted', _('Document Deleted')
+        SHARED = 'shared', _('Document Shared')
+        ACCESS_DENIED = 'access_denied', _('Access Denied')
+        
+    document = models.ForeignKey(
+        Document,
+        on_delete=models.CASCADE,
+        related_name='audit_logs',
+        verbose_name=_("Document")
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='document_audit_logs',
+        verbose_name=_("User")
+    )
+    action = models.CharField(
+        max_length=50,
+        choices=ActionType.choices,
+        verbose_name=_("Action")
+    )
+    ip_address = models.GenericIPAddressField(
+        null=True,
+        blank=True,
+        verbose_name=_("IP Address")
+    )
+    user_agent = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name=_("User Agent")
+    )
+    success = models.BooleanField(
+        default=True,
+        verbose_name=_("Success"),
+        help_text=_("Whether the action was successful")
+    )
+    error_message = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name=_("Error Message"),
+        help_text=_("Error details if action failed")
+    )
+    metadata = models.JSONField(
+        default=dict,
+        blank=True,
+        verbose_name=_("Additional Metadata"),
+        help_text=_("Extra context about the action")
+    )
+    
+    def __str__(self):
+        return f"{self.action} - {self.document.file_name} by {self.user}"
+    
+    class Meta:
+        verbose_name = _('Document Audit Log')
+        verbose_name_plural = _('Document Audit Logs')
+        ordering = ['-created_at']
+        app_label = 'common'
+        indexes = [
+            models.Index(fields=['document']),
+            models.Index(fields=['user']),
+            models.Index(fields=['action']),
+            models.Index(fields=['created_at']),
+            models.Index(fields=['ip_address']),
         ]
 
 # # ==========================================

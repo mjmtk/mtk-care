@@ -151,6 +151,7 @@ export default function ClientDashboardPage({ params }: ClientDashboardPageProps
       {/* Client Tabs Section */}
       <ClientTabsSection
         clientId={clientId}
+        clientName={`${client.firstName} ${client.lastName}`}
         canEditClient={true}
         activeEpisodeId={undefined}
       />

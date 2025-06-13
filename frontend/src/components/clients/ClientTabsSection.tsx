@@ -8,12 +8,14 @@ import { PersonalInfoSection } from './PersonalInfoSection';
 
 interface ClientTabsSectionProps {
   clientId: string;
+  clientName?: string;
   canEditClient?: boolean;
   activeEpisodeId?: string;
 }
 
 export function ClientTabsSection({
   clientId,
+  clientName,
   canEditClient = true,
   activeEpisodeId
 }: ClientTabsSectionProps) {
@@ -75,7 +77,8 @@ export function ClientTabsSection({
             <TabsContent value="documents" className="mt-0">
               <DocumentsSection 
                 clientId={clientId} 
-                episodeId={activeEpisodeId} 
+                clientName={clientName}
+                referralId={activeEpisodeId} 
               />
             </TabsContent>
           </div>

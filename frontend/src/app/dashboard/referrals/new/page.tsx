@@ -420,7 +420,7 @@ export default function NewReferralPage() {
           dropdowns?.referral_service_types?.find((st: any) => 
             st.label.toLowerCase().includes('to be determined') ||
             st.slug === 'to-be-determined'
-          )?.id;
+          )?.id || dropdowns?.referral_service_types?.[0]?.id;
 
         // Only proceed if we have valid IDs
         if (!defaultPriority || !defaultStatus || !defaultServiceType) {

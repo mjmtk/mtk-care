@@ -112,11 +112,11 @@ export async function apiRequest<ResponseType = unknown, RequestBody = unknown>(
 export const usersApi = {
   /**
    * Fetches the current authenticated user's profile.
-   * GET /api/v1/users/me/
+   * GET /api/v1/profile
    */
   getCurrentUserProfile: async (accessToken: string): Promise<components['schemas']['UserOut']> => {
     return apiRequest<components['schemas']['UserOut']>({
-      url: 'v1/users/me',
+      url: 'v1/profile',
       method: 'get',
       accessToken,
     });

@@ -27,9 +27,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { toast } from "sonner"
 import { Textarea } from "@/components/ui/textarea"
 
-import { useSharePointService } from '@/services/sharepoint-service'
 import { DocumentService, Document, DocumentCreateData } from '@/services/document-service'
-import type { SharePointFile } from '@/services/sharepoint-service'
 
 // TODO: Replace with OptionList integration for document types
 const documentTypes = [
@@ -46,15 +44,19 @@ const documentTypes = [
 
 // Map document types to folder categories
 const documentTypeToCategory: Record<string, string> = {
-  "Consent Form": "consent_form",
-  "Health Record": "medical_record",
-  "Identification": "id_document",
-  "Referral": "referral_letter",
-  "Assessment": "assessment",
-  "Treatment Plan": "care_plan",
-  "Progress Note": "general",
-  "Discharge Summary": "general",
-  "Other": "other",
+  // Client-level documents (general/)
+  "Identification": "identification",
+  "Health Record": "medical-records", 
+  
+  // Referral-specific documents (referrals/{referral_id}/ - no subfolders)
+  // All referral documents use the same category since metadata handles organization
+  "Consent Form": "referral",
+  "Referral": "referral",
+  "Assessment": "referral",
+  "Treatment Plan": "referral",
+  "Progress Note": "referral",
+  "Discharge Summary": "referral",
+  "Other": "referral", // Will be adjusted based on context
 }
 
 interface DocumentsSectionProps {
@@ -85,7 +87,6 @@ export function DocumentsSection({ clientId, clientName = "Client", referralId }
   const [editingDocument, setEditingDocument] = useState<Document | null>(null)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   
-  const sharePointService = useSharePointService()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Load documents
@@ -194,6 +195,14 @@ export function DocumentsSection({ clientId, clientName = "Client", referralId }
     try {
       const uploadPromises = uploadFiles.map(async (fileData) => {
         // Create document record
+        // Determine folder category based on document type and context
+        let folderCategory = documentTypeToCategory[fileData.type] || 'general-other';
+        
+        // Smart categorization for "Other" documents based on context
+        if (fileData.type === 'Other') {
+          folderCategory = fileData.referralId ? 'referral' : 'general-other';
+        }
+
         const documentData: DocumentCreateData = {
           file_name: fileData.file.name,
           original_filename: fileData.file.name,
@@ -201,7 +210,7 @@ export function DocumentsSection({ clientId, clientName = "Client", referralId }
           mime_type: fileData.file.type || 'application/octet-stream',
           client_id: clientId,
           referral_id: fileData.referralId,
-          folder_category: documentTypeToCategory[fileData.type] || 'other',
+          folder_category: folderCategory,
           description: fileData.description,
           is_confidential: fileData.isConfidential,
           status: 'uploading' as const,
@@ -210,26 +219,11 @@ export function DocumentsSection({ clientId, clientName = "Client", referralId }
         // Create document in database
         const document = await DocumentService.createDocument(documentData)
 
-        // Upload to SharePoint
-        if (sharePointService) {
-          const uploadResult = await sharePointService.uploadDocument(
-            clientId,
-            fileData.file,
-            fileData.referralId
-          )
-
-          if (uploadResult.success && uploadResult.file) {
-            // Update document with SharePoint info
-            await DocumentService.updateDocument(document.id, {
-              status: 'uploaded',
-              sharepoint_unique_id: uploadResult.file.UniqueId,
-              sharepoint_server_relative_url: uploadResult.file.ServerRelativeUrl,
-              sharepoint_etag: uploadResult.file.ETag,
-              uploaded_at: new Date().toISOString(),
-            })
-          } else {
-            throw new Error(uploadResult.error || 'Upload failed')
-          }
+        // Upload file via backend API (backend handles SharePoint integration)
+        const uploadResult = await DocumentService.uploadDocumentFile(document.id, fileData.file)
+        
+        if (!uploadResult.success) {
+          throw new Error(uploadResult.error || 'Upload failed')
         }
 
         return document
@@ -505,7 +499,7 @@ export function DocumentsSection({ clientId, clientName = "Client", referralId }
                             </div>
                             {fileData.referralId && (
                               <div className="text-sm text-muted-foreground">
-                                Will be uploaded to: referrals/{fileData.referralId}
+                                Will be uploaded to: referrals/{fileData.referralId}/
                               </div>
                             )}
                           </CardContent>
@@ -781,15 +775,34 @@ interface EditMetadataFormProps {
 
 function EditMetadataForm({ document, onSave, onCancel }: EditMetadataFormProps) {
   const [description, setDescription] = useState(document.description || '')
-  const [folderCategory, setFolderCategory] = useState(document.folder_category)
   const [isConfidential, setIsConfidential] = useState(document.is_confidential)
   const [saving, setSaving] = useState(false)
+  
+  // Find the document type that matches the current folder category
+  const getCurrentDocumentType = () => {
+    for (const [type, category] of Object.entries(documentTypeToCategory)) {
+      if (category === document.folder_category) {
+        return type;
+      }
+    }
+    return 'Other'; // Default fallback
+  }
+  
+  const [documentType, setDocumentType] = useState(getCurrentDocumentType())
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSaving(true)
     
     try {
+      // Convert document type back to folder category
+      let folderCategory = documentTypeToCategory[documentType] || 'general-other';
+      
+      // Smart categorization for "Other" documents based on context
+      if (documentType === 'Other') {
+        folderCategory = document.referral_id ? 'referral' : 'general-other';
+      }
+      
       await onSave({
         description: description.trim() || undefined,
         folder_category: folderCategory,
@@ -814,14 +827,14 @@ function EditMetadataForm({ document, onSave, onCancel }: EditMetadataFormProps)
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="folder-category">Document Type</Label>
-        <Select value={folderCategory} onValueChange={setFolderCategory}>
+        <Label htmlFor="document-type">Document Type</Label>
+        <Select value={documentType} onValueChange={setDocumentType}>
           <SelectTrigger>
             <SelectValue placeholder="Select document type" />
           </SelectTrigger>
           <SelectContent>
-            {Object.entries(documentTypeToCategory).map(([type, category]) => (
-              <SelectItem key={category} value={category}>
+            {documentTypes.map((type) => (
+              <SelectItem key={type} value={type}>
                 {type}
               </SelectItem>
             ))}

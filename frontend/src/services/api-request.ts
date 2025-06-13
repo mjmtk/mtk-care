@@ -1,5 +1,6 @@
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import axiosInstance from './axios-client';
+import { getSession } from 'next-auth/react';
 
 /**
  * Centralized API request utility supporting both session-based and token-based authentication.
@@ -64,8 +65,19 @@ export async function apiRequest<T = any>(options: ApiRequestOptions): Promise<T
     const tokenToUse = accessToken;
     
     finalHeaders.Authorization = `Bearer ${tokenToUse}`;
+  } else {
+    // For session mode, automatically include JWT token if available
+    try {
+      const session = await getSession();
+      if (session?.accessToken) {
+        finalHeaders.Authorization = `Bearer ${session.accessToken}`;
+      }
+    } catch (error) {
+      console.warn('Could not get session for API request:', error);
+      // Continue without token - let the backend handle authentication
+    }
   }
-  // For session mode, axiosInstance is already configured with withCredentials: true
+  // axiosInstance is configured with withCredentials: true for cookie-based fallback
 
   // Enforce API path rule
   if (url.startsWith('/api')) {

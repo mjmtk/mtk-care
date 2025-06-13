@@ -162,6 +162,43 @@ export class DocumentService {
   }
 
   /**
+   * Upload document file via backend (backend handles SharePoint integration)
+   */
+  static async uploadDocumentFile(documentId: string, file: File): Promise<{
+    success: boolean;
+    sharepoint_id?: string;
+    sharepoint_url?: string;
+    error?: string;
+  }> {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      // Use apiRequest which handles authentication
+      const result = await apiRequest({
+        url: `v1/documents/${documentId}/upload`,
+        method: 'POST',
+        data: formData,
+        headers: {
+          // Don't set Content-Type - let browser set it with boundary for FormData
+          'Content-Type': undefined
+        }
+      });
+
+      return {
+        success: true,
+        sharepoint_id: result.sharepoint_id,
+        sharepoint_url: result.sharepoint_url
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message || `Network error: ${error.message}`
+      };
+    }
+  }
+
+  /**
    * Format file size in human readable format
    */
   static formatFileSize(bytes?: number): string {

@@ -50,13 +50,6 @@ const navItems: NavItem[] = [
     subject: "ExternalOrg"
   },
   { 
-    href: "/dashboard/documents", 
-    label: "Documents", 
-    icon: FileText,
-    action: "read",
-    subject: "Document"
-  },
-  { 
     href: "/users", 
     label: "User Management", 
     icon: UserCog,

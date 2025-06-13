@@ -3,10 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState, useRef } from "react";
-import { usePnP } from "@/providers/PnpSharePointProvider";
 import { components } from "@/types/openapi";
 import axiosInstance from "@/services/axios-client";
 import { getApiPath } from "@/lib/apiConfig";
+import { DocumentService } from "@/services/document-service";
 
 type DocumentCreateSchema = components['schemas']['DocumentCreateSchema'];
 
@@ -26,7 +26,6 @@ interface Props {
 }
 
 export default function DocumentCreateDialog({ open, onOpenChange, onDocumentCreated, onDocumentUploading }: Props) {
-  const sp = usePnP();
   const [form, setForm] = useState<DocumentFormData>({});
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -48,7 +47,6 @@ export default function DocumentCreateDialog({ open, onOpenChange, onDocumentCre
     setLoading(true);
     setError(null);
     
-    const isAuthBypassMode = process.env.NEXT_PUBLIC_AUTH_BYPASS_MODE === 'true';
     let sharepointUrl = '';
     let fileName = '';
     
@@ -61,36 +59,9 @@ export default function DocumentCreateDialog({ open, onOpenChange, onDocumentCre
     try {
       fileName = file.name;
       
-      // 1. Upload the file to SharePoint (if not in bypass mode)
-      if (!isAuthBypassMode && sp) {
-        console.log("=== SHAREPOINT UPLOAD START ===");
-        console.log("File:", fileName);
-        console.log("File size:", file.size);
-        console.log("File type:", file.type);
-        
-        const folderUrl = "/sites/client_docs/Shared Documents";
-        console.log("Target folder:", folderUrl);
-        
-        const uploadResult = await sp.web.getFolderByServerRelativePath(folderUrl).files.addChunked(fileName, file, { Overwrite: true });
-        
-        console.log("Raw upload result:", uploadResult);
-        console.log("ServerRelativeUrl from upload:", uploadResult?.ServerRelativeUrl);
-        
-        // Store the ServerRelativeUrl as-is (don't convert to full URL yet)
-        sharepointUrl = uploadResult?.ServerRelativeUrl || '';
-        
-        console.log("=== SHAREPOINT UPLOAD COMPLETE ===");
-        console.log("Stored SharePoint URL:", sharepointUrl);
-      } else {
-        // In bypass mode, use a mock SharePoint URL
-        console.log("Auth bypass mode: Using mock SharePoint URL");
-        sharepointUrl = `/mock-sharepoint/documents/${fileName}`;
-      }
-      
-      // 2. Post document metadata + SharePoint URL to backend
+      // 1. Create document record in database first
       const payload: DocumentCreateSchema = {
         ...form,
-        sharepoint_id: sharepointUrl,
         file_name: fileName,
         // Store title and description in metadata since they're not direct fields in the schema
         metadata: {
@@ -98,17 +69,18 @@ export default function DocumentCreateDialog({ open, onOpenChange, onDocumentCre
           description: (form as DocumentFormData).description || 'Uploaded document'
         },
         // Required fields from schema
-        type_id: form.type_id || null // Default to null if not provided
+        type_id: form.type_id || null, // Default to null if not provided
+        status: 'uploading' as const
       };
       
-      console.log("Sending document data to API:", payload);
+      console.log("Creating document with data:", payload);
       
       // Create optimistic document for immediate feedback
       const tempId = `temp-${Date.now()}`;
       const tempDoc = {
         id: tempId,
         file_name: fileName,
-        sharepoint_id: sharepointUrl,
+        sharepoint_id: '',
         type_id: form.type_id || null,
         status_id: null,
         metadata: payload.metadata
@@ -119,17 +91,27 @@ export default function DocumentCreateDialog({ open, onOpenChange, onDocumentCre
       onDocumentUploading?.(tempDoc, true);
       
       try {
-        const res = await axiosInstance.post(getApiPath("v1/documents/"), payload);
-        console.log("API response:", res.data);
+        // 2. Create document record in database
+        const document = await DocumentService.createDocument(payload);
+        console.log("Document created in database:", document);
+        
+        // 3. Upload file via backend API (backend handles SharePoint integration)
+        const uploadResult = await DocumentService.uploadDocumentFile(document.id, file);
+        
+        if (!uploadResult.success) {
+          throw new Error(uploadResult.error || 'File upload failed');
+        }
+        
+        console.log("File uploaded successfully:", uploadResult);
         
         // Stop uploading state for temp document
         onDocumentUploading?.(tempDoc, false);
         
         // Replace temp document with real one (same position in list)
-        const realDoc = { ...res.data, tempId }; // Include tempId for replacement logic
+        const realDoc = { ...document, tempId }; // Include tempId for replacement logic
         onDocumentCreated?.(realDoc);
         
-        console.log("Document created successfully");
+        console.log("Document created and uploaded successfully");
         setForm({});
         setFile(null);
         if (fileInputRef.current) fileInputRef.current.value = "";

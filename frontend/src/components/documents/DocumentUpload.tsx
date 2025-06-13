@@ -6,8 +6,6 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { useSharePointService } from '@/services/sharepoint-service';
-import { useMockSharePointService } from '@/services/mock-sharepoint-service';
 import { DocumentService } from '@/services/document-service';
 
 export interface DocumentRecord {
@@ -53,9 +51,6 @@ export function DocumentUpload({
   const [error, setError] = useState<string | null>(null);
   const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   
-  const sharePointService = useSharePointService();
-  const mockSharePointService = useMockSharePointService();
-  const activeSharePointService = sharePointService || mockSharePointService;
 
   const addDocument = () => {
     if (documents.length >= maxFiles) {
@@ -81,10 +76,7 @@ export function DocumentUpload({
     // If document was uploaded, delete from SharePoint and database
     if (document.id && document.status === 'uploaded') {
       try {
-        // Delete from SharePoint if possible
-        if (activeSharePointService && document.sharepoint_id) {
-          await activeSharePointService.deleteDocument(clientId, document.file_name, referralId);
-        }
+        // Note: SharePoint deletion is handled by the backend when document is deleted
         
         // Delete from database
         if (document.id && !document.id.startsWith('temp-')) {
@@ -144,45 +136,32 @@ export function DocumentUpload({
       };
       onDocumentsChange(updatedDocs);
 
-      // Upload to SharePoint if service is available
-      if (activeSharePointService) {
-        const uploadResult = await activeSharePointService.uploadDocument(clientId, file, referralId);
+      // Upload via backend API (backend handles SharePoint integration)
+      try {
+        const uploadResult = await DocumentService.uploadDocumentFile(document.id, file);
         
         if (uploadResult.success) {
-          // Mark as uploaded in database
-          const uploadedDocument = await DocumentService.markDocumentUploaded(
-            document.id,
-            uploadResult.file?.UniqueId,
-            uploadResult.file?.ServerRelativeUrl
-          );
-
-          // Update document state
           updatedDocs[index] = {
             ...updatedDocs[index],
             status: 'uploaded',
-            sharepoint_id: uploadedDocument.sharepoint_id,
-            sharepoint_url: uploadedDocument.sharepoint_url
+            sharepoint_id: uploadResult.sharepoint_id,
+            sharepoint_url: uploadResult.sharepoint_url
           };
           onDocumentsChange(updatedDocs);
-
         } else {
-          // Mark as failed
-          await DocumentService.markDocumentFailed(document.id, uploadResult.error || 'Upload failed');
-          
           updatedDocs[index] = {
             ...updatedDocs[index],
             status: 'failed',
-            upload_error: uploadResult.error
+            upload_error: uploadResult.error || 'Upload failed'
           };
           onDocumentsChange(updatedDocs);
         }
-      } else {
-        // No SharePoint service - just mark as uploaded
-        const uploadedDocument = await DocumentService.markDocumentUploaded(document.id);
-        
+      } catch (error) {
+        console.error('Document upload error:', error);
         updatedDocs[index] = {
           ...updatedDocs[index],
-          status: 'uploaded'
+          status: 'failed',
+          upload_error: 'Upload failed: Network error'
         };
         onDocumentsChange(updatedDocs);
       }
@@ -371,7 +350,7 @@ export function DocumentUpload({
           )}
           {!referralId && (
             <span className="ml-2">
-              • Files will be stored in: /{clientId}/general/
+              • Files will be stored in: /{clientId}/general/[category]/
             </span>
           )}
         </div>

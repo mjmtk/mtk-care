@@ -44,8 +44,6 @@ export function ReferralDetailsStep({
   const [isLoadingProgram, setIsLoadingProgram] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
   
   const {
     register,
@@ -232,7 +230,6 @@ export function ReferralDetailsStep({
 
   const onFormSubmit = async (formData: any) => {
     try {
-      setIsSubmitting(true);
       setError(null);
       
       // Combine all form data including program-specific data
@@ -258,27 +255,15 @@ export function ReferralDetailsStep({
         referral_date: cleanDateValue(completeData.referral_date) || new Date().toISOString().split('T')[0],
       };
 
-      console.log('=== SUBMIT REFERRAL (ReferralDetailsStep) ===');
-      console.log('Original data completed_date:', completeData.completed_date);
-      console.log('Original data client_consent_date:', completeData.client_consent_date);
-      console.log('Cleaned data completed_date:', cleanedData.completed_date);
-      console.log('Cleaned data client_consent_date:', cleanedData.client_consent_date);
-
-      // Create the referral
-      const createdReferral = await ReferralService.createReferral(cleanedData);
+      // Update parent form data first, then trigger final submission
+      onComplete(cleanedData);
       
-      // Show success state briefly
-      setShowSuccess(true);
-      
-      // Redirect to the newly created referral detail page after a brief delay
-      setTimeout(() => {
-        router.push(`/dashboard/referrals/${createdReferral.id}?success=created`);
-      }, 1500);
+      // Call onSubmit to trigger the final referral submission and status update
+      onSubmit();
       
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create referral');
+      setError(err instanceof Error ? err.message : 'Failed to prepare referral data');
       console.error('Submit referral error:', err);
-      setIsSubmitting(false);
     }
   };
 
@@ -484,15 +469,6 @@ export function ReferralDetailsStep({
         </Alert>
       )}
 
-      {/* Success State */}
-      {showSuccess && (
-        <Alert className="bg-green-50 border-green-200">
-          <CheckCircle className="h-4 w-4 text-green-600" />
-          <AlertDescription className="text-green-800">
-            Referral created successfully! Redirecting to referral details...
-          </AlertDescription>
-        </Alert>
-      )}
 
       {/* Action Buttons */}
       <div className="flex justify-between">
@@ -500,7 +476,7 @@ export function ReferralDetailsStep({
           type="button" 
           variant="outline" 
           onClick={onPrevious}
-          disabled={isSubmitting || showSuccess}
+          disabled={isSaving}
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Client
@@ -510,27 +486,18 @@ export function ReferralDetailsStep({
             type="button" 
             variant="outline" 
             onClick={onSaveDraft}
-            disabled={isSaving || !hasUnsavedChanges || isSubmitting || showSuccess}
+            disabled={isSaving || !hasUnsavedChanges}
           >
             <Save className="h-4 w-4 mr-2" />
             {isSaving ? 'Saving...' : hasUnsavedChanges ? 'Save Draft' : 'Draft Saved'}
           </Button>
           <Button 
             type="submit" 
-            disabled={isSaving || isSubmitting || showSuccess}
-            className={showSuccess ? "bg-green-600" : "bg-green-600 hover:bg-green-700"}
+            disabled={isSaving}
+            className="bg-green-600 hover:bg-green-700"
           >
-            {showSuccess ? (
-              <>
-                <CheckCircle className="h-4 w-4 mr-2" />
-                Success!
-              </>
-            ) : (
-              <>
-                <Send className="h-4 w-4 mr-2" />
-                {isSubmitting ? 'Submitting...' : 'Submit Referral'}
-              </>
-            )}
+            <Send className="h-4 w-4 mr-2" />
+            {isSaving ? 'Submitting...' : 'Submit Referral'}
           </Button>
         </div>
       </div>

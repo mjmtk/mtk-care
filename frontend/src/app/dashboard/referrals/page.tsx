@@ -39,11 +39,11 @@ function ReferralsPageContent() {
   const accessToken = useAccessToken()
 
   // Debug: Log auth state
-  console.log('Referrals page auth state:', {
-    status,
-    hasSession: !!session,
-    hasAccessToken: !!accessToken,
-  });
+  // console.log('Referrals page auth state:', {
+  //   status,
+  //   hasSession: !!session,
+  //   hasAccessToken: !!accessToken,
+  // });
 
   // Set page title in top bar
   useEffect(() => {
@@ -51,7 +51,7 @@ function ReferralsPageContent() {
       title: 'Referrals',
       subtitle: 'Manage referrals and track their progress'
     });
-    
+
     return () => clearPageInfo();
   }, [setPageInfo, clearPageInfo]);
 
@@ -68,17 +68,17 @@ function ReferralsPageContent() {
       try {
         setIsLoading(true)
         setError(null)
-        
+
         // Reset to first page when filter changes
         const pageToLoad = 1;
         setCurrentPage(1);
-        
+
         // Build filter parameters
-        const params: ReferralListParams = { 
-          page: pageToLoad, 
-          limit: pageSize 
+        const params: ReferralListParams = {
+          page: pageToLoad,
+          limit: pageSize
         };
-        
+
         const response = await fetchReferrals(params)
         setReferrals(response.items || [])
         setTotalCount(response.total || 0)
@@ -94,16 +94,16 @@ function ReferralsPageContent() {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
-    
+
     if (status !== 'loading' && accessToken) {
       const loadReferrals = async () => {
         try {
           setIsPaginating(true)
           setError(null)
-          
+
           // Build filter parameters
           const params: ReferralListParams = { page, limit: pageSize };
-          
+
           const response = await fetchReferrals(params)
           setReferrals(response.items || [])
           setTotalCount(response.total || 0)
@@ -120,17 +120,17 @@ function ReferralsPageContent() {
   const handlePageSizeChange = (newPageSize: number) => {
     setPageSize(newPageSize)
     setCurrentPage(1) // Reset to first page when page size changes
-    
+
     // Immediately trigger API call for page size change
     if (status !== 'loading' && accessToken) {
       const loadReferrals = async () => {
         try {
           setIsPaginating(true)
           setError(null)
-          
+
           // Build filter parameters with new page size
           const params: ReferralListParams = { page: 1, limit: newPageSize };
-          
+
           const response = await fetchReferrals(params)
           setReferrals(response.items || [])
           setTotalCount(response.total || 0)
@@ -204,13 +204,6 @@ function ReferralsPageContent() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-end">
-        <Button size="sm" onClick={() => router.push('/dashboard/referrals/new')}>
-          <Plus className="mr-2 h-4 w-4" />
-          New Referral
-        </Button>
-      </div>
-      
       <div className="relative">
         {/* Pagination loading overlay */}
         {isPaginating && (
@@ -221,8 +214,8 @@ function ReferralsPageContent() {
             </div>
           </div>
         )}
-        <ReferralsDataTable 
-          data={referrals} 
+        <ReferralsDataTable
+          data={referrals}
           columns={columns}
           totalCount={totalCount}
           currentPage={currentPage}

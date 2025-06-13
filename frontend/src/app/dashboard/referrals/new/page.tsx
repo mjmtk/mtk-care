@@ -222,12 +222,69 @@ export default function NewReferralPage() {
   };
 
   const handleStepComplete = async (stepData: Partial<ReferralFormData>) => {
-    const updatedFormData = { ...formData, ...stepData };
-    setFormData(updatedFormData);
-    setHasUnsavedChanges(true);
-    setSaveStatus('saving');
-    
     try {
+      console.log('=== HANDLE STEP COMPLETE CALLED ===');
+      console.log('Current step:', currentStep);
+      console.log('Step data received:', stepData);
+      
+      const updatedFormData = { ...formData, ...stepData };
+      console.log('Updated form data status_id:', updatedFormData.status_id);
+      
+      setFormData(updatedFormData);
+      setHasUnsavedChanges(true);
+      setSaveStatus('saving');
+      
+      // Step 4 completion means final referral submission
+      if (currentStep === 4) {
+        console.log('=== STEP 4 COMPLETION START ===');
+        console.log('Step 4 completion - submitting referral with status_id:', updatedFormData.status_id);
+        
+        try {
+          // First save the current state as draft
+          console.log('=== SAVING DRAFT ===');
+          await saveDraft(updatedFormData);
+          console.log('=== DRAFT SAVED SUCCESSFULLY ===');
+          
+          // Then update the draft referral's status to the selected final status
+          console.log('=== STATUS UPDATE CHECK ===');
+          console.log('draftReferralId:', draftReferralId);
+          console.log('updatedFormData.status_id:', updatedFormData.status_id);
+          console.log('Type of status_id:', typeof updatedFormData.status_id);
+          
+          if (draftReferralId && updatedFormData.status_id) {
+            console.log('=== UPDATING REFERRAL STATUS ===');
+            console.log('Updating draft referral status...', {
+              referralId: draftReferralId,
+              newStatusId: updatedFormData.status_id
+            });
+            
+            const updatedReferral = await ReferralService.updateReferral(draftReferralId, {
+              status_id: updatedFormData.status_id
+            });
+            
+            console.log('=== REFERRAL STATUS UPDATED ===');
+            console.log('Referral status updated successfully:', updatedReferral);
+            
+            // Redirect to the updated referral
+            console.log('=== REDIRECTING TO REFERRAL DETAILS ===');
+            router.push(`/dashboard/referrals/${draftReferralId}?success=submitted`);
+          } else {
+            console.error('=== STATUS UPDATE FAILED ===');
+            console.error('Missing draftReferralId or status_id:', {
+              draftReferralId,
+              status_id: updatedFormData.status_id,
+              statusIdType: typeof updatedFormData.status_id
+            });
+            setError('Unable to submit referral: missing draft ID or status');
+          }
+        } catch (error) {
+          console.error('=== STEP 4 COMPLETION ERROR ===');
+          console.error('Error during step 4 completion:', error);
+          setError(error instanceof Error ? error.message : 'Failed to submit referral');
+        }
+        return; // Don't advance to step 5
+      }
+      
       // If we're completing step 2 and creating a new client, create the client first
       if (currentStep === 2 && updatedFormData.client_type === 'new' && 
           updatedFormData.first_name && updatedFormData.last_name) {
@@ -272,9 +329,10 @@ export default function NewReferralPage() {
         setCurrentStep(prev => prev + 1);
       }
     } catch (err) {
+      console.error('=== HANDLE STEP COMPLETE ERROR ===');
+      console.error('Error in handleStepComplete:', err);
       setSaveStatus('error');
-      setError(err instanceof Error ? err.message : 'Failed to save step data');
-      console.error('Step completion error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to complete step');
     }
   };
 
@@ -466,14 +524,20 @@ export default function NewReferralPage() {
     setIsSaving(true);
     setSaveStatus('saving');
     try {
-      // First save the current state
+      // First save the current state as draft
       await saveDraft(formData);
       
-      // Then update status to submitted (this would need a status update API call)
-      console.log('Submitting referral...', formData);
-      
-      // For now, just redirect after saving
-      router.push('/dashboard/referrals');
+      // Then update the draft referral's status to the selected final status
+      if (draftReferralId && formData.status_id) {
+        const updatedReferral = await ReferralService.updateReferral(draftReferralId, {
+          status_id: formData.status_id
+        });
+        
+        // Redirect to the updated referral
+        router.push(`/dashboard/referrals/${draftReferralId}?success=submitted`);
+      } else {
+        setError('Unable to submit referral: missing draft ID or status');
+      }
     } catch (err) {
       setSaveStatus('error');
       setError(err instanceof Error ? err.message : 'Failed to submit referral');
@@ -513,6 +577,7 @@ export default function NewReferralPage() {
       case 4:
         return (
           <ReferralDetailsStep
+            key="step4-component"
             data={formData}
             onComplete={handleStepComplete}
             onPrevious={handlePreviousStep}
@@ -529,17 +594,18 @@ export default function NewReferralPage() {
 
   return (
     <ErrorBoundary>
-      <div className="max-w-4xl mx-auto space-y-6">
-
-
-
+      <div className="h-[calc(100vh-80px)] flex flex-col">
+        <div className="max-w-4xl mx-auto w-full h-full flex flex-col">
           {error && (
-            <ErrorDisplay message={error} />
+            <div className="mb-4 flex-shrink-0">
+              <ErrorDisplay message={error} />
+            </div>
           )}
 
-        {/* Current Step Content */}
-        <div className="min-h-[400px]">
-          {renderCurrentStep()}
+          {/* Current Step Content - Smart height allocation */}
+          <div className="flex-1 flex flex-col min-h-0">
+            {renderCurrentStep()}
+          </div>
         </div>
       </div>
     </ErrorBoundary>

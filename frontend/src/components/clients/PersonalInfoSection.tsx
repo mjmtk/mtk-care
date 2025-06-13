@@ -6,14 +6,14 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  User, 
-  Phone, 
-  Mail, 
-  MapPin, 
-  Globe, 
-  Heart, 
-  Star, 
+import {
+  User,
+  Phone,
+  Mail,
+  MapPin,
+  Globe,
+  Heart,
+  Star,
   Shield,
   Users,
   AlertCircle,
@@ -64,11 +64,11 @@ export function PersonalInfoSection({ clientId, canEditClient = false }: Persona
     const birthDate = new Date(dateOfBirth);
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    
+
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
       age--;
     }
-    
+
     return age;
   };
 
@@ -140,7 +140,7 @@ export function PersonalInfoSection({ clientId, canEditClient = false }: Persona
                 )}
               </p>
             </div>
-            
+
             <div>
               <label className="text-sm font-medium text-gray-500">Date of Birth</label>
               <p className="text-lg">
@@ -154,10 +154,10 @@ export function PersonalInfoSection({ clientId, canEditClient = false }: Persona
             <div>
               <label className="text-sm font-medium text-gray-500">Risk Level</label>
               <div className="mt-1">
-                <Badge 
+                <Badge
                   variant={
-                    client.riskLevel === 'high' ? 'destructive' : 
-                    client.riskLevel === 'medium' ? 'default' : 'secondary'
+                    client.riskLevel === 'high' ? 'destructive' :
+                      client.riskLevel === 'medium' ? 'default' : 'secondary'
                   }
                 >
                   {client.riskLevel} Risk

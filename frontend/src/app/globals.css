@@ -119,4 +119,9 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Global button cursor styling */
+  button:hover {
+    cursor: pointer !important;
+  }
 }

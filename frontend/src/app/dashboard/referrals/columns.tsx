@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DataTableColumnHeader } from '@/components/ui/data-table-column-header'
 import { Referral } from '@/types/referral'
-import { CalendarIcon, UserIcon, BuildingIcon, AlertTriangleIcon, CheckCircleIcon, ClockIcon, MoreHorizontal, Eye, Edit, Trash2, AlertCircle, ShieldCheck } from 'lucide-react'
+import { CalendarIcon, UserIcon, BuildingIcon, AlertTriangleIcon, CheckCircleIcon, ClockIcon, MoreHorizontal, Eye, Edit, Trash2, AlertCircle, ShieldCheck, BookOpen } from 'lucide-react'
 import { format } from 'date-fns'
 import { Button } from '@/components/ui/button'
 import {
@@ -91,14 +91,29 @@ export const columns: ColumnDef<Referral>[] = [
         'bg-background transition-colors duration-200 group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted'
       ),
     },
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label='Select row'
-        className='translate-y-[2px]'
-      />
-    ),
+    cell: ({ row }) => {
+      const referral = row.original;
+      const priority = referral.priority?.label?.toLowerCase() || '';
+      
+      // Get lighter pastel priority color for checkbox highlight (always visible)
+      let checkboxClass = 'translate-y-[2px]';
+      if (priority.includes('high') || priority.includes('urgent')) {
+        checkboxClass += ' bg-red-100 border-red-300 data-[state=checked]:bg-red-200 data-[state=checked]:border-red-400';
+      } else if (priority.includes('medium')) {
+        checkboxClass += ' bg-yellow-100 border-yellow-300 data-[state=checked]:bg-yellow-200 data-[state=checked]:border-yellow-400';
+      } else {
+        checkboxClass += ' bg-blue-100 border-blue-300 data-[state=checked]:bg-blue-200 data-[state=checked]:border-blue-400';
+      }
+      
+      return (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label='Select row'
+          className={checkboxClass}
+        />
+      );
+    },
     enableSorting: false,
     enableHiding: false,
   },
@@ -236,18 +251,29 @@ export const columns: ColumnDef<Referral>[] = [
     accessorKey: 'priority',
     accessorFn: (row) => row.priority.label,
     header: ({ column }) => (
-      <div className='text-center'>
+      <div className='flex justify-center'>
         <DataTableColumnHeader column={column} title='Priority' />
       </div>
     ),
     cell: ({ row }) => {
       const priority = row.original.priority
-      const priorityStyle = getPriorityStyle(priority.label)
+      const lowerPriority = priority.label.toLowerCase()
+      
+      // Get text color based on priority
+      let textColorClass = 'text-gray-700'
+      if (lowerPriority.includes('high') || lowerPriority.includes('urgent')) {
+        textColorClass = 'text-red-700 font-semibold'
+      } else if (lowerPriority.includes('medium')) {
+        textColorClass = 'text-yellow-700 font-semibold'
+      } else {
+        textColorClass = 'text-blue-700 font-medium'
+      }
+      
       return (
         <div className='flex justify-center'>
-          <Badge variant={priorityStyle.variant} className={`capitalize text-xs px-3 py-1 whitespace-nowrap ${priorityStyle.className}`}>
+          <span className={`capitalize text-sm ${textColorClass}`}>
             {priority.label}
-          </Badge>
+          </span>
         </div>
       )
     },
@@ -325,9 +351,12 @@ export const columns: ColumnDef<Referral>[] = [
         };
         return sourceMap[source] || source.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
       };
+      // Use BookOpen icon for school
+      const IconComponent = referralSource === 'school' ? BookOpen : BuildingIcon;
+      
       return (
         <div className='flex items-center justify-center gap-x-2'>
-          <BuildingIcon size={14} className='text-muted-foreground flex-shrink-0' />
+          <IconComponent size={14} className='text-muted-foreground flex-shrink-0' />
           <span className='text-sm truncate max-w-36'>{formatSource(referralSource)}</span>
         </div>
       )
@@ -353,9 +382,11 @@ export const columns: ColumnDef<Referral>[] = [
       
       // If we have an external organization name, show it
       if (externalOrgName && externalOrgName.trim()) {
+        // Use BookOpen icon if this is a school
+        const IconComponent = referral.referral_source === 'school' ? BookOpen : BuildingIcon;
         return (
           <div className='flex items-center justify-center gap-x-2'>
-            <BuildingIcon size={14} className='text-muted-foreground flex-shrink-0' />
+            <IconComponent size={14} className='text-muted-foreground flex-shrink-0' />
             <span className='text-sm truncate max-w-40'>{externalOrgName}</span>
           </div>
         );
@@ -375,9 +406,12 @@ export const columns: ColumnDef<Referral>[] = [
       
       const genericName = sourceMap[referral.referral_source] || 'Unknown';
       
+      // Use BookOpen icon if this is a school
+      const IconComponent = referral.referral_source === 'school' ? BookOpen : BuildingIcon;
+      
       return (
         <div className='flex items-center justify-center gap-x-2'>
-          <BuildingIcon size={14} className='text-muted-foreground opacity-50 flex-shrink-0' />
+          <IconComponent size={14} className='text-muted-foreground opacity-50 flex-shrink-0' />
           <span className='text-sm text-muted-foreground italic truncate max-w-40'>{genericName}</span>
         </div>
       );
@@ -408,7 +442,7 @@ export const columns: ColumnDef<Referral>[] = [
   {
     accessorKey: 'referral_date',
     header: ({ column }) => (
-      <div className='text-center'>
+      <div className='flex justify-center'>
         <DataTableColumnHeader column={column} title='Referral Date' />
       </div>
     ),

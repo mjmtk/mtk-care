@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowRight, ArrowLeft, Search, Users, UserPlus, AlertCircle, CheckCircle, X, Globe, Phone, Mail, Heart, Star } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Search, Users, UserPlus, AlertCircle, CheckCircle, X, Globe, Phone, Mail, Heart, Star, Edit2, Save, XCircle, Calendar } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { NewClientService } from '@/services/new-client-service';
@@ -29,6 +29,19 @@ type ClientListSchema = components['schemas']['ClientListSchema'];
 
 // Use the EmergencyContact interface from the service
 
+// Helper function to calculate age from date of birth
+const calculateAge = (dateOfBirth: string): number | null => {
+  if (!dateOfBirth) return null;
+  const today = new Date();
+  const birth = new Date(dateOfBirth);
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+  return age;
+};
+
 export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataChange }: ClientIdentificationStepProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<ClientListSchema[]>([]);
@@ -37,6 +50,8 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
   const [showClientForm, setShowClientForm] = useState(false);
   const [searchPerformed, setSearchPerformed] = useState(false);
   const [isCreatingNew, setIsCreatingNew] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [originalClientData, setOriginalClientData] = useState<any>(null);
   
   // Dropdown data
   const [genderOptions, setGenderOptions] = useState<any[]>([]);
@@ -101,17 +116,31 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
 
   // Sync form values when data prop changes (for referral edit page)
   useEffect(() => {
+    console.log('=== Form sync useEffect triggered ===');
+    console.log('Incoming data prop:', data);
+    console.log('Selected client exists:', !!selectedClient);
+    
+    // Don't override client data when we have a selected client
+    if (selectedClient) {
+      console.log('Skipping form sync - client already selected');
+      return;
+    }
+    
     // Update form values when new data comes in (e.g. when editing existing referral)
     if (data.iwi_hapu_id !== undefined) {
+      console.log('Setting iwi_hapu_id from data:', data.iwi_hapu_id);
       setValue('iwi_hapu_id', data.iwi_hapu_id);
     }
     if (data.spiritual_needs_id !== undefined) {
+      console.log('Setting spiritual_needs_id from data:', data.spiritual_needs_id);
       setValue('spiritual_needs_id', data.spiritual_needs_id);
     }
     if (data.primary_language_id !== undefined) {
+      console.log('Setting primary_language_id from data:', data.primary_language_id);
       setValue('primary_language_id', data.primary_language_id);
     }
     if (data.gender_id !== undefined) {
+      console.log('Setting gender_id from data:', data.gender_id);
       setValue('gender_id', data.gender_id);
     }
     if (data.interpreter_needed !== undefined) {
@@ -122,7 +151,7 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
     if (data.emergency_contacts) {
       setEmergencyContacts(data.emergency_contacts);
     }
-  }, [data.iwi_hapu_id, data.spiritual_needs_id, data.primary_language_id, data.gender_id, data.interpreter_needed, data.emergency_contacts, setValue]);
+  }, [data.iwi_hapu_id, data.spiritual_needs_id, data.primary_language_id, data.gender_id, data.interpreter_needed, data.emergency_contacts, setValue, selectedClient]);
 
   // Load dropdown options
   useEffect(() => {
@@ -162,8 +191,9 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
     setIsSearching(true);
     setSearchPerformed(true);
     try {
-      const results = await NewClientService.searchClients(searchTerm);
-      setSearchResults(results || []);
+      const searchParams = { search: searchTerm.trim() };
+      const response = await NewClientService.searchClients(searchParams);
+      setSearchResults(response?.items || []);
     } catch (error) {
       console.error('Search error:', error);
       setSearchResults([]);
@@ -192,14 +222,63 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
     setValue('client_id', client.id);
     setValue('first_name', client.first_name);
     setValue('last_name', client.last_name);
+    setValue('email', client.email || '');
+    setValue('phone', client.phone || '');
+    setValue('date_of_birth', client.date_of_birth || '');
     setShowClientForm(false);
     setIsCreatingNew(false);
+    
+    // Load full client details including cultural identity
+    try {
+      console.log('=== Loading full client details ===');
+      const fullClient = await NewClientService.getClient(client.id);
+      console.log('Full client response:', fullClient);
+      console.log('Available keys:', Object.keys(fullClient || {}));
+      console.log('Cultural field IDs:', {
+        gender_id: fullClient?.gender_id,
+        iwi_hapu_id: fullClient?.iwi_hapu_id,
+        spiritual_needs_id: fullClient?.spiritual_needs_id,
+        primary_language_id: fullClient?.primary_language_id
+      });
+      
+      if (fullClient) {
+        // Update form with full client details
+        setValue('gender_id', fullClient.gender_id || undefined);
+        setValue('iwi_hapu_id', fullClient.iwi_hapu_id || undefined);
+        setValue('spiritual_needs_id', fullClient.spiritual_needs_id || undefined);
+        setValue('primary_language_id', fullClient.primary_language_id || undefined);
+        setValue('interpreter_needed', fullClient.interpreter_needed || false);
+        
+        console.log('Form values set:', {
+          gender_id: fullClient.gender_id,
+          iwi_hapu_id: fullClient.iwi_hapu_id,
+          spiritual_needs_id: fullClient.spiritual_needs_id,
+          primary_language_id: fullClient.primary_language_id
+        });
+        
+        // Update state for data change
+        onDataChange?.({
+          gender_id: fullClient.gender_id,
+          iwi_hapu_id: fullClient.iwi_hapu_id,
+          spiritual_needs_id: fullClient.spiritual_needs_id,
+          primary_language_id: fullClient.primary_language_id,
+          interpreter_needed: fullClient.interpreter_needed
+        });
+      }
+    } catch (error) {
+      console.error('Failed to load full client details:', error);
+    }
     
     // Load emergency contacts for the selected client
     try {
       const contacts = await EmergencyContactsService.getClientEmergencyContacts(client.id);
-      setEmergencyContacts(contacts);
-      onDataChange?.({ emergency_contacts: contacts });
+      // Transform contacts to ensure we have relationship_id
+      const transformedContacts = contacts.map(contact => ({
+        ...contact,
+        relationship_id: contact.relationship?.id || 0
+      }));
+      setEmergencyContacts(transformedContacts);
+      onDataChange?.({ emergency_contacts: transformedContacts });
     } catch (error) {
       console.error('Failed to load emergency contacts:', error);
       // Don't fail the selection, just log the error
@@ -212,6 +291,19 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
     setValue('client_id', '');
     setShowClientForm(true);
     setIsCreatingNew(true);
+    
+    // Parse search term to pre-populate name fields
+    if (searchTerm.trim()) {
+      const parts = searchTerm.trim().split(' ');
+      if (parts.length >= 2) {
+        // If multiple words, use first as first name and rest as last name
+        setValue('first_name', parts[0]);
+        setValue('last_name', parts.slice(1).join(' '));
+      } else if (parts.length === 1) {
+        // If single word, put it in first name
+        setValue('first_name', parts[0]);
+      }
+    }
   };
 
   const addEmergencyContact = () => {
@@ -261,58 +353,43 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
     console.log('Selected client:', selectedClient);
     
     try {
-      // If we have a client (existing or newly created), save emergency contacts and cultural identity
+      // If we have a client (existing or newly created), save all updates
       const clientId = formData.client_id || selectedClient?.id;
       console.log('Client ID to use:', clientId);
       
       if (clientId) {
         console.log('Client ID exists, proceeding to save data...');
-        // Save emergency contacts directly via emergency contacts API
-        if (emergencyContacts.length > 0) {
-          console.log('Saving emergency contacts for client:', clientId);
-          await EmergencyContactsService.replaceAllEmergencyContacts(clientId, emergencyContacts);
-        }
         
-        // Save cultural identity directly via client API
-        const culturalData = {
-          cultural_identity: formData.cultural_identity || {},
-          primary_language_id: formData.primary_language_id || null,
-          interpreter_needed: formData.interpreter_needed || false,
-          iwi_hapu_id: formData.iwi_hapu_id || null,
-          spiritual_needs_id: formData.spiritual_needs_id || null
-        };
-        
-        console.log('Cultural data to save:', culturalData);
-        console.log('Form data iwi_hapu_id:', formData.iwi_hapu_id);
-        console.log('Form data spiritual_needs_id:', formData.spiritual_needs_id);
-        
-        // Save gender separately via regular client update endpoint since it's not cultural identity
-        if (formData.gender_id) {
-          console.log('Saving gender for client:', clientId);
-          await apiRequest({
-            url: `v1/clients/${clientId}`,
-            method: 'PATCH',
-            data: { gender_id: formData.gender_id }
-          });
-        }
-        
-        // Always try to save cultural identity data
-        console.log('Saving cultural identity for client:', clientId);
-        console.log('Cultural data being sent:', culturalData);
-        try {
-          const result = await EmergencyContactsService.updateClientCulturalIdentity(clientId, culturalData);
-          console.log('Cultural identity saved successfully');
-          console.log('Updated client data returned:', result);
-          console.log('Full result object keys:', Object.keys(result));
-          console.log('Returned iwi_hapu_id:', result.iwi_hapu_id);
-          console.log('Returned spiritual_needs_id:', result.spiritual_needs_id);
-          console.log('result.iwi_hapu:', result.iwi_hapu);
-          console.log('result.spiritual_needs:', result.spiritual_needs);
-        } catch (error) {
-          console.error('Failed to save cultural identity:', error);
+        // Don't update existing client info when just continuing
+        // Updates are handled by the explicit Save Changes button
+        if (!selectedClient) {
+          // Only save emergency contacts and cultural identity for new clients
+          if (emergencyContacts.length > 0) {
+            console.log('Saving emergency contacts for new client:', clientId);
+            await EmergencyContactsService.replaceAllEmergencyContacts(clientId, emergencyContacts);
+          }
+          
+          // Save cultural identity for new client
+          const culturalData = {
+            cultural_identity: formData.cultural_identity || {},
+            primary_language_id: formData.primary_language_id || null,
+            interpreter_needed: formData.interpreter_needed || false,
+            iwi_hapu_id: formData.iwi_hapu_id || null,
+            spiritual_needs_id: formData.spiritual_needs_id || null
+          };
+          
+          console.log('Cultural data to save:', culturalData);
+          
+          console.log('Saving cultural identity for new client:', clientId);
+          try {
+            const result = await EmergencyContactsService.updateClientCulturalIdentity(clientId, culturalData);
+            console.log('Cultural identity saved successfully');
+          } catch (error) {
+            console.error('Failed to save cultural identity:', error);
+          }
         }
       } else {
-        console.log('No client ID found, skipping emergency contacts and cultural identity save');
+        console.log('No client ID found, skipping updates');
       }
       
       console.log('Client data processing complete, calling onComplete...');
@@ -353,129 +430,310 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-      <Card className="border-0 shadow-lg bg-white rounded-3xl">
-        <CardHeader className="pb-8">
-          <CardTitle className="flex items-center space-x-3 text-xl">
-            <Users className="h-6 w-6 text-blue-600" />
-            <span className="text-gray-900">Client Information & Cultural Identity</span>
-          </CardTitle>
-          <CardDescription className="text-gray-600 text-base leading-relaxed">
-            Find an existing client or create a new client record with cultural and emergency contact information
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-8 px-8 pb-8">
+    <div className="h-full flex flex-col">
+      <form onSubmit={handleSubmit(onSubmit)} className="h-full flex flex-col">
+        {/* Content Area - Max 80% height with scroll */}
+        <div className="flex-1 max-h-[80vh] overflow-y-auto">
+          <Card className="border-0 shadow-lg bg-white rounded-3xl">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center space-x-3 text-lg">
+                <Users className="h-5 w-5 text-blue-600" />
+                <span className="text-gray-900">Client Information & Cultural Identity</span>
+              </CardTitle>
+              <CardDescription className="text-gray-600 text-sm">
+                Find an existing client or create a new client record
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6 px-6 pb-6">
           
-          {/* Client Search */}
-          <div className="space-y-4">
-            <Label className="text-lg font-semibold text-gray-900">Find Client</Label>
-            <div className="flex space-x-3">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Search by name, email, or phone number..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 h-12 text-base border-2 border-gray-200 focus:border-blue-500 focus:ring-0"
-                />
+          {/* Client Search - Hide when creating new client */}
+          {!isCreatingNew && !selectedClient && (
+            <div className="space-y-4">
+              <Label className="text-lg font-semibold text-gray-900">Find Client</Label>
+              <div className="flex space-x-3">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input
+                    placeholder="Search by name, email, or phone number..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 h-12 text-base border-2 border-gray-200 focus:border-blue-500 focus:ring-0"
+                  />
+                </div>
+                <Button 
+                  type="button" 
+                  onClick={handleCreateNewClient}
+                  className="h-12 px-6 text-base bg-green-600 hover:bg-green-700 rounded-xl"
+                >
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  New Client
+                </Button>
               </div>
-              <Button 
-                type="button" 
-                onClick={handleCreateNewClient}
-                className="h-12 px-6 text-base bg-green-600 hover:bg-green-700 rounded-xl"
-              >
-                <UserPlus className="h-4 w-4 mr-2" />
-                New Client
-              </Button>
             </div>
+          )}
 
-            {/* Search Results */}
-            {isSearching && (
-              <div className="text-center py-4">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="text-gray-600 mt-2">Searching...</p>
-              </div>
-            )}
+          {/* Search Results - Only show when not creating new client and no client selected */}
+          {!isCreatingNew && !selectedClient && (
+            <>
+              {isSearching && (
+                <div className="text-center py-4">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                  <p className="text-gray-600 mt-2">Searching...</p>
+                </div>
+              )}
 
-            {searchPerformed && !isSearching && searchResults.length === 0 && searchTerm.length >= 2 && (
-              <div className="text-center py-8 text-gray-500">
-                <Users className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-                <p>No clients found matching "{searchTerm}"</p>
-                <p className="text-sm">Click "New Client" to create a new client record</p>
-              </div>
-            )}
+              {searchPerformed && !isSearching && searchResults.length === 0 && searchTerm.length >= 2 && (
+                <div className="text-center py-8 text-gray-500">
+                  <Users className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                  <p>No clients found matching "{searchTerm}"</p>
+                  <p className="text-sm">Click "New Client" to create a new client record</p>
+                </div>
+              )}
 
-            {searchResults.length > 0 && (
-              <div className="space-y-3">
-                {searchResults.map((client) => (
-                  <div
-                    key={client.id}
-                    className={`p-4 border rounded-xl cursor-pointer transition-all duration-200 ease-out hover:shadow-md ${
-                      selectedClient?.id === client.id
-                        ? 'border-blue-500 bg-blue-50 shadow-md'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                    onClick={() => handleSelectClient(client)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-semibold text-gray-900">
-                          {client.first_name} {client.last_name}
-                        </h4>
-                        <p className="text-sm text-gray-600">
-                          {client.email && `${client.email} • `}
-                          {client.phone && `${client.phone} • `}
-                          Born: {client.date_of_birth}
-                        </p>
+              {searchResults.length > 0 && (
+                <div className="space-y-3">
+                  {searchResults.map((client) => (
+                    <div
+                      key={client.id}
+                      className={`p-4 border rounded-xl cursor-pointer transition-all duration-200 ease-out hover:shadow-md ${
+                        selectedClient?.id === client.id
+                          ? 'border-blue-500 bg-blue-50 shadow-md'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                      onClick={() => handleSelectClient(client)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-semibold text-gray-900">
+                            {client.first_name} {client.last_name}
+                          </h4>
+                          <p className="text-sm text-gray-600">
+                            {client.email && `${client.email} • `}
+                            {client.phone && `${client.phone} • `}
+                            Born: {client.date_of_birth}
+                          </p>
+                        </div>
+                        {selectedClient?.id === client.id && (
+                          <CheckCircle className="h-5 w-5 text-green-600" />
+                        )}
                       </div>
-                      {selectedClient?.id === client.id && (
-                        <CheckCircle className="h-5 w-5 text-green-600" />
-                      )}
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
 
           {/* Selected Client or New Client Form */}
           {(selectedClient || showClientForm) && (
-            <Card className="bg-gray-50 border border-gray-200">
+            <Card className="bg-white border border-gray-200">
               <CardHeader className="pb-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-start justify-between">
                   <CardTitle className="text-lg">
-                    {selectedClient ? 'Selected Client' : 'New Client Details'}
+                    {selectedClient ? (
+                      <div className="flex flex-col space-y-1">
+                        <div className="flex items-center space-x-2">
+                          <CheckCircle className="h-5 w-5 text-green-600" />
+                          <span className="font-semibold text-gray-900 text-lg">{watch('first_name')} {watch('last_name')}</span>
+                        </div>
+                        <div className="flex items-center space-x-4 text-sm text-gray-600 ml-7">
+                          <div className="flex items-center space-x-1">
+                            <Calendar className="h-3 w-3" />
+                            <span>
+                              {watch('date_of_birth') ? (
+                                <>
+                                  {new Date(watch('date_of_birth')).toLocaleDateString('en-NZ', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                  {calculateAge(watch('date_of_birth')) && (
+                                    <span className="text-gray-500"> (Age {calculateAge(watch('date_of_birth'))})</span>
+                                  )}
+                                </>
+                              ) : (
+                                'DOB not set'
+                              )}
+                            </span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <Users className="h-3 w-3" />
+                            <span>{watch('gender_id') ? genderOptions.find(g => g.id === watch('gender_id'))?.label || 'Gender not set' : 'Gender not set'}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center space-x-2">
+                        <UserPlus className="h-5 w-5 text-blue-600" />
+                        <span>Creating New Client</span>
+                      </div>
+                    )}
                   </CardTitle>
-                  {selectedClient && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={handleCreateNewClient}
-                      className="text-blue-600 border-blue-600 hover:bg-blue-50"
-                    >
-                      Change Selection
-                    </Button>
-                  )}
+                  <div className="flex items-start space-x-2 mt-1">
+                    {selectedClient && (
+                      <>
+                        {!isEditMode && (
+                          <Button
+                            type="button"
+                            onClick={() => {
+                              setIsEditMode(true);
+                              // Store original data for cancel functionality
+                              setOriginalClientData({
+                                first_name: watch('first_name'),
+                                last_name: watch('last_name'),
+                                date_of_birth: watch('date_of_birth'),
+                                email: watch('email'),
+                                phone: watch('phone'),
+                                gender_id: watch('gender_id'),
+                                iwi_hapu_id: watch('iwi_hapu_id'),
+                                spiritual_needs_id: watch('spiritual_needs_id'),
+                                primary_language_id: watch('primary_language_id'),
+                                interpreter_needed: watch('interpreter_needed'),
+                                emergency_contacts: [...emergencyContacts]
+                              });
+                            }}
+                            variant="outline"
+                            size="sm"
+                            className="border-gray-300 hover:bg-gray-50"
+                          >
+                            <Edit2 className="h-4 w-4 mr-1" />
+                            Edit Details
+                          </Button>
+                        )}
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedClient(null);
+                            setIsCreatingNew(false);
+                            setShowClientForm(false);
+                            setValue('client_type', 'new');
+                            setValue('client_id', '');
+                            setIsEditMode(false);
+                          }}
+                          className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                        >
+                          <Search className="h-4 w-4 mr-1" />
+                          Search Again
+                        </Button>
+                      </>
+                    )}
+                    {!selectedClient && showClientForm && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setIsCreatingNew(false);
+                          setShowClientForm(false);
+                          setSearchTerm('');
+                          setSearchResults([]);
+                          setSearchPerformed(false);
+                          setIsEditMode(false);
+                        }}
+                        className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                      >
+                        <Search className="h-4 w-4 mr-1" />
+                        Search Existing
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-6">
+                {selectedClient && isEditMode && (
+                  <div className="flex items-center justify-between p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                    <div className="flex items-center space-x-2">
+                      <Edit2 className="h-4 w-4 text-yellow-600" />
+                      <span className="text-yellow-800">Editing client information</span>
+                    </div>
+                    <div className="flex space-x-2">
+                      <Button
+                        type="button"
+                        onClick={async () => {
+                          // Save changes
+                          try {
+                            const updateData = {
+                              first_name: watch('first_name'),
+                              last_name: watch('last_name'),
+                              date_of_birth: watch('date_of_birth'),
+                              email: watch('email') || '',
+                              phone: watch('phone') || '',
+                              gender_id: watch('gender_id') || null
+                            };
+                            
+                            await NewClientService.updateClient(selectedClient.id, updateData);
+                            
+                            // Update cultural identity
+                            const culturalData = {
+                              primary_language_id: watch('primary_language_id') || null,
+                              interpreter_needed: watch('interpreter_needed') || false,
+                              iwi_hapu_id: watch('iwi_hapu_id') || null,
+                              spiritual_needs_id: watch('spiritual_needs_id') || null
+                            };
+                            
+                            await EmergencyContactsService.updateClientCulturalIdentity(selectedClient.id, culturalData);
+                            
+                            // Update emergency contacts
+                            if (emergencyContacts.length > 0) {
+                              await EmergencyContactsService.replaceAllEmergencyContacts(selectedClient.id, emergencyContacts);
+                            }
+                            
+                            setIsEditMode(false);
+                            alert('Client details updated successfully');
+                          } catch (error) {
+                            console.error('Failed to update client:', error);
+                            alert('Failed to update client details');
+                          }
+                        }}
+                        size="sm"
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                      >
+                        <Save className="h-4 w-4 mr-1" />
+                        Save Changes
+                      </Button>
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          // Cancel and restore original data
+                          if (originalClientData) {
+                            setValue('first_name', originalClientData.first_name);
+                            setValue('last_name', originalClientData.last_name);
+                            setValue('date_of_birth', originalClientData.date_of_birth);
+                            setValue('email', originalClientData.email);
+                            setValue('phone', originalClientData.phone);
+                            setValue('gender_id', originalClientData.gender_id);
+                            setValue('iwi_hapu_id', originalClientData.iwi_hapu_id);
+                            setValue('spiritual_needs_id', originalClientData.spiritual_needs_id);
+                            setValue('primary_language_id', originalClientData.primary_language_id);
+                            setValue('interpreter_needed', originalClientData.interpreter_needed);
+                            setEmergencyContacts(originalClientData.emergency_contacts || []);
+                          }
+                          setIsEditMode(false);
+                        }}
+                        variant="outline"
+                        size="sm"
+                        className="border-gray-400 text-gray-600 hover:bg-gray-100"
+                      >
+                        <XCircle className="h-4 w-4 mr-1" />
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                )}
                 
                 <Tabs defaultValue="basic" className="w-full">
-                  <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="basic">Basic Info</TabsTrigger>
-                    <TabsTrigger value="cultural">Cultural Identity</TabsTrigger>
-                    <TabsTrigger value="emergency">Emergency Contacts</TabsTrigger>
+                  <TabsList className="grid w-full grid-cols-3 bg-white border border-gray-200">
+                    <TabsTrigger value="basic" className="data-[state=active]:bg-blue-500 data-[state=active]:text-white data-[state=inactive]:bg-gray-50 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-100">Basic Info</TabsTrigger>
+                    <TabsTrigger value="cultural" className="data-[state=active]:bg-blue-500 data-[state=active]:text-white data-[state=inactive]:bg-gray-50 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-100">Cultural Identity</TabsTrigger>
+                    <TabsTrigger value="emergency" className="data-[state=active]:bg-blue-500 data-[state=active]:text-white data-[state=inactive]:bg-gray-50 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-100">Emergency Contacts</TabsTrigger>
                   </TabsList>
                   
-                  <TabsContent value="basic" className="space-y-6 mt-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <TabsContent value="basic" className="space-y-4 mt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label className="text-base font-semibold">First Name *</Label>
                         <Input
                           {...register('first_name', { required: 'First name is required' })}
-                          disabled={!!selectedClient}
-                          className="h-12 text-base"
+                          disabled={selectedClient && !isEditMode}
+                          className={`h-10 text-sm ${selectedClient && !isEditMode ? 'bg-gray-100' : 'bg-white'}`}
                         />
                         {errors.first_name && (
                           <p className="text-sm text-red-500">{errors.first_name.message}</p>
@@ -486,8 +744,8 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                         <Label className="text-base font-semibold">Last Name *</Label>
                         <Input
                           {...register('last_name', { required: 'Last name is required' })}
-                          disabled={!!selectedClient}
-                          className="h-12 text-base"
+                          disabled={selectedClient && !isEditMode}
+                          className={`h-10 text-sm ${selectedClient && !isEditMode ? 'bg-gray-100' : 'bg-white'}`}
                         />
                         {errors.last_name && (
                           <p className="text-sm text-red-500">{errors.last_name.message}</p>
@@ -499,8 +757,8 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                         <Input
                           type="date"
                           {...register('date_of_birth', { required: 'Date of birth is required' })}
-                          disabled={!!selectedClient}
-                          className="h-12 text-base"
+                          disabled={selectedClient && !isEditMode}
+                          className={`h-10 text-sm ${selectedClient && !isEditMode ? 'bg-gray-100' : 'bg-white'}`}
                         />
                         {errors.date_of_birth && (
                           <p className="text-sm text-red-500">{errors.date_of_birth.message}</p>
@@ -512,9 +770,9 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                         <Select 
                           value={watch('gender_id')?.toString() || ''} 
                           onValueChange={(value) => setValue('gender_id', value ? parseInt(value) : undefined)}
-                          disabled={!!selectedClient}
+                          disabled={selectedClient && !isEditMode}
                         >
-                          <SelectTrigger className="h-12">
+                          <SelectTrigger className={`h-10 ${selectedClient && !isEditMode ? 'bg-gray-100' : 'bg-white'}`}>
                             <SelectValue placeholder="Select gender identity..." />
                           </SelectTrigger>
                           <SelectContent>
@@ -532,8 +790,8 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                         <Input
                           type="email"
                           {...register('email')}
-                          disabled={!!selectedClient}
-                          className="h-12 text-base"
+                          disabled={selectedClient && !isEditMode}
+                          className={`h-10 text-sm ${selectedClient && !isEditMode ? 'bg-gray-100' : 'bg-white'}`}
                           placeholder="email@example.com"
                         />
                       </div>
@@ -542,16 +800,16 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                         <Label className="text-base font-semibold">Phone</Label>
                         <Input
                           {...register('phone')}
-                          disabled={!!selectedClient}
-                          className="h-12 text-base"
+                          disabled={selectedClient && !isEditMode}
+                          className={`h-10 text-sm ${selectedClient && !isEditMode ? 'bg-gray-100' : 'bg-white'}`}
                           placeholder="+64 21 123 4567"
                         />
                       </div>
                     </div>
                   </TabsContent>
 
-                  <TabsContent value="cultural" className="space-y-6 mt-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <TabsContent value="cultural" className="space-y-4 mt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label className="text-base font-semibold flex items-center space-x-2">
                           <Heart className="h-4 w-4 text-red-500" />
@@ -560,8 +818,9 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                         <Select 
                           value={watch('iwi_hapu_id')?.toString() || ''} 
                           onValueChange={(value) => setValue('iwi_hapu_id', value ? parseInt(value) : undefined)}
+                          disabled={selectedClient && !isEditMode}
                         >
-                          <SelectTrigger className="h-12">
+                          <SelectTrigger className={`h-10 ${selectedClient && !isEditMode ? 'bg-gray-100' : 'bg-white'}`}>
                             <SelectValue placeholder="Select iwi/hapū..." />
                           </SelectTrigger>
                           <SelectContent>
@@ -582,8 +841,9 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                         <Select 
                           value={watch('spiritual_needs_id')?.toString() || ''} 
                           onValueChange={(value) => setValue('spiritual_needs_id', value ? parseInt(value) : undefined)}
+                          disabled={selectedClient && !isEditMode}
                         >
-                          <SelectTrigger className="h-12">
+                          <SelectTrigger className={`h-10 ${selectedClient && !isEditMode ? 'bg-gray-100' : 'bg-white'}`}>
                             <SelectValue placeholder="Select spiritual practices..." />
                           </SelectTrigger>
                           <SelectContent>
@@ -604,8 +864,9 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                         <Select 
                           value={watch('primary_language_id')?.toString() || ''} 
                           onValueChange={(value) => setValue('primary_language_id', value ? parseInt(value) : undefined)}
+                          disabled={selectedClient && !isEditMode}
                         >
-                          <SelectTrigger className="h-12">
+                          <SelectTrigger className={`h-10 ${selectedClient && !isEditMode ? 'bg-gray-100' : 'bg-white'}`}>
                             <SelectValue placeholder="Select primary language..." />
                           </SelectTrigger>
                           <SelectContent>
@@ -624,6 +885,7 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                             id="interpreter_needed"
                             checked={watch('interpreter_needed')}
                             onCheckedChange={(checked) => setValue('interpreter_needed', !!checked)}
+                            disabled={selectedClient && !isEditMode}
                           />
                           <Label htmlFor="interpreter_needed" className="text-base font-semibold">
                             Interpreter Required
@@ -636,10 +898,15 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                     </div>
                   </TabsContent>
 
-                  <TabsContent value="emergency" className="space-y-6 mt-6">
+                  <TabsContent value="emergency" className="space-y-4 mt-4">
                     <div className="flex items-center justify-between">
                       <h4 className="text-base font-semibold text-gray-900">Emergency Contacts</h4>
-                      <Button type="button" onClick={addEmergencyContact} variant="outline">
+                      <Button 
+                        type="button" 
+                        onClick={addEmergencyContact} 
+                        variant="outline"
+                        disabled={selectedClient && !isEditMode}
+                      >
                         <UserPlus className="h-4 w-4 mr-2" />
                         Add Contact
                       </Button>
@@ -647,7 +914,7 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
 
                     <div className="space-y-4">
                       {emergencyContacts.map((contact, index) => (
-                        <div key={index} className="p-6 bg-white rounded-xl border border-gray-200">
+                        <div key={index} className={`p-4 rounded-lg border ${selectedClient && !isEditMode ? 'bg-gray-50 border-gray-200' : 'bg-white border-gray-200'}`}>
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex items-center space-x-2">
                               <Badge variant={contact.is_primary ? "default" : "secondary"}>
@@ -660,6 +927,7 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                                   size="sm"
                                   onClick={() => setPrimaryContact(index)}
                                   className="text-xs"
+                                  disabled={selectedClient && !isEditMode}
                                 >
                                   Make Primary
                                 </Button>
@@ -671,19 +939,21 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                               size="sm"
                               onClick={() => removeEmergencyContact(index)}
                               className="text-gray-400 hover:text-red-600"
+                              disabled={selectedClient && !isEditMode}
                             >
                               <X className="h-4 w-4" />
                             </Button>
                           </div>
 
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             <div className="space-y-2">
                               <Label className="text-sm font-medium">Relationship</Label>
                               <Select 
-                                value={contact.relationship_id.toString()} 
+                                value={contact.relationship_id?.toString() || ''} 
                                 onValueChange={(value) => updateEmergencyContact(index, 'relationship_id', parseInt(value))}
+                                disabled={selectedClient && !isEditMode}
                               >
-                                <SelectTrigger>
+                                <SelectTrigger className={`h-9 ${selectedClient && !isEditMode ? 'bg-gray-100' : 'bg-white'}`}>
                                   <SelectValue placeholder="Select relationship..." />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -705,6 +975,8 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                                 value={contact.phone}
                                 onChange={(e) => updateEmergencyContact(index, 'phone', e.target.value)}
                                 placeholder="+64 21 123 4567"
+                                disabled={selectedClient && !isEditMode}
+                                className={`h-9 text-sm ${selectedClient && !isEditMode ? 'bg-gray-100' : 'bg-white'}`}
                               />
                             </div>
 
@@ -714,6 +986,8 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                                 value={contact.first_name}
                                 onChange={(e) => updateEmergencyContact(index, 'first_name', e.target.value)}
                                 placeholder="First name"
+                                disabled={selectedClient && !isEditMode}
+                                className={`h-9 text-sm ${selectedClient && !isEditMode ? 'bg-gray-100' : 'bg-white'}`}
                               />
                             </div>
 
@@ -723,6 +997,8 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                                 value={contact.last_name}
                                 onChange={(e) => updateEmergencyContact(index, 'last_name', e.target.value)}
                                 placeholder="Last name"
+                                disabled={selectedClient && !isEditMode}
+                                className={`h-9 text-sm ${selectedClient && !isEditMode ? 'bg-gray-100' : 'bg-white'}`}
                               />
                             </div>
 
@@ -736,6 +1012,8 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                                 value={contact.email || ''}
                                 onChange={(e) => updateEmergencyContact(index, 'email', e.target.value)}
                                 placeholder="email@example.com"
+                                disabled={selectedClient && !isEditMode}
+                                className={`h-9 text-sm ${selectedClient && !isEditMode ? 'bg-gray-100' : 'bg-white'}`}
                               />
                             </div>
                           </div>
@@ -756,29 +1034,33 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
             </Card>
           )}
 
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </div>
 
-      {/* Action Buttons */}
-      <div className="flex justify-between items-center pt-2">
-        <Button 
-          type="button" 
-          variant="outline" 
-          onClick={onPrevious}
-          className="flex items-center space-x-2 h-12 px-6 text-base border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 rounded-xl"
-        >
-          <ArrowLeft className="h-5 w-5" />
-          <span>Back to Source</span>
-        </Button>
-        <Button 
-          type="submit" 
-          disabled={!selectedClient && !showClientForm}
-          className="flex items-center space-x-2 h-12 px-8 text-base bg-blue-600 hover:bg-blue-700 hover:shadow-lg rounded-xl transition-all duration-200 ease-out hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <span>Continue to Consent & Documents</span>
-          <ArrowRight className="h-5 w-5" />
-        </Button>
-      </div>
-    </form>
+        {/* Action Buttons - Always visible at bottom */}
+        <div className="flex-shrink-0 pt-4 pb-4 bg-white border-t border-gray-100">
+          <div className="flex justify-between items-center">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onPrevious}
+              className="flex items-center space-x-2 h-11 px-5 text-sm border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 rounded-lg"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span>Referral Source</span>
+            </Button>
+            <Button 
+              type="submit" 
+              disabled={!selectedClient && !showClientForm}
+              className="flex items-center space-x-2 h-11 px-6 text-sm bg-blue-600 hover:bg-blue-700 hover:shadow-lg rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span>{selectedClient ? 'Update & Continue' : 'Create & Continue'}</span>
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </form>
+    </div>
   );
 }

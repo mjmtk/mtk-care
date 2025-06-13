@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { DataTableFacetedFilter } from './data-table-faceted-filter'
 import { DataTableViewOptions } from './data-table-view-options'
-import { AlertTriangleIcon, CheckCircleIcon, ClockIcon, BuildingIcon } from 'lucide-react'
+import { AlertTriangleIcon, CheckCircleIcon, ClockIcon, BuildingIcon, BookOpen, Plus } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 interface ReferralsDataTableToolbarProps<TData> {
   table: Table<TData>
@@ -32,7 +33,7 @@ const referralSourceOptions = [
   { label: 'External Agency', value: 'external_agency', icon: BuildingIcon },
   { label: 'Self Referral', value: 'self_referral', icon: BuildingIcon },
   { label: 'Family Referral', value: 'family_referral', icon: BuildingIcon },
-  { label: 'School', value: 'school', icon: BuildingIcon },
+  { label: 'School', value: 'school', icon: BookOpen },
   { label: 'Healthcare Provider', value: 'healthcare', icon: BuildingIcon },
   { label: 'Police', value: 'police', icon: BuildingIcon },
   { label: 'Court', value: 'court', icon: BuildingIcon },
@@ -42,11 +43,19 @@ const referralSourceOptions = [
 export function ReferralsDataTableToolbar<TData>({
   table,
 }: ReferralsDataTableToolbarProps<TData>) {
+  const router = useRouter()
   const isFiltered = table.getState().columnFilters.length > 0
 
   return (
     <div className='flex items-center justify-between'>
-      <div className='flex flex-1 flex-col-reverse items-start gap-y-2 sm:flex-row sm:items-center sm:space-x-2'>
+      <div className='flex flex-1 flex-col-reverse items-start gap-y-2 sm:flex-row sm:items-center sm:space-x-4'>
+        <Button 
+          onClick={() => router.push('/dashboard/referrals/new')}
+          className='bg-blue-500 hover:bg-blue-600 text-white text-base px-4 py-2 h-10'
+        >
+          <Plus className="mr-2 h-4 w-4" />
+          New Referral
+        </Button>
         <Input
           placeholder='Filter by client name...'
           value={
@@ -55,9 +64,9 @@ export function ReferralsDataTableToolbar<TData>({
           onChange={(event) =>
             table.getColumn('client')?.setFilterValue(event.target.value)
           }
-          className='h-10 w-[180px] lg:w-[300px] text-base'
+          className='h-10 w-[180px] lg:w-[300px] text-lg font-bold placeholder:font-bold'
         />
-        <div className='flex gap-x-2'>
+        <div className='flex gap-x-2 text-sm'>
           {table.getColumn('status') && (
             <DataTableFacetedFilter
               column={table.getColumn('status')}

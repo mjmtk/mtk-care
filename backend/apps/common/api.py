@@ -3,9 +3,14 @@ from ninja.responses import Response
 from .models import Document, DocumentAuditLog
 from .schemas import DocumentSchema, DocumentCreateSchema, DocumentUpdateSchema
 from .services import SharePointURLService, DocumentAccessService
+from .sharepoint_service import SharePointGraphService
 from typing import List, Optional
 from django.shortcuts import get_object_or_404
 from apps.authentication.decorators import auth_required
+from django.utils import timezone
+import logging
+
+logger = logging.getLogger(__name__)
 
 documents_router = Router()
 
@@ -139,6 +144,132 @@ def get_document_access_url(request, doc_id: str, action: str = "view"):
         "size": document.file_size,
         "mime_type": document.mime_type
     }
+
+
+@documents_router.post("/{doc_id}/upload", response=dict)
+@auth_required
+def upload_document_file(request, doc_id: str):
+    """Upload file for a document and store in SharePoint via backend."""
+    from django.core.files.storage import default_storage
+    import tempfile
+    import os
+    
+    document = get_object_or_404(Document, id=doc_id)
+    user = getattr(request, 'auth', None) or getattr(request, 'user', None)
+    
+    # Check permissions
+    if not DocumentAccessService.can_user_access_document(user, document):
+        return Response({"error": "Access denied"}, status=403)
+    
+    # Get uploaded file
+    if 'file' not in request.FILES:
+        return Response({"error": "No file provided"}, status=400)
+    
+    uploaded_file = request.FILES['file']
+    
+    try:
+        # Update document status to uploading
+        document.status = 'uploading'
+        document.file_size = uploaded_file.size
+        document.mime_type = uploaded_file.content_type or 'application/octet-stream'
+        document.save()
+        
+        # Initialize SharePoint service
+        sharepoint_service = SharePointGraphService()
+        
+        # Determine file path in SharePoint based on document type and context
+        if document.referral_id:
+            # Referral-specific documents: client_id/referrals/referral_id/
+            file_path = f"{document.client_id}/referrals/{document.referral_id}/{document.file_name}"
+        else:
+            # Client-level documents: client_id/general/category/
+            folder_category = document.folder_category or 'general-other'
+            # Map client-level categories to general subfolders
+            if folder_category in ['identification', 'medical-records', 'legal', 'insurance']:
+                file_path = f"{document.client_id}/general/{folder_category}/{document.file_name}"
+            else:
+                file_path = f"{document.client_id}/general/other/{document.file_name}"
+        
+        logger.info(f"Uploading document {document.id} to SharePoint path: {file_path}")
+        
+        # Upload to SharePoint
+        sharepoint_result = sharepoint_service.upload_file(
+            file_path_in_sharepoint=file_path,
+            file_content=uploaded_file,
+            mime_type=document.mime_type
+        )
+        
+        # Update document with SharePoint metadata
+        logger.info(f"SharePoint upload result: {sharepoint_result}")
+        document.sharepoint_id = sharepoint_result['id']
+        document.sharepoint_unique_id = sharepoint_result['id']
+        document.sharepoint_server_relative_url = sharepoint_result['serverRelativeUrl']
+        document.sharepoint_web_url = sharepoint_result['webUrl']
+        document.sharepoint_download_url = sharepoint_result.get('downloadUrl')
+        document.sharepoint_etag = sharepoint_result.get('eTag')
+        document.status = 'uploaded'
+        document.uploaded_at = timezone.now()
+        document.save(user=user)
+        
+        logger.info(f"Document {document.id} saved with SharePoint URLs:")
+        logger.info(f"  - web_url: {document.sharepoint_web_url}")
+        logger.info(f"  - download_url: {document.sharepoint_download_url}")
+        logger.info(f"  - server_relative_url: {document.sharepoint_server_relative_url}")
+        
+        # Log successful upload
+        DocumentAccessService.log_document_access(
+            document=document,
+            user=user,
+            action=DocumentAuditLog.ActionType.UPLOADED,
+            request=request,
+            success=True,
+            metadata={
+                'sharepoint_id': sharepoint_result['id'],
+                'file_path': file_path
+            }
+        )
+        
+        logger.info(f"Successfully uploaded document {document.id} to SharePoint")
+        
+        return {
+            "success": True,
+            "sharepoint_id": document.sharepoint_id,
+            "sharepoint_url": document.sharepoint_web_url,
+            "message": "File uploaded successfully to SharePoint"
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to upload document {document.id}: {str(e)}")
+        
+        # Update document status to failed
+        document.status = 'failed'
+        document.upload_error = str(e)
+        document.save()
+        
+        # Log failed upload
+        DocumentAccessService.log_document_access(
+            document=document,
+            user=user,
+            action=DocumentAuditLog.ActionType.UPLOADED,
+            request=request,
+            success=False,
+            error_message=str(e)
+        )
+        
+        # Check if it's a permissions error and provide helpful message
+        error_message = str(e)
+        if "403" in error_message or "Forbidden" in error_message:
+            error_message = (
+                "SharePoint upload failed due to insufficient permissions. "
+                "Please ensure the Azure AD application has Sites.ReadWrite.All and Files.ReadWrite.All permissions. "
+                "See docs/04-development/backend/azure-ad-sharepoint-permissions.md for setup instructions."
+            )
+        elif "401" in error_message or "Unauthorized" in error_message:
+            error_message = (
+                "SharePoint authentication failed. Please check Azure AD client credentials in environment variables."
+            )
+        
+        return Response({"error": f"Upload failed: {error_message}"}, status=500)
 
 @documents_router.get("/client/{client_id}/folders", response=dict)
 @auth_required

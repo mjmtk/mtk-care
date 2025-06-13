@@ -7,6 +7,9 @@ from api.ninja import api
 from ninja.security import HttpBearer # HttpBearer might be used by JWTAuth or other parts, keep for now
 from django.contrib.auth.models import User # Keep if used by JWTAuth or other parts
 from apps.authentication.jwt_auth import JWTAuth
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Authentication instance (used by @api.get decorators below for auth=auth)
 auth = JWTAuth()
@@ -72,6 +75,20 @@ def get_user_profile(request):
     
     # Get all roles from Azure AD groups
     azure_groups = getattr(user, 'azure_ad_groups', []) or []
+    
+    # Debug: Log what we're getting
+    logger.info(f"Profile endpoint - User: {user.email}")
+    logger.info(f"Profile endpoint - azure_groups from user object: {azure_groups}")
+    
+    # Fallback: Try to get groups from user profile if not on user object
+    if not azure_groups:
+        try:
+            profile = user.userprofile if hasattr(user, 'userprofile') else user.profile
+            azure_groups = profile.azure_ad_groups or []
+            logger.info(f"Profile endpoint - azure_groups from profile: {azure_groups}")
+        except:
+            logger.warning(f"Profile endpoint - Could not get azure_groups from profile")
+            azure_groups = []
     
     # Get all role mappings for user's Azure AD groups
     from apps.users.models import GroupRoleMapping

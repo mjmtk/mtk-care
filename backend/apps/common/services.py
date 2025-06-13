@@ -40,7 +40,14 @@ class SharePointURLService:
         Get direct download URL for a document using SharePoint's download endpoint.
         This bypasses the SharePoint UI and downloads the file directly.
         """
-        if document.sharepoint_unique_id:
+        # First try the direct download URL from SharePoint
+        if document.sharepoint_download_url:
+            return document.sharepoint_download_url
+        # Fallback to web URL with download parameter
+        elif document.sharepoint_web_url:
+            return f"{document.sharepoint_web_url}?web=1&download=1"
+        # Legacy fallback using constructed URLs
+        elif document.sharepoint_unique_id:
             return f"{self.base_url}/_layouts/15/download.aspx?UniqueId={document.sharepoint_unique_id}"
         elif document.sharepoint_server_relative_url:
             encoded_url = urllib.parse.quote(document.sharepoint_server_relative_url)
@@ -51,7 +58,11 @@ class SharePointURLService:
         """
         Get URL for previewing document in SharePoint's web viewer.
         """
-        if document.sharepoint_unique_id:
+        # Use the web URL directly from SharePoint - this should work for viewing
+        if document.sharepoint_web_url:
+            return document.sharepoint_web_url
+        # Legacy fallback
+        elif document.sharepoint_unique_id:
             return f"{self.base_url}/_layouts/15/WopiFrame.aspx?sourcedoc={document.sharepoint_unique_id}&action=view"
         return None
     
@@ -66,20 +77,37 @@ class SharePointURLService:
     def generate_folder_structure_paths(self, client_id: str) -> list[str]:
         """
         Generate all folder paths that should be pre-created for a client.
+        Uses the new logical folder structure.
         """
         base_path = f"{client_id}"
         
         paths = [
+            # Base client folder
             base_path,
+            
+            # Client-level document structure
+            f"{base_path}/general",
+            f"{base_path}/general/identification",
+            f"{base_path}/general/medical-records", 
+            f"{base_path}/general/legal",
+            f"{base_path}/general/insurance",
+            f"{base_path}/general/other",
+            
+            # Referrals base folder (specific referral folders created dynamically)
             f"{base_path}/referrals",
-            f"{base_path}/other-documents",
-            f"{base_path}/other-documents/identification",
-            f"{base_path}/other-documents/medical-records",
-            f"{base_path}/other-documents/court-orders",
-            f"{base_path}/other-documents/school-reports",
-            f"{base_path}/other-documents/insurance",
-            f"{base_path}/other-documents/general",
-            f"{base_path}/other-documents/other",
+        ]
+        
+        return paths
+    
+    def generate_referral_folder_structure_paths(self, client_id: str, referral_id: str) -> list[str]:
+        """
+        Generate folder paths for a specific referral.
+        Called when a referral is created.
+        """
+        base_path = f"{client_id}/referrals/{referral_id}"
+        
+        paths = [
+            base_path,  # Just the referral folder - no subfolders needed
         ]
         
         return paths

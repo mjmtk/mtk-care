@@ -3,6 +3,7 @@ from ninja import Router
 from typing import List
 from .services import UserService, RoleService
 from .schemas import UserOut, UserCreate, UserUpdate, RoleOut, RoleCreate, RoleUpdate, UserProfileOut
+from apps.authentication.decorators import auth_required
 
 # Initialize routers
 users_router = Router(tags=["users"])
@@ -10,7 +11,8 @@ roles_router = Router(tags=["roles"])
 
 # --- User Endpoints ---
 
-@users_router.get("/me", response=UserOut)
+@users_router.get("/me", response={200: UserOut, 401: dict, 404: dict})
+@auth_required
 def get_current_user(request):
     print("HIT /me endpoint (CASCADE DEBUG)")
     # In auth bypass mode, user comes from request.user

@@ -224,6 +224,12 @@ AZURE_AD = {
      'CLIENT_ID': env('AZURE_AD_CLIENT_ID', default=''),
      'CLIENT_SECRET': env('AZURE_AD_CLIENT_SECRET', default=''),
 }
+
+# SharePoint Configuration
+SHAREPOINT_SITE_URL = env('SHAREPOINT_SITE_URL', default='https://manaakitech.sharepoint.com/sites/client_docs')
+SHAREPOINT_CLIENT_ID = env('SHAREPOINT_CLIENT_ID', default='')
+SHAREPOINT_CLIENT_SECRET = env('SHAREPOINT_CLIENT_SECRET', default='')
+SHAREPOINT_TENANT_ID = env('SHAREPOINT_TENANT_ID', default='')
 # JWT Configuration
 JWT_AUTH = {
      'ALGORITHM': 'RS256',

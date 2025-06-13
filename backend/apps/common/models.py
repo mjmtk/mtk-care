@@ -274,21 +274,21 @@ class Document(UUIDPKBaseModel):
         verbose_name=_("SharePoint ETag")
     )
     sharepoint_server_relative_url = models.CharField(
-        max_length=500,
+        max_length=1000,
         null=True,
         blank=True,
         help_text=_('Server-relative URL for API access'),
         verbose_name=_("SharePoint Server Relative URL")
     )
     sharepoint_web_url = models.URLField(
-        max_length=500,
+        max_length=1000,
         null=True,
         blank=True,
         verbose_name=_("SharePoint Web URL"),
         help_text=_("URL to view file in SharePoint web interface")
     )
     sharepoint_download_url = models.URLField(
-        max_length=500,
+        max_length=1000,
         null=True,
         blank=True,
         verbose_name=_("SharePoint Download URL"),
@@ -309,27 +309,21 @@ class Document(UUIDPKBaseModel):
         help_text=_("UUID of the referral this document belongs to (if referral-specific)")
     )
     class DocumentCategory(models.TextChoices):
-        # Referral-specific documents (stored in referrals/{referral_id}/)
-        CONSENT_FORM = 'consent_form', _('Consent Form')
-        ASSESSMENT = 'assessment', _('Assessment Report')
-        CARE_PLAN = 'care_plan', _('Care Plan')
-        REFERRAL_LETTER = 'referral_letter', _('Referral Letter')
+        # Client-level documents (stored in general/{subcategory}/)
+        IDENTIFICATION = 'identification', _('Identification')           # general/identification/
+        MEDICAL_RECORDS = 'medical-records', _('Medical Records')       # general/medical-records/
+        LEGAL = 'legal', _('Legal Documents')                           # general/legal/
+        INSURANCE = 'insurance', _('Insurance')                         # general/insurance/
+        GENERAL_OTHER = 'general-other', _('General Other')             # general/other/
         
-        # Client general documents (stored in other-documents/{category}/)
-        ID_DOCUMENT = 'id_document', _('Identification Document')
-        MEDICAL_RECORD = 'medical_record', _('Medical Record')
-        COURT_ORDER = 'court_order', _('Court Order')
-        SCHOOL_REPORT = 'school_report', _('School Report')
-        INSURANCE_DOCUMENT = 'insurance_document', _('Insurance Document')
-        
-        # General categories
-        GENERAL = 'general', _('General Document')
-        OTHER = 'other', _('Other Document')
+        # Referral-specific documents (stored in referrals/{referral_id}/ - no subfolders)
+        # Use Django metadata for organization: type, folder_category, etc.
+        REFERRAL = 'referral', _('Referral Document')                   # All referral documents
     
     folder_category = models.CharField(
         max_length=50,
         choices=DocumentCategory.choices,
-        default=DocumentCategory.GENERAL,
+        default=DocumentCategory.GENERAL_OTHER,
         verbose_name=_("Document Category"),
         help_text=_("Category determines SharePoint folder organization")
     )

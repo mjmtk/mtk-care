@@ -500,7 +500,7 @@ function SearchAndFilters({
                     <SelectValue placeholder="All Types" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Types</SelectItem>
+                    <SelectItem value="all">All Types</SelectItem>
                     {organisationTypes.map((type) => (
                       <SelectItem key={type.id} value={type.slug}>
                         {type.label}

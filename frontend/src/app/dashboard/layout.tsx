@@ -6,6 +6,7 @@ import { UserNav } from "@/components/user-nav";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { SessionManager } from "@/components/auth/SessionManager";
 import { RoleSwitcher } from "@/components/auth/RoleSwitcher";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { PageProvider, usePageContext } from "@/contexts/PageContext";
 import { EnhancedHeader } from "@/components/ui/enhanced-header";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -67,6 +68,7 @@ function DashboardLayoutInner({ children }: DashboardLayoutProps) {
           }
           rightContent={
             <>
+              <ThemeToggle />
               <RoleSwitcher />
               <UserNav />
             </>

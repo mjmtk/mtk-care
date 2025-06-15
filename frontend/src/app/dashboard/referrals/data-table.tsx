@@ -121,7 +121,7 @@ export function ReferralsDataTable({
       <div className='rounded-md border overflow-hidden'>
         <div className='overflow-x-auto'>
           <Table className="w-full min-w-[1200px]">
-            <TableHeader className="bg-gray-50 border-b-2 border-gray-200">
+            <TableHeader className="bg-muted/50 border-b-2 border-border">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className='group/row'>
                 {headerGroup.headers.map((header) => {
@@ -129,7 +129,7 @@ export function ReferralsDataTable({
                     <TableHead
                       key={header.id}
                       colSpan={header.colSpan}
-                      className={`${header.column.columnDef.meta?.className ?? ''} font-semibold text-gray-700 px-4 py-3`}
+                      className={`${header.column.columnDef.meta?.className ?? ''} font-semibold text-foreground px-4 py-3`}
                     >
                       {header.isPlaceholder
                         ? null
@@ -149,7 +149,7 @@ export function ReferralsDataTable({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
-                  className={`group/row ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50`}
+                  className={`group/row ${index % 2 === 0 ? 'bg-background' : 'bg-muted/30'} hover:bg-muted/50`}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell

@@ -38,7 +38,7 @@ export function EnhancedHeader({
   const hasPageInfo = pageTitle || steps?.length;
   
   return (
-    <header className="flex items-center justify-between h-16 px-4 border-b md:justify-between bg-white">
+    <header className="flex items-center justify-between h-16 px-4 border-b md:justify-between bg-background">
       {/* Left side - Page info and steps */}
       <div className="flex items-center space-x-4 flex-1 min-w-0">
         {/* Mobile hamburger */}

@@ -42,13 +42,13 @@ const getPriorityStyle = (priority: string) => {
   if (lowerPriority.includes('high') || lowerPriority.includes('urgent')) {
     return {
       variant: 'outline' as const,
-      className: 'bg-red-100 text-red-700 border-red-200 hover:bg-red-150'
+      className: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-700 hover:bg-red-150 dark:hover:bg-red-900/50'
     }
   }
   if (lowerPriority.includes('medium')) {
     return {
       variant: 'outline' as const, 
-      className: 'bg-yellow-100 text-yellow-700 border-yellow-200 hover:bg-yellow-150'
+      className: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 border-yellow-200 dark:border-yellow-700 hover:bg-yellow-150 dark:hover:bg-yellow-900/50'
     }
   }
   return {
@@ -98,11 +98,11 @@ export const columns: ColumnDef<Referral>[] = [
       // Get lighter pastel priority color for checkbox highlight (always visible)
       let checkboxClass = 'translate-y-[2px]';
       if (priority.includes('high') || priority.includes('urgent')) {
-        checkboxClass += ' bg-red-100 border-red-300 data-[state=checked]:bg-red-200 data-[state=checked]:border-red-400';
+        checkboxClass += ' bg-red-100 dark:bg-red-900/30 border-red-300 dark:border-red-700 data-[state=checked]:bg-red-200 dark:data-[state=checked]:bg-red-800/50 data-[state=checked]:border-red-400 dark:data-[state=checked]:border-red-600';
       } else if (priority.includes('medium')) {
-        checkboxClass += ' bg-yellow-100 border-yellow-300 data-[state=checked]:bg-yellow-200 data-[state=checked]:border-yellow-400';
+        checkboxClass += ' bg-yellow-100 dark:bg-yellow-900/30 border-yellow-300 dark:border-yellow-700 data-[state=checked]:bg-yellow-200 dark:data-[state=checked]:bg-yellow-800/50 data-[state=checked]:border-yellow-400 dark:data-[state=checked]:border-yellow-600';
       } else {
-        checkboxClass += ' bg-blue-100 border-blue-300 data-[state=checked]:bg-blue-200 data-[state=checked]:border-blue-400';
+        checkboxClass += ' bg-blue-100 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700 data-[state=checked]:bg-blue-200 dark:data-[state=checked]:bg-blue-800/50 data-[state=checked]:border-blue-400 dark:data-[state=checked]:border-blue-600';
       }
       
       return (
@@ -260,13 +260,13 @@ export const columns: ColumnDef<Referral>[] = [
       const lowerPriority = priority.label.toLowerCase()
       
       // Get text color based on priority
-      let textColorClass = 'text-gray-700'
+      let textColorClass = 'text-foreground'
       if (lowerPriority.includes('high') || lowerPriority.includes('urgent')) {
-        textColorClass = 'text-red-700 font-semibold'
+        textColorClass = 'text-red-600 dark:text-red-400 font-semibold'
       } else if (lowerPriority.includes('medium')) {
-        textColorClass = 'text-yellow-700 font-semibold'
+        textColorClass = 'text-yellow-600 dark:text-yellow-400 font-semibold'
       } else {
-        textColorClass = 'text-blue-700 font-medium'
+        textColorClass = 'text-blue-600 dark:text-blue-400 font-medium'
       }
       
       return (
@@ -469,7 +469,7 @@ export const columns: ColumnDef<Referral>[] = [
       const serviceType = row.original.service_type
       return (
         <div className='max-w-32 truncate text-sm'>
-          {serviceType?.label || <span className="text-gray-400 italic">Not set</span>}
+          {serviceType?.label || <span className="text-muted-foreground italic">Not set</span>}
         </div>
       )
     },

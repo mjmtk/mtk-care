@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case Management Status Definitions</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            color: #1976d2;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        
+        h3 {
+            color: #333;
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+        
+        .table-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        th {
+            background-color: #1976d2;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+            border: 1px solid #1976d2;
+        }
+        
+        td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            vertical-align: top;
+        }
+        
+        /* Status color coding matching SVG */
+        .status-pending {
+            background-color: #fff3e0;
+            border-left: 4px solid #f57c00;
+            font-weight: bold;
+        }
+        
+        .status-active {
+            background-color: #e8f5e9;
+            border-left: 4px solid #388e3c;
+            font-weight: bold;
+        }
+        
+        .status-terminal {
+            background-color: #ffebee;
+            border-left: 4px solid #d32f2f;
+            font-weight: bold;
+        }
+        
+        .status-special {
+            background-color: #f3e5f5;
+            border-left: 4px solid #7b1fa2;
+            font-weight: bold;
+        }
+        
+        .time-limit {
+            background-color: #fff9c4;
+            font-size: 0.9em;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        
+        .sub-status {
+            margin-left: 20px;
+            font-size: 0.95em;
+            color: #555;
+        }
+        
+        .sub-status li {
+            margin-bottom: 5px;
+        }
+        
+        .note {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #1976d2;
+        }
+        
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            border: 1px solid #999;
+        }
+    </style>
+</head>
+<body>
+    <h1>Case Management Status Definitions</h1>
+    
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #fff3e0; border-color: #f57c00;"></div>
+            <span>Pending/Waiting states</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #e8f5e9; border-color: #388e3c;"></div>
+            <span>Active/In-progress states</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #ffebee; border-color: #d32f2f;"></div>
+            <span>Terminal/End states</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #f3e5f5; border-color: #7b1fa2;"></div>
+            <span>Special/Admin states</span>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <h2>3.2 Status Definitions and Business Rules</h2>
+        
+        <h3>Referral/Intake Statuses</h3>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 18%;">Status</th>
+                    <th style="width: 22%;">Definition</th>
+                    <th style="width: 18%;">Entry Criteria</th>
+                    <th style="width: 18%;">Exit Criteria</th>
+                    <th style="width: 16%;">Allowed Transitions</th>
+                    <th style="width: 8%;">Time Limits</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="status-pending">Draft/Incomplete</td>
+                    <td>Referral started but not submitted</td>
+                    <td>User begins referral entry</td>
+                    <td>User completes and submits referral</td>
+                    <td>→ Pending - Awaiting Consent/Initial Assessment</td>
+                    <td><span class="time-limit">Max: 30 days*</span></td>
+                </tr>
+                <tr>
+                    <td class="status-pending">Pending - Awaiting Consent/Initial Assessment</td>
+                    <td>Referral received, awaiting consent and/or assessment</td>
+                    <td>Referral submitted</td>
+                    <td>Consent received AND initial assessment completed</td>
+                    <td>→ Accepted<br>→ Declined<br>→ No Further Action Required<br>→ Closed</td>
+                    <td><span class="time-limit">Max: 14 days*</span></td>
+                </tr>
+                <tr>
+                    <td class="status-active">Accepted</td>
+                    <td>Client meets criteria for service</td>
+                    <td>Initial assessment completed with positive outcome</td>
+                    <td>Service allocation begins</td>
+                    <td>→ Active/Enrolled</td>
+                    <td><span class="time-limit">Max: 7 days*</span></td>
+                </tr>
+                <tr>
+                    <td class="status-terminal">Declined</td>
+                    <td>NPO decided against providing service</td>
+                    <td>Initial assessment completed or other decline reason</td>
+                    <td>N/A</td>
+                    <td>→ Reopened (supervisor approval)</td>
+                    <td>N/A</td>
+                </tr>
+                <tr>
+                    <td class="status-terminal">No Further Action Required</td>
+                    <td>Assessment determines no service needed</td>
+                    <td>Initial assessment completed</td>
+                    <td>N/A</td>
+                    <td>→ Reopened (new referral)</td>
+                    <td>N/A</td>
+                </tr>
+                <tr>
+                    <td class="status-active">Active/Enrolled</td>
+                    <td>Client actively receiving services</td>
+                    <td>Client accepted and allocated to program</td>
+                    <td>Service episode ends</td>
+                    <td>→ Active - Implementing Plan<br>→ Active - In Review<br>→ Service Episode Complete<br>→ Closed</td>
+                    <td>Program-specific</td>
+                </tr>
+                <tr>
+                    <td class="status-terminal">Closed</td>
+                    <td>Case closed before service completion</td>
+                    <td>Various (see sub-statuses)</td>
+                    <td>N/A</td>
+                    <td>→ Reopened (if applicable)</td>
+                    <td>N/A</td>
+                </tr>
+                <tr>
+                    <td class="status-special">Reopened</td>
+                    <td>Previously closed case reactivated</td>
+                    <td>Supervisor approval + valid reason</td>
+                    <td>Case re-enters workflow</td>
+                    <td>→ Pending - Awaiting Consent/Initial Assessment<br>→ Active/Enrolled</td>
+                    <td><span class="time-limit">Max: 7 days</span></td>
+                </tr>
+                <tr>
+                    <td class="status-special">Archived</td>
+                    <td>Administrative removal</td>
+                    <td>Created in error + supervisor approval</td>
+                    <td>N/A</td>
+                    <td>Terminal status (no transitions)</td>
+                    <td>N/A</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h3>Service Delivery Statuses</h3>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 18%;">Status</th>
+                    <th style="width: 22%;">Definition</th>
+                    <th style="width: 18%;">Entry Criteria</th>
+                    <th style="width: 18%;">Exit Criteria</th>
+                    <th style="width: 16%;">Allowed Transitions</th>
+                    <th style="width: 8%;">Time Limits</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="status-active">Active - Implementing Plan</td>
+                    <td>Actively delivering services per care plan</td>
+                    <td>Care plan created and approved</td>
+                    <td>Review scheduled or service complete</td>
+                    <td>→ Active - In Review<br>→ Service Episode Complete<br>→ Closed</td>
+                    <td><span class="time-limit">Max: 90 days*</span></td>
+                </tr>
+                <tr>
+                    <td class="status-active">Active - In Review</td>
+                    <td>Formal review of progress and care plan</td>
+                    <td>Review triggered by schedule or event</td>
+                    <td>Review completed with decision</td>
+                    <td>→ Active - Implementing Plan<br>→ Service Episode Complete<br>→ Closed</td>
+                    <td><span class="time-limit">Max: 7 days</span></td>
+                </tr>
+                <tr>
+                    <td class="status-terminal">Service Episode Complete</td>
+                    <td>Service delivered and episode ended</td>
+                    <td>Service goals met or exit criteria reached</td>
+                    <td>N/A</td>
+                    <td>→ Reopened (new episode)</td>
+                    <td>N/A</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="note">
+            <strong>*Time Limit Notes:</strong>
+            <ul style="margin: 10px 0;">
+                <li>Time limits trigger automatic notifications and escalations</li>
+                <li>At 80% of max time: Warning notification to case worker</li>
+                <li>At 100% of max time: Escalation to supervisor</li>
+                <li>Supervisor approval required to exceed time limits</li>
+            </ul>
+        </div>
+        
+        <h3>Sub-statuses</h3>
+        
+        <h4>Pending - Awaiting Consent/Initial Assessment:</h4>
+        <ul class="sub-status">
+            <li>Consent forms sent</li>
+            <li>Consent received, assessment pending</li>
+            <li>Awaiting guardian/POA response (if applicable)</li>
+            <li>Documentation incomplete</li>
+        </ul>
+        
+        <h4>Declined:</h4>
+        <ul class="sub-status">
+            <li>Did not meet criteria (specify: age, location, service type)</li>
+            <li>Referred to another organisation (capture organisation name)</li>
+            <li>Capacity/resources unavailable</li>
+            <li>Client declined services after assessment</li>
+            <li>Other (requires description)</li>
+        </ul>
+        
+        <h4>Closed:</h4>
+        <ul class="sub-status">
+            <li>Declined consent (before service start)</li>
+            <li>Onward referral to external organization</li>
+            <li>Administrative closure (duplicate referral)</li>
+            <li>Client unreachable after multiple attempts</li>
+        </ul>
+        
+        <h4>Service Episode Complete:</h4>
+        <ul class="sub-status">
+            <li>By mutual consent (goals achieved)</li>
+            <li>Client/Whānau withdrew consent</li>
+            <li>Not contactable (specify attempts: 3+ over 14 days)</li>
+            <li>Client moved out of area</li>
+            <li>Referred to external provider (capture details)</li>
+            <li>Maximum service duration reached</li>
+            <li>Client deceased</li>
+            <li>Aged out of program</li>
+            <li>Other (requires description)</li>
+        </ul>
+    </div>
+</body>
+</html>

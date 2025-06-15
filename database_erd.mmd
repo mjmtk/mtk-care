@@ -1,0 +1,761 @@
+erDiagram
+    users_User {
+        ManyToOneRel logentry
+        OneToOneRel profile
+        ManyToOneRel group_role_mappings
+        ManyToOneRel common_organisation_created_by_audit
+        ManyToOneRel common_organisation_updated_by_audit
+        ManyToOneRel common_organisation_deleted_by
+        ManyToOneRel common_document_created_by_audit
+        ManyToOneRel common_document_updated_by_audit
+        ManyToOneRel common_document_deleted_by
+        ManyToOneRel common_documentauditlog_created_by_audit
+        ManyToOneRel common_documentauditlog_updated_by_audit
+        ManyToOneRel common_documentauditlog_deleted_by
+        ManyToOneRel document_audit_logs
+        OneToOneRel azure_profile
+        ManyToOneRel tasks_task_created_by
+        ManyToOneRel tasks_task_updated_by
+        ManyToOneRel assigned_tasks
+        ManyToOneRel tasks_taskcomment_created_by
+        ManyToOneRel tasks_taskcomment_updated_by
+        ManyToOneRel tasks_taskattachment_created_by
+        ManyToOneRel tasks_taskattachment_updated_by
+        ManyToOneRel notifications_notification_updated_by
+        ManyToOneRel notifications
+        ManyToOneRel audit_logs
+        ManyToOneRel optionlists_optionlist_created_by_audit
+        ManyToOneRel optionlists_optionlist_updated_by_audit
+        ManyToOneRel optionlists_optionlist_deleted_by
+        ManyToOneRel optionlists_optionlistitem_created_by_audit
+        ManyToOneRel optionlists_optionlistitem_updated_by_audit
+        ManyToOneRel optionlists_optionlistitem_deleted_by
+        ManyToOneRel programs_program_created_by_audit
+        ManyToOneRel programs_program_updated_by_audit
+        ManyToOneRel programs_program_deleted_by
+        ManyToManyRel program
+        ManyToOneRel programs_enrolment_created_by_audit
+        ManyToOneRel programs_enrolment_updated_by_audit
+        ManyToOneRel programs_enrolment_deleted_by
+        ManyToOneRel program_enrolment_responsible_staff
+        ManyToOneRel programs_programassignedstaff_created_by_audit
+        ManyToOneRel programs_programassignedstaff_updated_by_audit
+        ManyToOneRel programs_programassignedstaff_deleted_by
+        ManyToOneRel programassignedstaff
+        ManyToOneRel external_organisation_management_externalorganisation_created_by_audit
+        ManyToOneRel external_organisation_management_externalorganisation_updated_by_audit
+        ManyToOneRel external_organisation_management_externalorganisation_deleted_by
+        ManyToOneRel external_organisation_management_externalorganisationcontact_created_by_audit
+        ManyToOneRel external_organisation_management_externalorganisationcontact_updated_by_audit
+        ManyToOneRel external_organisation_management_externalorganisationcontact_deleted_by
+        ManyToOneRel external_organisation_management_phonenumber_created_by_audit
+        ManyToOneRel external_organisation_management_phonenumber_updated_by_audit
+        ManyToOneRel external_organisation_management_phonenumber_deleted_by
+        ManyToOneRel external_organisation_management_emailaddress_created_by_audit
+        ManyToOneRel external_organisation_management_emailaddress_updated_by_audit
+        ManyToOneRel external_organisation_management_emailaddress_deleted_by
+        ManyToOneRel referral_management_referral_created_by_audit
+        ManyToOneRel referral_management_referral_updated_by_audit
+        ManyToOneRel referral_management_referral_deleted_by
+        ManyToOneRel approved_referrals
+        ManyToOneRel program_assigned_referrals
+        ManyToOneRel assigned_referrals
+        ManyToOneRel staff_assignment_referrals
+        ManyToOneRel commencement_approved_referrals
+        ManyToOneRel referral_management_consentrecord_created_by_audit
+        ManyToOneRel referral_management_consentrecord_updated_by_audit
+        ManyToOneRel referral_management_consentrecord_deleted_by
+        ManyToOneRel obtained_consents
+        ManyToOneRel withdrawn_consents
+        ManyToOneRel client_management_client_created_by_audit
+        ManyToOneRel client_management_client_updated_by_audit
+        ManyToOneRel client_management_client_deleted_by
+        ManyToOneRel client_management_clientemergencycontact_created_by_audit
+        ManyToOneRel client_management_clientemergencycontact_updated_by_audit
+        ManyToOneRel client_management_clientemergencycontact_deleted_by
+        VARCHAR(128) password NOT NULL
+        DATETIME last_login
+        BOOLEAN is_superuser NOT NULL
+        VARCHAR(150) username UK,NOT NULL
+        VARCHAR(150) first_name NOT NULL
+        VARCHAR(150) last_name NOT NULL
+        EMAIL(254) email NOT NULL
+        BOOLEAN is_staff NOT NULL
+        BOOLEAN is_active NOT NULL
+        DATETIME date_joined NOT NULL
+        UUID(32) id PK,UK,NOT NULL
+        M-M groups NOT NULL
+        M-M user_permissions NOT NULL
+    }
+    users_Role {
+        ManyToOneRel user_profiles
+        ManyToOneRel azure_group_mappings
+        DATETIME created_at NOT NULL
+        DATETIME updated_at NOT NULL
+        UUID(32) id PK,UK,NOT NULL
+        VARCHAR(100) name UK,NOT NULL
+        TEXT description
+        PositiveSmallIntegerField level UK,NOT NULL
+        BOOLEAN is_system_role NOT NULL
+        BOOLEAN is_active NOT NULL
+        JSON custom_permissions NOT NULL
+        M-M permissions NOT NULL
+    }
+    users_UserProfile {
+        DATETIME created_at NOT NULL
+        DATETIME updated_at NOT NULL
+        UUID(32) id PK,UK,NOT NULL
+        1-1 user UK,NOT NULL
+        VARCHAR(20) phone_number
+        VARCHAR(50) employee_id
+        VARCHAR(100) title
+        ImageField(100) avatar
+        JSON preferences NOT NULL
+        JSON azure_ad_groups NOT NULL
+        FK role
+    }
+    users_GroupRoleMapping {
+        DATETIME created_at NOT NULL
+        DATETIME updated_at NOT NULL
+        UUID(32) id PK,UK,NOT NULL
+        VARCHAR(128) azure_ad_group_id NOT NULL
+        VARCHAR(255) azure_ad_group_name
+        FK role NOT NULL
+        FK created_by NOT NULL
+    }
+    common_Organisation {
+        ManyToOneRel option_lists
+        DATETIME created_at NOT NULL
+        DATETIME updated_at NOT NULL
+        FK created_by
+        FK updated_by
+        BOOLEAN is_deleted NOT NULL
+        DATETIME deleted_at
+        FK deleted_by
+        UUID(32) id PK,UK,NOT NULL
+        DATETIME last_synced_at
+        VARCHAR(255) name UK,NOT NULL
+        BOOLEAN is_active NOT NULL
+    }
+    common_Document {
+        ManyToOneRel supersedes
+        ManyToOneRel audit_logs
+        ManyToManyRel enrolment
+        ManyToOneRel consent_records
+        DATETIME created_at NOT NULL
+        DATETIME updated_at NOT NULL
+        FK created_by
+        FK updated_by
+        BOOLEAN is_deleted NOT NULL
+        DATETIME deleted_at
+        FK deleted_by
+        UUID(32) id PK,UK,NOT NULL
+        DATETIME last_synced_at
+        VARCHAR(255) file_name NOT NULL
+        VARCHAR(255) original_filename
+        PositiveBigIntegerField file_size
+        VARCHAR(100) mime_type
+        VARCHAR(255) sharepoint_id
+        VARCHAR(255) sharepoint_unique_id
+        VARCHAR(255) sharepoint_etag
+        VARCHAR(1000) sharepoint_server_relative_url
+        URLField(1000) sharepoint_web_url
+        URLField(1000) sharepoint_download_url
+        UUID(32) client_id
+        UUID(32) referral_id
+        VARCHAR(50) folder_category NOT NULL
+        FK type
+        VARCHAR(20) status NOT NULL
+        BOOLEAN is_confidential NOT NULL
+        VARCHAR(20) access_level NOT NULL
+        VARCHAR(20) version NOT NULL
+        BOOLEAN is_latest_version NOT NULL
+        FK superseded_by
+        TEXT description
+        JSON tags NOT NULL
+        JSON metadata NOT NULL
+        TEXT upload_error
+        DATETIME uploaded_at
+    }
+    common_DocumentAuditLog {
+        DATETIME created_at NOT NULL
+        DATETIME updated_at NOT NULL
+        FK created_by
+        FK updated_by
+        BOOLEAN is_deleted NOT NULL
+        DATETIME deleted_at
+        FK deleted_by
+        UUID(32) id PK,UK,NOT NULL
+        DATETIME last_synced_at
+        FK document NOT NULL
+        FK user
+        VARCHAR(50) action NOT NULL
+        GenericIPAddressField(39) ip_address
+        TEXT user_agent
+        BOOLEAN success NOT NULL
+        TEXT error_message
+        JSON metadata NOT NULL
+    }
+    authentication_UserProfile {
+        BigAutoField id PK,UK,NOT NULL
+        1-1 user UK,NOT NULL
+        VARCHAR(36) azure_oid UK,NOT NULL
+    }
+    tasks_Task {
+        ManyToOneRel comments
+        ManyToOneRel attachments
+        UUID(32) id PK,UK,NOT NULL
+        DATETIME created_at NOT NULL
+        DATETIME updated_at NOT NULL
+        FK created_by
+        FK updated_by
+        VARCHAR(200) title NOT NULL
+        TEXT description NOT NULL
+        JSON tags NOT NULL
+        FK assigned_to
+        FK assigned_group
+        VARCHAR(15) status NOT NULL
+        VARCHAR(10) priority NOT NULL
+        DATETIME due_date
+        DATETIME started_at
+        DATETIME completed_at
+        PositiveIntegerField progress_percentage NOT NULL
+        PositiveIntegerField estimated_hours
+        PositiveIntegerField actual_hours
+    }
+    tasks_TaskComment {
+        UUID(32) id PK,UK,NOT NULL
+        DATETIME created_at NOT NULL
+        DATETIME updated_at NOT NULL
+        FK created_by
+        FK updated_by
+        FK task NOT NULL
+        TEXT content NOT NULL
+        BOOLEAN is_internal NOT NULL
+    }
+    tasks_TaskAttachment {
+        UUID(32) id PK,UK,NOT NULL
+        DATETIME created_at NOT NULL
+        DATETIME updated_at NOT NULL
+        FK created_by
+        FK updated_by
+        FK task NOT NULL
+        FileField(100) file NOT NULL
+        VARCHAR(255) original_filename NOT NULL
+        PositiveIntegerField file_size NOT NULL
+        VARCHAR(100) content_type NOT NULL
+    }
+    notifications_Notification {
+        UUID(32) id PK,UK,NOT NULL
+        DATETIME created_at NOT NULL
+        DATETIME updated_at NOT NULL
+        FK updated_by
+        FK created_by
+        FK recipient NOT NULL
+        VARCHAR(20) notification_type NOT NULL
+        VARCHAR(200) title NOT NULL
+        TEXT message NOT NULL
+        BOOLEAN is_read NOT NULL
+        DATETIME read_at
+        VARCHAR(50) related_object_type NOT NULL
+        VARCHAR(100) related_object_id NOT NULL
+    }
+    audit_AuditLog {
+        BigAutoField id PK,UK,NOT NULL
+        FK user NOT NULL
+        VARCHAR(50) action NOT NULL
+        VARCHAR(200) resource NOT NULL
+        VARCHAR(100) resource_id NOT NULL
+        GenericIPAddressField(39) ip_address
+        TEXT user_agent NOT NULL
+        PositiveIntegerField status_code NOT NULL
+        TEXT request_data NOT NULL
+        DATETIME timestamp NOT NULL
+    }
+    optionlists_OptionList {
+        ManyToOneRel items
+        BigAutoField id PK,UK,NOT NULL
+        DATETIME created_at NOT NULL
+        DATETIME updated_at NOT NULL
+        FK created_by
+        FK updated_by
+        BOOLEAN is_deleted NOT NULL
+        DATETIME deleted_at
+        FK deleted_by
+        VARCHAR(255) name NOT NULL
+        SlugField(64) slug NOT NULL
+        TEXT description
+        FK organization
+        BOOLEAN is_active NOT NULL
+        BOOLEAN is_template NOT NULL
+        BOOLEAN global_option_list NOT NULL
+        JSON metadata
+    }
+    optionlists_OptionListItem {
+        ManyToOneRel document_types
+        ManyToOneRel children
+        ManyToManyRel program_funding_agencies
+        ManyToManyRel program_types
+        ManyToManyRel program_delivery_modes
+        ManyToManyRel program_locations
+        ManyToOneRel enrolment_statuses
+        ManyToOneRel enrolment_exit_reasons
+        ManyToOneRel funded_programs
+        ManyToOneRel program_regions_link
+        ManyToOneRel external_organisation_type_organisations
+        ManyToOneRel phone_type_phones
+        ManyToOneRel email_type_emails
+        ManyToOneRel referral_status_referrals
+        ManyToOneRel referral_priority_referrals
+        ManyToOneRel referral_service_type_referrals
+        ManyToOneRel declined_referrals
+        ManyToOneRel consent_type_records
+        ManyToOneRel client_status_clients
+        ManyToOneRel gender_clients
+        ManyToOneRel iwi_hapu_clients
+        ManyToOneRel spiritual_needs_clients
+        ManyToOneRel emergency_contact_relationships
+        BigAutoField id PK,UK,NOT NULL
+        DATETIME created_at NOT NULL
+        DATETIME updated_at NOT NULL
+        FK created_by
+        FK updated_by
+        BOOLEAN is_deleted NOT NULL
+        DATETIME deleted_at
+        FK deleted_by
+        FK option_list NOT NULL
+        BOOLEAN global_option NOT NULL
+        SlugField(64) slug NOT NULL
+        VARCHAR(255) name NOT NULL
+        VARCHAR(255) label NOT NULL
+        VARCHAR(16) code
+        VARCHAR(255) description
+        VARCHAR(100) region
+        BOOLEAN is_active NOT NULL
+        PositiveIntegerField sort_order NOT NULL
+        JSON metadata
+        FK parent
+    }
+    reference_data_Country {
+        BigAutoField id PK,UK,NOT NULL
+        VARCHAR(3) code UK,NOT NULL
+        VARCHAR(128) name NOT NULL
+        BOOLEAN is_active NOT NULL
+    }
+    reference_data_Language {
+        ManyToOneRel primary_language_clients
+        BigAutoField id PK,UK,NOT NULL
+        VARCHAR(12) code UK,NOT NULL
+        VARCHAR(128) name NOT NULL
+        BOOLEAN is_active NOT NULL
+    }
+    programs_Program {
+        ManyToOneRel enrolment
+        ManyToOneRel funding_links
+        ManyToOneRel staff
+        ManyToOneRel region_links
+        ManyToOneRel referrals
+        ManyToOneRel assigned_referrals
+        DATETIME created_at NOT NULL
+        DATETIME updated_at NOT NULL
+        FK created_by
+        FK updated_by
+        BOOLEAN is_deleted NOT NULL
+        DATETIME deleted_at
+        FK deleted_by
+        UUID(32) id PK,UK,NOT NULL
+        DATETIME last_synced_at
+        VARCHAR(128) name NOT NULL
+        TEXT description NOT NULL
+        VARCHAR(20) status NOT NULL
+        DATE start_date NOT NULL
+        DATE end_date
+        JSON enrolment_schema
+        JSON referral_schema
+        JSON extra_data
+        M-M funding_agencies NOT NULL
+        M-M assigned_staff NOT NULL
+        M-M service_types NOT NULL
+        M-M delivery_modes NOT NULL
+        M-M locations NOT NULL
+    }
+    programs_Enrolment {
+        DATETIME created_at NOT NULL
+        DATETIME updated_at NOT NULL
+        FK created_by
+        FK updated_by
+        BOOLEAN is_deleted NOT NULL
+        DATETIME deleted_at
+        FK deleted_by
+        UUID(32) id PK,UK,NOT NULL
+        DATETIME last_synced_at
+        FK program NOT NULL
+        FK responsible_staff
+        DATE enrolment_date NOT NULL
+        DATE start_date NOT NULL
+        DATE end_date
+        FK status NOT NULL
+        FK exit_reason
+        TEXT exit_notes
+        TEXT notes
+        FK referral
+        VARCHAR(32) episode_number NOT NULL
+        JSON extra_data
+        M-M documents NOT NULL
+    }
+    programs_ProgramFunding {
+        BigAutoField id PK,UK,NOT NULL
+        FK program NOT NULL
+        FK funding_agency NOT NULL
+        DATE start_date NOT NULL
+        DATE end_date
+        DecimalField amount
+    }
+    programs_ProgramAssignedStaff {
+        DATETIME created_at NOT NULL
+        DATETIME updated_at NOT NULL
+        FK created_by
+        FK updated_by
+        BOOLEAN is_deleted NOT NULL
+        DATETIME deleted_at
+        FK deleted_by
+        UUID(32) id PK,UK,NOT NULL
+        DATETIME last_synced_at
+        FK program NOT NULL
+        FK staff NOT NULL
+        VARCHAR(64) role NOT NULL
+        DecimalField fte NOT NULL
+        BOOLEAN is_responsible NOT NULL
+        DATE start_date NOT NULL
+        DATE end_date
+    }
+    programs_ProgramRegion {
+        BigAutoField id PK,UK,NOT NULL
+        FK program NOT NULL
+        FK region NOT NULL
+    }
+    external_organisation_management_ExternalOrganisation {
+        ManyToOneRel contacts
+        ManyToOneRel phones
+        ManyToOneRel emails
+        ManyToOneRel referrals
+        DATETIME created_at NOT NULL
+        DATETIME updated_at NOT NULL
+        FK created_by
+        FK updated_by
+        BOOLEAN is_deleted NOT NULL
+        DATETIME deleted_at
+        FK deleted_by
+        UUID(32) id PK,UK,NOT NULL
+        DATETIME last_synced_at
+        VARCHAR(255) name UK,NOT NULL
+        FK type NOT NULL
+        VARCHAR(50) phone NOT NULL
+        EMAIL(254) email
+        VARCHAR(255) address NOT NULL
+        BOOLEAN is_active NOT NULL
+    }
+    external_organisation_management_ExternalOrganisationContact {
+        ManyToOneRel phones
+        ManyToOneRel emails
+        ManyToOneRel referrals
+        DATETIME created_at NOT NULL
+        DATETIME updated_at NOT NULL
+        FK created_by
+        FK updated_by
+        BOOLEAN is_deleted NOT NULL
+        DATETIME deleted_at
+        FK deleted_by
+        UUID(32) id PK,UK,NOT NULL
+        DATETIME last_synced_at
+        FK organisation NOT NULL
+        VARCHAR(100) first_name NOT NULL
+        VARCHAR(100) last_name NOT NULL
+        VARCHAR(100) job_title NOT NULL
+        BOOLEAN is_active NOT NULL
+        TEXT notes NOT NULL
+    }
+    external_organisation_management_PhoneNumber {
+        DATETIME created_at NOT NULL
+        DATETIME updated_at NOT NULL
+        FK created_by
+        FK updated_by
+        BOOLEAN is_deleted NOT NULL
+        DATETIME deleted_at
+        FK deleted_by
+        UUID(32) id PK,UK,NOT NULL
+        DATETIME last_synced_at
+        FK contact
+        FK organisation
+        VARCHAR(50) number NOT NULL
+        FK type NOT NULL
+        BOOLEAN is_active NOT NULL
+        TEXT notes
+    }
+    external_organisation_management_EmailAddress {
+        DATETIME created_at NOT NULL
+        DATETIME updated_at NOT NULL
+        FK created_by
+        FK updated_by
+        BOOLEAN is_deleted NOT NULL
+        DATETIME deleted_at
+        FK deleted_by
+        UUID(32) id PK,UK,NOT NULL
+        DATETIME last_synced_at
+        FK contact
+        FK organisation
+        EMAIL(254) email NOT NULL
+        FK type NOT NULL
+        BOOLEAN is_active NOT NULL
+        BOOLEAN is_primary NOT NULL
+    }
+    referral_management_Referral {
+        ManyToOneRel enrolment
+        ManyToOneRel consent_records
+        DATETIME created_at NOT NULL
+        DATETIME updated_at NOT NULL
+        FK created_by
+        FK updated_by
+        BOOLEAN is_deleted NOT NULL
+        DATETIME deleted_at
+        FK deleted_by
+        UUID(32) id PK,UK,NOT NULL
+        DATETIME last_synced_at
+        VARCHAR(20) type NOT NULL
+        FK status NOT NULL
+        FK priority NOT NULL
+        FK service_type
+        TEXT reason NOT NULL
+        TEXT notes
+        FK client
+        VARCHAR(20) client_type NOT NULL
+        VARCHAR(30) referral_source NOT NULL
+        VARCHAR(100) external_reference_number
+        JSON program_data NOT NULL
+        FK target_program
+        DATE referral_date NOT NULL
+        DATE accepted_date
+        DATE completed_date
+        DATE follow_up_date
+        DATE client_consent_date
+        BOOLEAN requires_approval NOT NULL
+        TEXT approval_reason
+        FK approved_by
+        DATETIME approval_date
+        FK decline_reason
+        TEXT decline_explanation
+        FK assigned_program
+        DATETIME program_assigned_date
+        FK program_assigned_by
+        FK assigned_staff
+        DATETIME staff_assigned_date
+        FK staff_assigned_by
+        DATE commencement_date
+        FK commencement_approved_by
+        FK external_organisation
+        FK external_organisation_contact
+    }
+    referral_management_ConsentRecord {
+        DATETIME created_at NOT NULL
+        DATETIME updated_at NOT NULL
+        FK created_by
+        FK updated_by
+        BOOLEAN is_deleted NOT NULL
+        DATETIME deleted_at
+        FK deleted_by
+        UUID(32) id PK,UK,NOT NULL
+        DATETIME last_synced_at
+        FK referral NOT NULL
+        FK consent_type NOT NULL
+        VARCHAR(20) status NOT NULL
+        DATE consent_date
+        DATE withdrawal_date
+        DATE expiry_date
+        FK document
+        TEXT notes
+        FK obtained_by
+        FK withdrawn_by
+        TEXT withdrawal_reason
+    }
+    client_management_Client {
+        ManyToOneRel referrals
+        ManyToOneRel emergency_contacts
+        DATETIME created_at NOT NULL
+        DATETIME updated_at NOT NULL
+        FK created_by
+        FK updated_by
+        BOOLEAN is_deleted NOT NULL
+        DATETIME deleted_at
+        FK deleted_by
+        UUID(32) id PK,UK,NOT NULL
+        DATETIME last_synced_at
+        VARCHAR(100) first_name NOT NULL
+        VARCHAR(100) last_name NOT NULL
+        VARCHAR(100) preferred_name
+        DATE date_of_birth NOT NULL
+        EMAIL(254) email
+        VARCHAR(50) phone
+        TEXT address
+        FK status NOT NULL
+        FK primary_language
+        BOOLEAN interpreter_needed NOT NULL
+        FK gender
+        JSON cultural_identity
+        FK iwi_hapu
+        FK spiritual_needs
+        VARCHAR(20) risk_level NOT NULL
+        BOOLEAN consent_required NOT NULL
+        BOOLEAN incomplete_documentation NOT NULL
+        TEXT notes
+        JSON extended_data
+    }
+    client_management_ClientEmergencyContact {
+        DATETIME created_at NOT NULL
+        DATETIME updated_at NOT NULL
+        FK created_by
+        FK updated_by
+        BOOLEAN is_deleted NOT NULL
+        DATETIME deleted_at
+        FK deleted_by
+        UUID(32) id PK,UK,NOT NULL
+        DATETIME last_synced_at
+        FK client NOT NULL
+        FK relationship NOT NULL
+        VARCHAR(100) first_name NOT NULL
+        VARCHAR(100) last_name NOT NULL
+        VARCHAR(50) phone NOT NULL
+        EMAIL(254) email
+        TEXT address
+        BOOLEAN is_primary NOT NULL
+        PositiveIntegerField priority_order NOT NULL
+        TEXT notes
+        TEXT availability_notes
+    }
+    users_User }o--o{ auth_Group : relates
+    users_User }o--o{ auth_Permission : relates
+    users_Role }o--o{ auth_Permission : relates
+    users_User ||--o{ users_UserProfile : has
+    users_Role ||--o{ users_UserProfile : has
+    users_Role ||--o{ users_GroupRoleMapping : has
+    users_User ||--o{ users_GroupRoleMapping : has
+    users_User ||--o{ common_Organisation : has
+    users_User ||--o{ common_Organisation : has
+    users_User ||--o{ common_Organisation : has
+    users_User ||--o{ common_Document : has
+    users_User ||--o{ common_Document : has
+    users_User ||--o{ common_Document : has
+    optionlists_OptionListItem ||--o{ common_Document : has
+    common_Document ||--o{ common_Document : has
+    users_User ||--o{ common_DocumentAuditLog : has
+    users_User ||--o{ common_DocumentAuditLog : has
+    users_User ||--o{ common_DocumentAuditLog : has
+    common_Document ||--o{ common_DocumentAuditLog : has
+    users_User ||--o{ common_DocumentAuditLog : has
+    users_User ||--o{ authentication_UserProfile : has
+    users_User ||--o{ tasks_Task : has
+    users_User ||--o{ tasks_Task : has
+    users_User ||--o{ tasks_Task : has
+    auth_Group ||--o{ tasks_Task : has
+    users_User ||--o{ tasks_TaskComment : has
+    users_User ||--o{ tasks_TaskComment : has
+    tasks_Task ||--o{ tasks_TaskComment : has
+    users_User ||--o{ tasks_TaskAttachment : has
+    users_User ||--o{ tasks_TaskAttachment : has
+    tasks_Task ||--o{ tasks_TaskAttachment : has
+    users_User ||--o{ notifications_Notification : has
+    users_User ||--o{ notifications_Notification : has
+    users_User ||--o{ notifications_Notification : has
+    users_User ||--o{ audit_AuditLog : has
+    users_User ||--o{ optionlists_OptionList : has
+    users_User ||--o{ optionlists_OptionList : has
+    users_User ||--o{ optionlists_OptionList : has
+    common_Organisation ||--o{ optionlists_OptionList : has
+    users_User ||--o{ optionlists_OptionListItem : has
+    users_User ||--o{ optionlists_OptionListItem : has
+    users_User ||--o{ optionlists_OptionListItem : has
+    optionlists_OptionList ||--o{ optionlists_OptionListItem : has
+    optionlists_OptionListItem ||--o{ optionlists_OptionListItem : has
+    users_User ||--o{ programs_Program : has
+    users_User ||--o{ programs_Program : has
+    users_User ||--o{ programs_Program : has
+    programs_Program }o--o{ optionlists_OptionListItem : relates
+    programs_Program }o--o{ users_User : relates
+    programs_Program }o--o{ optionlists_OptionListItem : relates
+    programs_Program }o--o{ optionlists_OptionListItem : relates
+    programs_Program }o--o{ optionlists_OptionListItem : relates
+    users_User ||--o{ programs_Enrolment : has
+    users_User ||--o{ programs_Enrolment : has
+    users_User ||--o{ programs_Enrolment : has
+    programs_Program ||--o{ programs_Enrolment : has
+    users_User ||--o{ programs_Enrolment : has
+    optionlists_OptionListItem ||--o{ programs_Enrolment : has
+    optionlists_OptionListItem ||--o{ programs_Enrolment : has
+    referral_management_Referral ||--o{ programs_Enrolment : has
+    programs_Enrolment }o--o{ common_Document : relates
+    programs_Program ||--o{ programs_ProgramFunding : has
+    optionlists_OptionListItem ||--o{ programs_ProgramFunding : has
+    users_User ||--o{ programs_ProgramAssignedStaff : has
+    users_User ||--o{ programs_ProgramAssignedStaff : has
+    users_User ||--o{ programs_ProgramAssignedStaff : has
+    programs_Program ||--o{ programs_ProgramAssignedStaff : has
+    users_User ||--o{ programs_ProgramAssignedStaff : has
+    programs_Program ||--o{ programs_ProgramRegion : has
+    optionlists_OptionListItem ||--o{ programs_ProgramRegion : has
+    users_User ||--o{ external_organisation_management_ExternalOrganisation : has
+    users_User ||--o{ external_organisation_management_ExternalOrganisation : has
+    users_User ||--o{ external_organisation_management_ExternalOrganisation : has
+    optionlists_OptionListItem ||--o{ external_organisation_management_ExternalOrganisation : has
+    users_User ||--o{ external_organisation_management_ExternalOrganisationContact : has
+    users_User ||--o{ external_organisation_management_ExternalOrganisationContact : has
+    users_User ||--o{ external_organisation_management_ExternalOrganisationContact : has
+    external_organisation_management_ExternalOrganisation ||--o{ external_organisation_management_ExternalOrganisationContact : has
+    users_User ||--o{ external_organisation_management_PhoneNumber : has
+    users_User ||--o{ external_organisation_management_PhoneNumber : has
+    users_User ||--o{ external_organisation_management_PhoneNumber : has
+    external_organisation_management_ExternalOrganisationContact ||--o{ external_organisation_management_PhoneNumber : has
+    external_organisation_management_ExternalOrganisation ||--o{ external_organisation_management_PhoneNumber : has
+    optionlists_OptionListItem ||--o{ external_organisation_management_PhoneNumber : has
+    users_User ||--o{ external_organisation_management_EmailAddress : has
+    users_User ||--o{ external_organisation_management_EmailAddress : has
+    users_User ||--o{ external_organisation_management_EmailAddress : has
+    external_organisation_management_ExternalOrganisationContact ||--o{ external_organisation_management_EmailAddress : has
+    external_organisation_management_ExternalOrganisation ||--o{ external_organisation_management_EmailAddress : has
+    optionlists_OptionListItem ||--o{ external_organisation_management_EmailAddress : has
+    users_User ||--o{ referral_management_Referral : has
+    users_User ||--o{ referral_management_Referral : has
+    users_User ||--o{ referral_management_Referral : has
+    optionlists_OptionListItem ||--o{ referral_management_Referral : has
+    optionlists_OptionListItem ||--o{ referral_management_Referral : has
+    optionlists_OptionListItem ||--o{ referral_management_Referral : has
+    client_management_Client ||--o{ referral_management_Referral : has
+    programs_Program ||--o{ referral_management_Referral : has
+    users_User ||--o{ referral_management_Referral : has
+    optionlists_OptionListItem ||--o{ referral_management_Referral : has
+    programs_Program ||--o{ referral_management_Referral : has
+    users_User ||--o{ referral_management_Referral : has
+    users_User ||--o{ referral_management_Referral : has
+    users_User ||--o{ referral_management_Referral : has
+    users_User ||--o{ referral_management_Referral : has
+    external_organisation_management_ExternalOrganisation ||--o{ referral_management_Referral : has
+    external_organisation_management_ExternalOrganisationContact ||--o{ referral_management_Referral : has
+    users_User ||--o{ referral_management_ConsentRecord : has
+    users_User ||--o{ referral_management_ConsentRecord : has
+    users_User ||--o{ referral_management_ConsentRecord : has
+    referral_management_Referral ||--o{ referral_management_ConsentRecord : has
+    optionlists_OptionListItem ||--o{ referral_management_ConsentRecord : has
+    common_Document ||--o{ referral_management_ConsentRecord : has
+    users_User ||--o{ referral_management_ConsentRecord : has
+    users_User ||--o{ referral_management_ConsentRecord : has
+    users_User ||--o{ client_management_Client : has
+    users_User ||--o{ client_management_Client : has
+    users_User ||--o{ client_management_Client : has
+    optionlists_OptionListItem ||--o{ client_management_Client : has
+    reference_data_Language ||--o{ client_management_Client : has
+    optionlists_OptionListItem ||--o{ client_management_Client : has
+    optionlists_OptionListItem ||--o{ client_management_Client : has
+    optionlists_OptionListItem ||--o{ client_management_Client : has
+    users_User ||--o{ client_management_ClientEmergencyContact : has
+    users_User ||--o{ client_management_ClientEmergencyContact : has
+    users_User ||--o{ client_management_ClientEmergencyContact : has
+    client_management_Client ||--o{ client_management_ClientEmergencyContact : has
+    optionlists_OptionListItem ||--o{ client_management_ClientEmergencyContact : has

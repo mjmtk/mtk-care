@@ -20,6 +20,9 @@ Development authentication bypass configuration for local development.
 ### [Azure AD Role Integration](./azure-ad-role-integration.md)
 Azure AD integration guide with role-based permissions setup.
 
+### [Role Mappings Management](./role-mappings-management.md)
+Comprehensive role mappings system with Entra ID integration, automated deployment, and health validation.
+
 ### [Frontend Session Management](./frontend-session-management.md)
 Professional session handling with AuthGuard and SessionManager components.
 
@@ -33,6 +36,10 @@ Professional session handling with AuthGuard and SessionManager components.
 - Azure AD setup and configuration
 - Development bypass mode
 - Role mapping and permissions
+- Automated role mappings management
+- Entra ID group integration
+- Deployment-safe role validation
+- Production lockout prevention
 
 ## Related Documentation
 

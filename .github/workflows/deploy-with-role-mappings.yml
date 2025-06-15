@@ -1,0 +1,217 @@
+name: Deploy with Role Mappings
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - production
+
+env:
+  AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+  DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+jobs:
+  fetch-role-mappings:
+    name: Fetch Current Role Mappings
+    runs-on: ubuntu-latest
+    outputs:
+      mappings-available: ${{ steps.fetch.outputs.success }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        pip install requests
+    
+    - name: Fetch Entra ID groups
+      id: fetch
+      run: |
+        echo "Fetching MC_ groups from Entra ID..."
+        if python scripts/fetch_entra_groups.py --output role_mappings.json; then
+          echo "success=true" >> $GITHUB_OUTPUT
+          echo "Role mappings fetched successfully"
+          
+          # Show summary for logs
+          echo "=== Fetched Role Mappings ==="
+          cat role_mappings.json | python -m json.tool
+        else
+          echo "success=false" >> $GITHUB_OUTPUT
+          echo "⚠️ Failed to fetch role mappings - will use defaults"
+        fi
+      env:
+        AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+    
+    - name: Upload role mappings artifact
+      if: steps.fetch.outputs.success == 'true'
+      uses: actions/upload-artifact@v3
+      with:
+        name: role-mappings
+        path: role_mappings.json
+        retention-days: 1
+
+  validate-role-mappings:
+    name: Validate Role Mappings
+    runs-on: ubuntu-latest
+    needs: fetch-role-mappings
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Download role mappings
+      if: needs.fetch-role-mappings.outputs.mappings-available == 'true'
+      uses: actions/download-artifact@v3
+      with:
+        name: role-mappings
+    
+    - name: Install backend dependencies
+      run: |
+        cd backend
+        pip install -r requirements.txt
+    
+    - name: Run Django checks
+      run: |
+        cd backend
+        python manage.py check --deploy
+    
+    - name: Validate role mappings
+      run: |
+        cd backend
+        
+        # Setup database for validation
+        python manage.py migrate
+        python manage.py seed_roles
+        
+        # Setup role mappings
+        if [ -f "../role_mappings.json" ]; then
+          echo "Using fetched role mappings"
+          python manage.py setup_role_mappings --mappings-file ../role_mappings.json --dry-run
+        else
+          echo "Using default role mappings"
+          python manage.py setup_role_mappings --use-defaults --dry-run
+        fi
+        
+        # Run validation
+        python manage.py validate_role_mappings --output-format json > validation_results.json
+        
+        # Display results
+        echo "=== Role Mappings Validation ==="
+        cat validation_results.json | python -m json.tool
+        
+        # Check if validation passed
+        if ! python manage.py validate_role_mappings --fail-on-warnings; then
+          echo "❌ Role mappings validation failed"
+          exit 1
+        fi
+        
+        echo "✅ Role mappings validation passed"
+
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [fetch-role-mappings, validate-role-mappings]
+    if: github.ref == 'refs/heads/main' || github.event.inputs.environment == 'staging'
+    environment: staging
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Download role mappings
+      if: needs.fetch-role-mappings.outputs.mappings-available == 'true'
+      uses: actions/download-artifact@v3
+      with:
+        name: role-mappings
+    
+    - name: Deploy to Staging
+      run: |
+        echo "🚀 Deploying to staging..."
+        export DEPLOYMENT_ENV=staging
+        
+        # Run deployment script
+        ./scripts/deploy_with_role_mappings.sh deploy
+        
+        echo "✅ Staging deployment complete"
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [fetch-role-mappings, validate-role-mappings, deploy-staging]
+    if: github.event.inputs.environment == 'production'
+    environment: production
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Download role mappings
+      if: needs.fetch-role-mappings.outputs.mappings-available == 'true'
+      uses: actions/download-artifact@v3
+      with:
+        name: role-mappings
+    
+    - name: Deploy to Production
+      run: |
+        echo "🚀 Deploying to production..."
+        export DEPLOYMENT_ENV=production
+        
+        # Run deployment script with extra validation
+        ./scripts/deploy_with_role_mappings.sh deploy
+        
+        echo "✅ Production deployment complete"
+    
+    - name: Post-deployment validation
+      run: |
+        cd backend
+        
+        # Final health check
+        python manage.py validate_role_mappings --check-azure --fail-on-warnings
+        
+        # List current mappings for audit log
+        echo "=== Final Role Mappings ==="
+        python manage.py list_role_mappings
+
+  notify-teams:
+    name: Notify Teams
+    runs-on: ubuntu-latest
+    needs: [deploy-staging, deploy-production]
+    if: always() && (needs.deploy-staging.result != 'skipped' || needs.deploy-production.result != 'skipped')
+    
+    steps:
+    - name: Notify deployment status
+      run: |
+        if [ "${{ needs.deploy-production.result }}" = "success" ]; then
+          echo "🎉 Production deployment successful!"
+        elif [ "${{ needs.deploy-staging.result }}" = "success" ]; then
+          echo "✅ Staging deployment successful!"
+        else
+          echo "❌ Deployment failed"
+          exit 1
+        fi

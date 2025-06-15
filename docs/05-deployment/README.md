@@ -14,11 +14,17 @@ Complete guide for deploying MTK-Care to Azure from scratch.
 ### [Post Deployment Tasks](./post-deployment-tasks.md)
 Essential configuration and verification steps after deployment.
 
+### [Role Mappings Deployment](./role-mappings-deployment.md)
+Automated role mappings deployment with Entra ID integration and health validation.
+
 **Key topics:**
 - Azure resource setup and configuration
 - Environment variable configuration
 - Database setup and migration
 - Authentication and authorization setup
+- Role mappings automation and validation
+- Entra ID group integration
+- Deployment safety and lockout prevention
 - SSL certificate configuration
 - Monitoring and logging setup
 
@@ -51,9 +57,10 @@ Essential configuration and verification steps after deployment.
 3. **Database Setup**: Create and migrate database
 4. **Application Deployment**: Deploy frontend and backend
 5. **Authentication Setup**: Configure Azure AD integration
-6. **SSL Configuration**: Set up HTTPS with custom domain
-7. **Monitoring Setup**: Configure Application Insights
-8. **Post-Deployment Testing**: Verify all functionality
+6. **Role Mappings Setup**: Configure automated role mappings with health validation
+7. **SSL Configuration**: Set up HTTPS with custom domain
+8. **Monitoring Setup**: Configure Application Insights
+9. **Post-Deployment Testing**: Verify all functionality
 
 ## Environment Management
 

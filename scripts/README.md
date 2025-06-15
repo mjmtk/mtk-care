@@ -99,11 +99,61 @@ VPS_USER="mj"              # Your VPS username
 LOCAL_PG_PORT="15432"      # Local port for PostgreSQL
 ```
 
+## Role Mappings Scripts
+
+### 🔍 `fetch_entra_groups.py`
+Fetches Azure AD groups starting with "MC_" and maps them to application roles.
+
+```bash
+# Basic usage
+python scripts/fetch_entra_groups.py --output role_mappings.json
+
+# Dry run to see what would be fetched
+python scripts/fetch_entra_groups.py --dry-run
+```
+
+### 🚀 `deploy_with_role_mappings.sh`
+Complete deployment automation with role mappings management.
+
+```bash
+# Full deployment
+./scripts/deploy_with_role_mappings.sh deploy
+
+# Only validate current role mappings
+./scripts/deploy_with_role_mappings.sh validate-only
+```
+
+### 🔒 `pre-commit-role-check.sh`
+Pre-commit hook to validate role mappings before commits.
+
+```bash
+# Install as git hook
+ln -s ../../scripts/pre-commit-role-check.sh .git/hooks/pre-commit
+```
+
+## Django Management Commands
+
+```bash
+# Setup role mappings
+python manage.py setup_role_mappings --dry-run              # Preview
+python manage.py setup_role_mappings --mappings-file file.json  # Use fetched groups
+
+# Validate role mappings
+python manage.py validate_role_mappings --check-azure
+
+# List current mappings
+python manage.py list_role_mappings
+```
+
 ## Other Scripts
 
 - `setup-development.sh` - Initial environment setup
 - `verify-dev-setup.sh` - Environment verification
 - `generate_openapi_types.sh` - TypeScript type generation
+- `validate_api_routes.py` - API route validation
+- `validate_frontend_urls.py` - Frontend URL validation
+- `azure_migrate.sh` - Azure database migration
+- `load_fixtures.sh` - Load development fixtures
 
 ## SSH Key Setup (Recommended)
 

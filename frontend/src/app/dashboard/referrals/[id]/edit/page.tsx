@@ -25,6 +25,34 @@ import { ReferralDetailsStep } from '@/components/referrals/steps/ReferralDetail
 // Types from OpenAPI
 import type { components } from '@/types/openapi';
 
+// Extended types that include properties not yet in OpenAPI schema
+interface ExtendedReferral extends components['schemas']['ReferralSchemaOut'] {
+  referral_source?: string;
+  external_reference_number?: string;
+  client_type?: string;
+  type?: string;
+  priority?: { id: number } | null;
+  target_program?: { id: string } | null;
+  program_data?: Record<string, any>;
+  accepted_date?: string;
+  completed_date?: string;
+  follow_up_date?: string;
+  client_consent_date?: string;
+  external_organisation_id?: string;
+  external_organisation_contact_id?: string;
+}
+
+interface ExtendedClient extends components['schemas']['ClientSchemaOut'] {
+  iwi_hapu?: any;
+  spiritual_needs?: any;
+  iwi_hapu_id?: number;
+  spiritual_needs_id?: number;
+  gender?: any;
+  gender_id?: number;
+  cultural_identity?: Record<string, any>;
+  interpreter_needed?: boolean;
+}
+
 type ReferralFormData = {
   // Step 1: Referral Source & Basic Details
   referral_source: string;
@@ -171,10 +199,12 @@ export default function EditReferralPage() {
         setError(null);
         
         // Load both referral and dropdown data
-        const [referralData, dropdownData] = await Promise.all([
+        const [rawReferralData, dropdownData] = await Promise.all([
           ReferralService.getReferral(referralId),
           ReferralService.getBatchDropdowns()
         ]);
+        
+        const referralData = rawReferralData as ExtendedReferral;
         
         setDropdowns(dropdownData);
         
@@ -195,14 +225,14 @@ export default function EditReferralPage() {
           external_reference_number: referralData.external_reference_number || undefined,
           external_organisation_name: referralData.program_data?.external_organisation_name || undefined,
           target_program_id: referralData.target_program?.id || '__none__',
-          type: referralData.type,
+          type: referralData.type || 'incoming',
           priority_id: referralData.priority?.id || 0,
-          referral_date: referralData.referral_date,
-          client_type: referralData.client_type,
+          referral_date: referralData.referral_date || new Date().toISOString().split('T')[0],
+          client_type: referralData.client_type || 'existing',
           client_id: referralData.client_id || undefined,
           service_type_id: referralData.service_type?.id || 0,
           status_id: referralData.status?.id || 0,
-          reason: referralData.reason,
+          reason: referralData.reason || '',
           notes: referralData.notes || undefined,
           accepted_date: referralData.accepted_date || undefined,
           completed_date: referralData.completed_date || undefined,
@@ -216,10 +246,12 @@ export default function EditReferralPage() {
         // If referral has a client, fetch the client data to populate the form
         if (referralData.client_id) {
           try {
-            const [clientData, emergencyContacts] = await Promise.all([
+            const [rawClientData, emergencyContacts] = await Promise.all([
               NewClientService.getClient(referralData.client_id),
               EmergencyContactsService.getClientEmergencyContacts(referralData.client_id)
             ]);
+            
+            const clientData = rawClientData as ExtendedClient;
             console.log('Loaded client data:', clientData);
             console.log('Client iwi_hapu:', clientData.iwi_hapu);
             console.log('Client spiritual_needs:', clientData.spiritual_needs);
@@ -282,12 +314,22 @@ export default function EditReferralPage() {
 
   // Memoize the updated steps to prevent infinite re-renders
   const steps = useMemo(() => {
-    return baseSteps.map(step => ({
-      ...step,
-      status: step.id < currentStep ? 'completed' : 
-              step.id === currentStep ? 'current' : 'pending'
-    }));
-  }, [baseSteps, currentStep]);
+    return baseSteps.map(step => {
+      const stepStatus = step.id < currentStep ? 'completed' : 
+                        step.id === currentStep ? 'current' : 'pending';
+      
+      // Check for warnings on step 3 (Consent & Documents) if no documents uploaded
+      const hasWarning = step.id === 3 && 
+                        stepStatus === 'completed' && 
+                        (!formData.documents || formData.documents.length === 0);
+      
+      return {
+        ...step,
+        status: stepStatus,
+        warning: hasWarning
+      };
+    });
+  }, [baseSteps, currentStep, formData.documents]);
 
   // Update page context based on current step
   useEffect(() => {

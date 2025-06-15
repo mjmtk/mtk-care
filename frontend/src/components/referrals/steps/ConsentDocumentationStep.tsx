@@ -202,10 +202,10 @@ export function ConsentDocumentationStep({ data, onComplete, onPrevious, onDataC
 
   const getConsentStatusColor = useCallback((status: string) => {
     switch (status) {
-      case 'obtained': return 'bg-green-100 text-green-800 border-green-200';
-      case 'declined': return 'bg-red-100 text-red-800 border-red-200';
-      case 'withdrawn': return 'bg-orange-100 text-orange-800 border-orange-200';
-      default: return 'bg-gray-100 text-gray-600 border-gray-200';
+      case 'obtained': return 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900 dark:text-green-200 dark:border-green-700';
+      case 'declined': return 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900 dark:text-red-200 dark:border-red-700';
+      case 'withdrawn': return 'bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900 dark:text-orange-200 dark:border-orange-700';
+      default: return 'bg-gray-100 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600';
     }
   }, []);
 
@@ -222,11 +222,11 @@ export function ConsentDocumentationStep({ data, onComplete, onPrevious, onDataC
       <Card>
         <CardContent className="pt-6">
           <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
             <div className="space-y-2">
-              <div className="h-10 bg-gray-200 rounded"></div>
-              <div className="h-10 bg-gray-200 rounded"></div>
+              <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded"></div>
             </div>
           </div>
         </CardContent>
@@ -239,7 +239,7 @@ export function ConsentDocumentationStep({ data, onComplete, onPrevious, onDataC
       <Card>
         <CardContent className="pt-6">
           <div className="text-center">
-            <p className="text-red-600 mb-4">{error}</p>
+            <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>
             <Button onClick={() => window.location.reload()}>
               Try Again
             </Button>
@@ -251,13 +251,13 @@ export function ConsentDocumentationStep({ data, onComplete, onPrevious, onDataC
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-      <Card className="border-0 shadow-lg bg-white rounded-3xl">
+      <Card className="border-0 shadow-lg bg-white dark:bg-gray-800 rounded-3xl">
         <CardHeader className="pb-8">
           <CardTitle className="flex items-center space-x-3 text-xl">
             <Shield className="h-6 w-6 text-blue-600" />
-            <span className="text-gray-900">Consent Forms & Documentation</span>
+            <span className="text-gray-900 dark:text-white">Consent Forms & Documentation</span>
           </CardTitle>
-          <CardDescription className="text-gray-600 text-base leading-relaxed">
+          <CardDescription className="text-gray-600 dark:text-gray-300 text-base leading-relaxed">
             Manage consent forms and upload supporting documentation for this referral
           </CardDescription>
         </CardHeader>
@@ -266,7 +266,7 @@ export function ConsentDocumentationStep({ data, onComplete, onPrevious, onDataC
           {/* Consent Management Section */}
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">Consent Forms</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Consent Forms</h3>
               <Select onValueChange={(value) => addConsentType(parseInt(value))}>
                 <SelectTrigger className="w-64">
                   <SelectValue placeholder="Add consent type..." />
@@ -287,18 +287,18 @@ export function ConsentDocumentationStep({ data, onComplete, onPrevious, onDataC
                 if (!consentType) return null;
 
                 return (
-                  <div key={index} className="p-6 bg-gray-50 rounded-2xl border border-gray-200">
+                  <div key={index} className="p-6 bg-gray-50 dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900 mb-1">{consentType.label}</h4>
-                        <p className="text-sm text-gray-600">{consentType.description}</p>
+                        <h4 className="font-semibold text-gray-900 dark:text-white mb-1">{consentType.label}</h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-300">{consentType.description}</p>
                       </div>
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
                         onClick={() => removeConsentRecord(index)}
-                        className="text-gray-400 hover:text-red-600"
+                        className="text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400"
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -382,11 +382,11 @@ export function ConsentDocumentationStep({ data, onComplete, onPrevious, onDataC
           
           {!(clientId || data.client_id) && (
             <div className="space-y-6">
-              <div className="text-center py-8 text-amber-600 bg-amber-50 rounded-lg border border-amber-200">
-                <AlertCircle className="h-12 w-12 mx-auto mb-3 text-amber-400" />
+              <div className="text-center py-8 text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-700">
+                <AlertCircle className="h-12 w-12 mx-auto mb-3 text-amber-400 dark:text-amber-500" />
                 <p className="font-medium">Document Upload Not Available</p>
                 <p className="text-sm">Complete the client identification step to enable document uploads</p>
-                <p className="text-xs text-gray-500 mt-2">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                   Debug: clientId={clientId}, data.client_id={data.client_id}
                 </p>
               </div>
@@ -402,7 +402,7 @@ export function ConsentDocumentationStep({ data, onComplete, onPrevious, onDataC
           type="button" 
           variant="outline" 
           onClick={onPrevious}
-          className="flex items-center space-x-2 h-12 px-6 text-base border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 rounded-xl"
+          className="flex items-center space-x-2 h-12 px-6 text-base border-2 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl"
         >
           <ArrowLeft className="h-5 w-5" />
           <span>Back to Client Info</span>

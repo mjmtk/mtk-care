@@ -70,7 +70,7 @@ export function TimelineSection({ clientId, canEditClient = true }: TimelineSect
   const [showNewNoteDialog, setShowNewNoteDialog] = useState(false);
   const [newNoteType, setNewNoteType] = useState<'clinical' | 'administrative'>('clinical');
   const [newNoteContent, setNewNoteContent] = useState('');
-  const [newNoteProgram, setNewNoteProgram] = useState<string>('');
+  const [newNoteProgram, setNewNoteProgram] = useState<string>('none');
   const [submittingNote, setSubmittingNote] = useState(false);
 
   const loadData = useCallback(async () => {
@@ -124,12 +124,12 @@ export function TimelineSection({ clientId, canEditClient = true }: TimelineSect
       const newActivity = await unifiedClientService.addTimelineActivity(clientId, {
         type: newNoteType,
         content: newNoteContent,
-        program: newNoteProgram
+        program: newNoteProgram === 'none' ? '' : newNoteProgram
       });
       
       setActivities(prev => [newActivity, ...prev]);
       setNewNoteContent('');
-      setNewNoteProgram('');
+      setNewNoteProgram('none');
       setShowNewNoteDialog(false);
     } catch (error) {
       console.error('Error creating note:', error);
@@ -268,7 +268,7 @@ export function TimelineSection({ clientId, canEditClient = true }: TimelineSect
                           <SelectValue placeholder="Select program" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">No program</SelectItem>
+                          <SelectItem value="none">No program</SelectItem>
                           {programs.map(program => (
                             <SelectItem key={program.id} value={program.name}>
                               {program.name}

@@ -434,13 +434,13 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
       <form onSubmit={handleSubmit(onSubmit)} className="h-full flex flex-col">
         {/* Content Area - Max 80% height with scroll */}
         <div className="flex-1 max-h-[80vh] overflow-y-auto">
-          <Card className="border-0 shadow-lg bg-white rounded-3xl">
+          <Card className="border-0 shadow-lg bg-white dark:bg-gray-800 rounded-3xl">
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center space-x-3 text-lg">
-                <Users className="h-5 w-5 text-blue-600" />
-                <span className="text-gray-900">Client Information & Cultural Identity</span>
+                <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                <span className="text-gray-900 dark:text-white">Client Information & Cultural Identity</span>
               </CardTitle>
-              <CardDescription className="text-gray-600 text-sm">
+              <CardDescription className="text-gray-600 dark:text-gray-300 text-sm">
                 Find an existing client or create a new client record
               </CardDescription>
             </CardHeader>
@@ -449,7 +449,7 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
           {/* Client Search - Hide when creating new client */}
           {!isCreatingNew && !selectedClient && (
             <div className="space-y-4">
-              <Label className="text-lg font-semibold text-gray-900">Find Client</Label>
+              <Label className="text-lg font-semibold text-gray-900 dark:text-white">Find Client</Label>
               <div className="flex space-x-3">
                 <div className="flex-1 relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -477,14 +477,14 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
             <>
               {isSearching && (
                 <div className="text-center py-4">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                  <p className="text-gray-600 mt-2">Searching...</p>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400 mx-auto"></div>
+                  <p className="text-muted-foreground mt-2">Searching...</p>
                 </div>
               )}
 
               {searchPerformed && !isSearching && searchResults.length === 0 && searchTerm.length >= 2 && (
-                <div className="text-center py-8 text-gray-500">
-                  <Users className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                <div className="text-center py-8 text-muted-foreground">
+                  <Users className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
                   <p>No clients found matching "{searchTerm}"</p>
                   <p className="text-sm">Click "New Client" to create a new client record</p>
                 </div>
@@ -497,24 +497,24 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                       key={client.id}
                       className={`p-4 border rounded-xl cursor-pointer transition-all duration-200 ease-out hover:shadow-md ${
                         selectedClient?.id === client.id
-                          ? 'border-blue-500 bg-blue-50 shadow-md'
-                          : 'border-gray-200 hover:border-gray-300'
+                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-400 shadow-md'
+                          : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 bg-background hover:bg-muted/50'
                       }`}
                       onClick={() => handleSelectClient(client)}
                     >
                       <div className="flex items-center justify-between">
                         <div>
-                          <h4 className="font-semibold text-gray-900">
+                          <h4 className="font-semibold text-foreground">
                             {client.first_name} {client.last_name}
                           </h4>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-muted-foreground">
                             {client.email && `${client.email} • `}
                             {client.phone && `${client.phone} • `}
                             Born: {client.date_of_birth}
                           </p>
                         </div>
                         {selectedClient?.id === client.id && (
-                          <CheckCircle className="h-5 w-5 text-green-600" />
+                          <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
                         )}
                       </div>
                     </div>
@@ -526,17 +526,17 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
 
           {/* Selected Client or New Client Form */}
           {(selectedClient || showClientForm) && (
-            <Card className="bg-white border border-gray-200">
+            <Card className="bg-background border border-border">
               <CardHeader className="pb-4">
                 <div className="flex items-start justify-between">
                   <CardTitle className="text-lg">
                     {selectedClient ? (
                       <div className="flex flex-col space-y-1">
                         <div className="flex items-center space-x-2">
-                          <CheckCircle className="h-5 w-5 text-green-600" />
-                          <span className="font-semibold text-gray-900 text-lg">{watch('first_name')} {watch('last_name')}</span>
+                          <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                          <span className="font-semibold text-foreground text-lg">{watch('first_name')} {watch('last_name')}</span>
                         </div>
-                        <div className="flex items-center space-x-4 text-sm text-gray-600 ml-7">
+                        <div className="flex items-center space-x-4 text-sm text-muted-foreground ml-7">
                           <div className="flex items-center space-x-1">
                             <Calendar className="h-3 w-3" />
                             <span>
@@ -544,7 +544,7 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                                 <>
                                   {new Date(watch('date_of_birth')).toLocaleDateString('en-NZ', { day: 'numeric', month: 'short', year: 'numeric' })}
                                   {calculateAge(watch('date_of_birth')) && (
-                                    <span className="text-gray-500"> (Age {calculateAge(watch('date_of_birth'))})</span>
+                                    <span className="text-muted-foreground/70"> (Age {calculateAge(watch('date_of_birth'))})</span>
                                   )}
                                 </>
                               ) : (
@@ -608,7 +608,7 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                             setValue('client_id', '');
                             setIsEditMode(false);
                           }}
-                          className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                          className="text-blue-600 dark:text-blue-400 border-blue-600 dark:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20"
                         >
                           <Search className="h-4 w-4 mr-1" />
                           Search Again
@@ -628,7 +628,7 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                           setSearchPerformed(false);
                           setIsEditMode(false);
                         }}
-                        className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                        className="text-blue-600 dark:text-blue-400 border-blue-600 dark:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20"
                       >
                         <Search className="h-4 w-4 mr-1" />
                         Search Existing
@@ -720,10 +720,10 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                 )}
                 
                 <Tabs defaultValue="basic" className="w-full">
-                  <TabsList className="grid w-full grid-cols-3 bg-white border border-gray-200">
-                    <TabsTrigger value="basic" className="data-[state=active]:bg-blue-500 data-[state=active]:text-white data-[state=inactive]:bg-gray-50 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-100">Basic Info</TabsTrigger>
-                    <TabsTrigger value="cultural" className="data-[state=active]:bg-blue-500 data-[state=active]:text-white data-[state=inactive]:bg-gray-50 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-100">Cultural Identity</TabsTrigger>
-                    <TabsTrigger value="emergency" className="data-[state=active]:bg-blue-500 data-[state=active]:text-white data-[state=inactive]:bg-gray-50 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-100">Emergency Contacts</TabsTrigger>
+                  <TabsList className="grid w-full grid-cols-3 bg-background border border-border">
+                    <TabsTrigger value="basic" className="data-[state=active]:bg-blue-500 data-[state=active]:text-white data-[state=inactive]:bg-muted data-[state=inactive]:text-foreground data-[state=inactive]:hover:bg-muted/80">Basic Info</TabsTrigger>
+                    <TabsTrigger value="cultural" className="data-[state=active]:bg-blue-500 data-[state=active]:text-white data-[state=inactive]:bg-muted data-[state=inactive]:text-foreground data-[state=inactive]:hover:bg-muted/80">Cultural Identity</TabsTrigger>
+                    <TabsTrigger value="emergency" className="data-[state=active]:bg-blue-500 data-[state=active]:text-white data-[state=inactive]:bg-muted data-[state=inactive]:text-foreground data-[state=inactive]:hover:bg-muted/80">Emergency Contacts</TabsTrigger>
                   </TabsList>
                   
                   <TabsContent value="basic" className="space-y-4 mt-4">
@@ -733,7 +733,7 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                         <Input
                           {...register('first_name', { required: 'First name is required' })}
                           disabled={selectedClient && !isEditMode}
-                          className={`h-10 text-sm ${selectedClient && !isEditMode ? 'bg-gray-100' : 'bg-white'}`}
+                          className={`h-10 text-sm ${selectedClient && !isEditMode ? 'bg-muted' : 'bg-background'}`}
                         />
                         {errors.first_name && (
                           <p className="text-sm text-red-500">{errors.first_name.message}</p>
@@ -745,7 +745,7 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                         <Input
                           {...register('last_name', { required: 'Last name is required' })}
                           disabled={selectedClient && !isEditMode}
-                          className={`h-10 text-sm ${selectedClient && !isEditMode ? 'bg-gray-100' : 'bg-white'}`}
+                          className={`h-10 text-sm ${selectedClient && !isEditMode ? 'bg-muted' : 'bg-background'}`}
                         />
                         {errors.last_name && (
                           <p className="text-sm text-red-500">{errors.last_name.message}</p>
@@ -758,7 +758,7 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                           type="date"
                           {...register('date_of_birth', { required: 'Date of birth is required' })}
                           disabled={selectedClient && !isEditMode}
-                          className={`h-10 text-sm ${selectedClient && !isEditMode ? 'bg-gray-100' : 'bg-white'}`}
+                          className={`h-10 text-sm ${selectedClient && !isEditMode ? 'bg-muted' : 'bg-background'}`}
                         />
                         {errors.date_of_birth && (
                           <p className="text-sm text-red-500">{errors.date_of_birth.message}</p>
@@ -772,7 +772,7 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                           onValueChange={(value) => setValue('gender_id', value ? parseInt(value) : undefined)}
                           disabled={selectedClient && !isEditMode}
                         >
-                          <SelectTrigger className={`h-10 ${selectedClient && !isEditMode ? 'bg-gray-100' : 'bg-white'}`}>
+                          <SelectTrigger className={`h-10 ${selectedClient && !isEditMode ? 'bg-muted' : 'bg-background'}`}>
                             <SelectValue placeholder="Select gender identity..." />
                           </SelectTrigger>
                           <SelectContent>
@@ -791,7 +791,7 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                           type="email"
                           {...register('email')}
                           disabled={selectedClient && !isEditMode}
-                          className={`h-10 text-sm ${selectedClient && !isEditMode ? 'bg-gray-100' : 'bg-white'}`}
+                          className={`h-10 text-sm ${selectedClient && !isEditMode ? 'bg-muted' : 'bg-background'}`}
                           placeholder="email@example.com"
                         />
                       </div>
@@ -801,7 +801,7 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                         <Input
                           {...register('phone')}
                           disabled={selectedClient && !isEditMode}
-                          className={`h-10 text-sm ${selectedClient && !isEditMode ? 'bg-gray-100' : 'bg-white'}`}
+                          className={`h-10 text-sm ${selectedClient && !isEditMode ? 'bg-muted' : 'bg-background'}`}
                           placeholder="+64 21 123 4567"
                         />
                       </div>
@@ -820,7 +820,7 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                           onValueChange={(value) => setValue('iwi_hapu_id', value ? parseInt(value) : undefined)}
                           disabled={selectedClient && !isEditMode}
                         >
-                          <SelectTrigger className={`h-10 ${selectedClient && !isEditMode ? 'bg-gray-100' : 'bg-white'}`}>
+                          <SelectTrigger className={`h-10 ${selectedClient && !isEditMode ? 'bg-muted' : 'bg-background'}`}>
                             <SelectValue placeholder="Select iwi/hapū..." />
                           </SelectTrigger>
                           <SelectContent>
@@ -843,7 +843,7 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                           onValueChange={(value) => setValue('spiritual_needs_id', value ? parseInt(value) : undefined)}
                           disabled={selectedClient && !isEditMode}
                         >
-                          <SelectTrigger className={`h-10 ${selectedClient && !isEditMode ? 'bg-gray-100' : 'bg-white'}`}>
+                          <SelectTrigger className={`h-10 ${selectedClient && !isEditMode ? 'bg-muted' : 'bg-background'}`}>
                             <SelectValue placeholder="Select spiritual practices..." />
                           </SelectTrigger>
                           <SelectContent>
@@ -866,7 +866,7 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                           onValueChange={(value) => setValue('primary_language_id', value ? parseInt(value) : undefined)}
                           disabled={selectedClient && !isEditMode}
                         >
-                          <SelectTrigger className={`h-10 ${selectedClient && !isEditMode ? 'bg-gray-100' : 'bg-white'}`}>
+                          <SelectTrigger className={`h-10 ${selectedClient && !isEditMode ? 'bg-muted' : 'bg-background'}`}>
                             <SelectValue placeholder="Select primary language..." />
                           </SelectTrigger>
                           <SelectContent>
@@ -900,7 +900,7 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
 
                   <TabsContent value="emergency" className="space-y-4 mt-4">
                     <div className="flex items-center justify-between">
-                      <h4 className="text-base font-semibold text-gray-900">Emergency Contacts</h4>
+                      <h4 className="text-base font-semibold text-foreground">Emergency Contacts</h4>
                       <Button 
                         type="button" 
                         onClick={addEmergencyContact} 
@@ -914,7 +914,7 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
 
                     <div className="space-y-4">
                       {emergencyContacts.map((contact, index) => (
-                        <div key={index} className={`p-4 rounded-lg border ${selectedClient && !isEditMode ? 'bg-gray-50 border-gray-200' : 'bg-white border-gray-200'}`}>
+                        <div key={index} className={`p-4 rounded-lg border ${selectedClient && !isEditMode ? 'bg-muted/50 border-border' : 'bg-background border-border'}`}>
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex items-center space-x-2">
                               <Badge variant={contact.is_primary ? "default" : "secondary"}>
@@ -953,7 +953,7 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                                 onValueChange={(value) => updateEmergencyContact(index, 'relationship_id', parseInt(value))}
                                 disabled={selectedClient && !isEditMode}
                               >
-                                <SelectTrigger className={`h-9 ${selectedClient && !isEditMode ? 'bg-gray-100' : 'bg-white'}`}>
+                                <SelectTrigger className={`h-9 ${selectedClient && !isEditMode ? 'bg-muted' : 'bg-background'}`}>
                                   <SelectValue placeholder="Select relationship..." />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -976,7 +976,7 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                                 onChange={(e) => updateEmergencyContact(index, 'phone', e.target.value)}
                                 placeholder="+64 21 123 4567"
                                 disabled={selectedClient && !isEditMode}
-                                className={`h-9 text-sm ${selectedClient && !isEditMode ? 'bg-gray-100' : 'bg-white'}`}
+                                className={`h-9 text-sm ${selectedClient && !isEditMode ? 'bg-muted' : 'bg-background'}`}
                               />
                             </div>
 
@@ -987,7 +987,7 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                                 onChange={(e) => updateEmergencyContact(index, 'first_name', e.target.value)}
                                 placeholder="First name"
                                 disabled={selectedClient && !isEditMode}
-                                className={`h-9 text-sm ${selectedClient && !isEditMode ? 'bg-gray-100' : 'bg-white'}`}
+                                className={`h-9 text-sm ${selectedClient && !isEditMode ? 'bg-muted' : 'bg-background'}`}
                               />
                             </div>
 
@@ -998,7 +998,7 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                                 onChange={(e) => updateEmergencyContact(index, 'last_name', e.target.value)}
                                 placeholder="Last name"
                                 disabled={selectedClient && !isEditMode}
-                                className={`h-9 text-sm ${selectedClient && !isEditMode ? 'bg-gray-100' : 'bg-white'}`}
+                                className={`h-9 text-sm ${selectedClient && !isEditMode ? 'bg-muted' : 'bg-background'}`}
                               />
                             </div>
 
@@ -1013,7 +1013,7 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                                 onChange={(e) => updateEmergencyContact(index, 'email', e.target.value)}
                                 placeholder="email@example.com"
                                 disabled={selectedClient && !isEditMode}
-                                className={`h-9 text-sm ${selectedClient && !isEditMode ? 'bg-gray-100' : 'bg-white'}`}
+                                className={`h-9 text-sm ${selectedClient && !isEditMode ? 'bg-muted' : 'bg-background'}`}
                               />
                             </div>
                           </div>
@@ -1021,8 +1021,8 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
                       ))}
 
                       {emergencyContacts.length === 0 && (
-                        <div className="text-center py-8 text-gray-500">
-                          <Phone className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                        <div className="text-center py-8 text-muted-foreground">
+                          <Phone className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
                           <p>No emergency contacts added yet</p>
                           <p className="text-sm">Click "Add Contact" to add emergency contact information</p>
                         </div>
@@ -1039,7 +1039,7 @@ export function ClientIdentificationStep({ data, onComplete, onPrevious, onDataC
         </div>
 
         {/* Action Buttons - Always visible at bottom */}
-        <div className="flex-shrink-0 pt-4 pb-4 bg-white border-t border-gray-100">
+        <div className="flex-shrink-0 pt-4 pb-4 bg-background border-t border-border">
           <div className="flex justify-between items-center">
             <Button 
               type="button" 

@@ -198,21 +198,21 @@ export default function ClientsPage() {
                           {client.primary_language && (
                             <Badge variant="outline" className="flex items-center gap-1 text-xs">
                               <Globe className="h-3 w-3" />
-                              {client.primary_language.name || client.primary_language}
+                              {typeof client.primary_language === 'string' ? client.primary_language : client.primary_language.name}
                             </Badge>
                           )}
-                          {client.interpreter_needed && (
+                          {(client as any).interpreter_needed && (
                             <Badge variant="secondary" className="text-xs">
                               Interpreter Required
                             </Badge>
                           )}
-                          {(client.iwi_hapu || client.cultural_identity?.iwi_hapu) && (
+                          {((client as any).iwi_hapu || (client as any).cultural_identity?.iwi_hapu) && (
                             <Badge variant="outline" className="flex items-center gap-1 text-xs">
                               <Heart className="h-3 w-3 text-red-500" />
-                              {client.iwi_hapu?.label || client.cultural_identity?.iwi_hapu || 'Iwi/Hapū'}
+                              {(client as any).iwi_hapu?.label || (client as any).cultural_identity?.iwi_hapu || 'Iwi/Hapū'}
                             </Badge>
                           )}
-                          {client.consent_required && (
+                          {(client as any).consent_required && (
                             <Badge variant="secondary" className="flex items-center gap-1 text-xs">
                               <Shield className="h-3 w-3" />
                               Consent Required

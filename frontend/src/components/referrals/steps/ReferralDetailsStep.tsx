@@ -151,7 +151,7 @@ export function ReferralDetailsStep({
               placeholder={field.help_text}
             />
             {field.help_text && (
-              <p className="text-sm text-gray-600">{field.help_text}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{field.help_text}</p>
             )}
           </div>
         );
@@ -178,7 +178,7 @@ export function ReferralDetailsStep({
               </SelectContent>
             </Select>
             {field.help_text && (
-              <p className="text-sm text-gray-600">{field.help_text}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{field.help_text}</p>
             )}
           </div>
         );
@@ -196,7 +196,7 @@ export function ReferralDetailsStep({
               onChange={(e) => handleProgramFieldChange(field.name, e.target.value)}
             />
             {field.help_text && (
-              <p className="text-sm text-gray-600">{field.help_text}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{field.help_text}</p>
             )}
           </div>
         );
@@ -214,7 +214,7 @@ export function ReferralDetailsStep({
               onChange={(e) => handleProgramFieldChange(field.name, e.target.value)}
             />
             {field.help_text && (
-              <p className="text-sm text-gray-600">{field.help_text}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{field.help_text}</p>
             )}
           </div>
         );
@@ -272,11 +272,11 @@ export function ReferralDetailsStep({
       <Card>
         <CardContent className="pt-6">
           <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
             <div className="space-y-2">
-              <div className="h-10 bg-gray-200 rounded"></div>
-              <div className="h-32 bg-gray-200 rounded"></div>
+              <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
             </div>
           </div>
         </CardContent>
@@ -355,7 +355,7 @@ export function ReferralDetailsStep({
             {errors.reason && (
               <p className="text-sm text-red-500">{errors.reason.message}</p>
             )}
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground dark:text-gray-400">
               Focus on the main concern and any safety considerations or immediate needs.
             </p>
           </div>
@@ -368,7 +368,7 @@ export function ReferralDetailsStep({
               placeholder="Any additional context, special considerations, cultural factors, accessibility needs, or follow-up requirements..."
               className="min-h-[80px]"
             />
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground dark:text-gray-400">
               Include any information that would be helpful for intake staff or service providers.
             </p>
           </div>
@@ -390,10 +390,10 @@ export function ReferralDetailsStep({
           <CardContent>
             {isLoadingProgram ? (
               <div className="animate-pulse space-y-4">
-                <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-                <div className="h-10 bg-gray-200 rounded"></div>
-                <div className="h-4 bg-gray-200 rounded w-1/3"></div>
-                <div className="h-10 bg-gray-200 rounded"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
+                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded"></div>
               </div>
             ) : programFields.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -431,7 +431,7 @@ export function ReferralDetailsStep({
                 type="date"
                 {...register('accepted_date')}
               />
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground dark:text-gray-400">
                 Date the referral was accepted for processing
               </p>
             </div>
@@ -443,7 +443,7 @@ export function ReferralDetailsStep({
                 type="date"
                 {...register('client_consent_date')}
               />
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground dark:text-gray-400">
                 Date client provided consent for services
               </p>
             </div>
@@ -455,7 +455,7 @@ export function ReferralDetailsStep({
                 type="date"
                 {...register('follow_up_date')}
               />
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground dark:text-gray-400">
                 Scheduled follow-up or review date
               </p>
             </div>

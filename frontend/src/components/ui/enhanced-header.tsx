@@ -11,6 +11,7 @@ interface StepInfo {
   id: number;
   title: string;
   status: 'pending' | 'current' | 'completed';
+  warning?: boolean; // Add warning flag for amber/warning states
   icon?: React.ComponentType<{ className?: string }>;
 }
 
@@ -72,13 +73,13 @@ export function EnhancedHeader({
                             <StepIcon className={cn(
                               'w-4 h-4',
                               step.status === 'current' ? 'text-blue-600' :
-                              step.status === 'completed' ? 'text-green-600' :
+                              step.status === 'completed' ? (step.warning ? 'text-amber-600' : 'text-green-600') :
                               'text-gray-400'
                             )} />
                           ) : (
                             <div className={cn(
                               'w-2 h-2 rounded-full',
-                              step.status === 'completed' ? 'bg-green-500' :
+                              step.status === 'completed' ? (step.warning ? 'bg-amber-500' : 'bg-green-500') :
                               step.status === 'current' ? 'bg-blue-500' :
                               'bg-gray-300'
                             )} />
@@ -86,7 +87,7 @@ export function EnhancedHeader({
                           <span className={cn(
                             'text-sm font-medium truncate',
                             step.status === 'current' ? 'text-blue-600' :
-                            step.status === 'completed' ? 'text-green-600' :
+                            step.status === 'completed' ? (step.warning ? 'text-amber-600' : 'text-green-600') :
                             'text-gray-500'
                           )}>
                             {step.title}

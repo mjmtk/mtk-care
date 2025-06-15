@@ -7,6 +7,7 @@ interface StepInfo {
   id: number;
   title: string;
   status: 'pending' | 'current' | 'completed';
+  warning?: boolean; // Add warning flag for amber/warning states
 }
 
 interface PageContextType {

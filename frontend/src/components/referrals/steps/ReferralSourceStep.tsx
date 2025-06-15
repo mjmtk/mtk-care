@@ -133,11 +133,11 @@ export function ReferralSourceStep({ data, onComplete, onCancel }: ReferralSourc
       <Card>
         <CardContent className="pt-6">
           <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
             <div className="space-y-2">
-              <div className="h-10 bg-gray-200 rounded"></div>
-              <div className="h-10 bg-gray-200 rounded"></div>
+              <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded"></div>
             </div>
           </div>
         </CardContent>
@@ -162,13 +162,13 @@ export function ReferralSourceStep({ data, onComplete, onCancel }: ReferralSourc
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-      <Card className="border-0 shadow-lg bg-white rounded-3xl">
+      <Card className="border-0 shadow-lg bg-white dark:bg-gray-800 rounded-3xl">
         <CardHeader className="pb-8">
           <CardTitle className="flex items-center space-x-3 text-xl">
-            <Building2 className="h-6 w-6 text-blue-600" />
-            <span className="text-gray-900">Referral Source & Basic Details</span>
+            <Building2 className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            <span className="text-gray-900 dark:text-white">Referral Source & Basic Details</span>
           </CardTitle>
-          <CardDescription className="text-gray-600 text-base leading-relaxed">
+          <CardDescription className="text-gray-600 dark:text-gray-300 text-base leading-relaxed">
             Identify where this referral is coming from and set basic priority
           </CardDescription>
         </CardHeader>
@@ -176,7 +176,7 @@ export function ReferralSourceStep({ data, onComplete, onCancel }: ReferralSourc
           
           {/* Referral Direction Selection */}
           <div className="space-y-4">
-            <Label className="text-lg font-semibold text-gray-900">Referral Direction *</Label>
+            <Label className="text-lg font-semibold text-gray-900 dark:text-white">Referral Direction *</Label>
             <RadioGroup
               value={selectedType}
               onValueChange={(value) => {
@@ -190,20 +190,20 @@ export function ReferralSourceStep({ data, onComplete, onCancel }: ReferralSourc
             >
               <Label
                 htmlFor="type-incoming"
-                className={`relative flex items-start space-x-3 p-4 bg-white border rounded-xl cursor-pointer transition-all duration-200 ease-out
-                  hover:shadow-md hover:border-gray-300
+                className={`relative flex items-start space-x-3 p-4 bg-white dark:bg-gray-800 border rounded-xl cursor-pointer transition-all duration-200 ease-out
+                  hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600
                   ${selectedType === 'incoming' 
-                    ? 'border-blue-500 shadow-md ring-2 ring-blue-100' 
-                    : 'border-gray-200 shadow-sm'
+                    ? 'border-blue-500 shadow-md ring-2 ring-blue-100 dark:ring-blue-900' 
+                    : 'border-gray-200 dark:border-gray-700 shadow-sm'
                   }`}
               >
                 <RadioGroupItem value="incoming" id="type-incoming" className="sr-only" />
                 <ArrowRight className={`h-4 w-4 mt-0.5 flex-shrink-0 transition-colors ${
-                  selectedType === 'incoming' ? 'text-blue-600' : 'text-gray-500'
+                  selectedType === 'incoming' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'
                 }`} />
                 <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-gray-900 text-sm mb-1">Incoming Referral</div>
-                  <p className="text-xs text-gray-600 leading-relaxed">
+                  <div className="font-semibold text-gray-900 dark:text-white text-sm mb-1">Incoming Referral</div>
+                  <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
                     Someone is referring a client to our services
                   </p>
                 </div>
@@ -211,15 +211,15 @@ export function ReferralSourceStep({ data, onComplete, onCancel }: ReferralSourc
 
               <Label
                 htmlFor="type-outgoing"
-                className={`relative flex items-start space-x-3 p-4 bg-gray-50 border rounded-xl cursor-not-allowed transition-all duration-200 ease-out
-                  border-gray-100 opacity-50
+                className={`relative flex items-start space-x-3 p-4 bg-gray-50 dark:bg-gray-800 border rounded-xl cursor-not-allowed transition-all duration-200 ease-out
+                  border-gray-100 dark:border-gray-700 opacity-50
                   }`}
               >
                 <RadioGroupItem value="outgoing" id="type-outgoing" className="sr-only" disabled />
-                <ArrowLeft className="h-4 w-4 mt-0.5 flex-shrink-0 text-gray-400" />
+                <ArrowLeft className="h-4 w-4 mt-0.5 flex-shrink-0 text-gray-400 dark:text-gray-500" />
                 <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-gray-500 text-sm mb-1">Outgoing Referral</div>
-                  <p className="text-xs text-gray-400 leading-relaxed">
+                  <div className="font-semibold text-gray-500 dark:text-gray-400 text-sm mb-1">Outgoing Referral</div>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
                     Coming soon - We are referring a client to another service
                   </p>
                 </div>
@@ -229,7 +229,7 @@ export function ReferralSourceStep({ data, onComplete, onCancel }: ReferralSourc
 
           {/* Referral Source Selection */}
           <div className="space-y-4">
-            <Label className="text-lg font-semibold text-gray-900">
+            <Label className="text-lg font-semibold text-gray-900 dark:text-white">
               {selectedType === 'incoming' 
                 ? 'How did this referral come to us? *' 
                 : 'Where are we referring this client? *'
@@ -250,20 +250,20 @@ export function ReferralSourceStep({ data, onComplete, onCancel }: ReferralSourc
                   <Label
                     key={source.value}
                     htmlFor={source.value}
-                    className={`relative flex items-start space-x-3 p-4 bg-white border rounded-xl cursor-pointer transition-all duration-200 ease-out
-                      hover:shadow-md hover:border-gray-300
+                    className={`relative flex items-start space-x-3 p-4 bg-white dark:bg-gray-800 border rounded-xl cursor-pointer transition-all duration-200 ease-out
+                      hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600
                       ${isSelected 
-                        ? 'border-blue-500 shadow-md ring-2 ring-blue-100' 
-                        : 'border-gray-200 shadow-sm'
+                        ? 'border-blue-500 shadow-md ring-2 ring-blue-100 dark:ring-blue-900' 
+                        : 'border-gray-200 dark:border-gray-700 shadow-sm'
                       }`}
                   >
                     <RadioGroupItem value={source.value} id={source.value} className="sr-only" />
                     <Icon className={`h-4 w-4 mt-0.5 flex-shrink-0 transition-colors ${
-                      isSelected ? 'text-blue-600' : 'text-gray-500'
+                      isSelected ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'
                     }`} />
                     <div className="flex-1 min-w-0">
-                      <div className="font-semibold text-gray-900 text-sm mb-1">{source.label}</div>
-                      <p className="text-xs text-gray-600 leading-relaxed">
+                      <div className="font-semibold text-gray-900 dark:text-white text-sm mb-1">{source.label}</div>
+                      <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
                         {getSourceDescription(source.value, selectedType === 'outgoing')}
                       </p>
                     </div>
@@ -278,10 +278,10 @@ export function ReferralSourceStep({ data, onComplete, onCancel }: ReferralSourc
 
           {/* Conditional fields based on source */}
           {(selectedSource === 'external_agency' || selectedSource === 'school') && (
-            <div className="p-8 bg-gray-50 rounded-2xl border border-gray-200 animate-in slide-in-from-top-2 duration-300">
+            <div className="p-8 bg-gray-50 dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 animate-in slide-in-from-top-2 duration-300">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                  <Label htmlFor="external_organisation_name" className="text-base font-semibold text-gray-900">
+                  <Label htmlFor="external_organisation_name" className="text-base font-semibold text-gray-900 dark:text-white">
                     {selectedType === 'outgoing' 
                       ? (selectedSource === 'external_agency' ? 'Destination Agency Name' : 'Destination School Name')
                       : (selectedSource === 'external_agency' ? 'Referring Agency Name' : 'School Name')
@@ -313,7 +313,7 @@ export function ReferralSourceStep({ data, onComplete, onCancel }: ReferralSourc
                 </div>
                 
                 <div className="space-y-4">
-                  <Label htmlFor="external_reference_number" className="text-base font-semibold text-gray-900">
+                  <Label htmlFor="external_reference_number" className="text-base font-semibold text-gray-900 dark:text-white">
                     {selectedType === 'outgoing'
                       ? (selectedSource === 'external_agency' ? 'Our Reference Number' : 'Our Reference Number') 
                       : (selectedSource === 'external_agency' ? 'Agency Reference Number' : 'Student ID / Reference')
@@ -345,7 +345,7 @@ export function ReferralSourceStep({ data, onComplete, onCancel }: ReferralSourc
 
           {/* Service Program Selection */}
           <div className="space-y-4">
-            <Label className="text-lg font-semibold text-gray-900">Target Program (Optional)</Label>
+            <Label className="text-lg font-semibold text-gray-900 dark:text-white">Target Program (Optional)</Label>
             <RadioGroup
               value={selectedProgram}
               onValueChange={(value) => {
@@ -357,20 +357,20 @@ export function ReferralSourceStep({ data, onComplete, onCancel }: ReferralSourc
               {/* Default option */}
               <Label
                 htmlFor="program-none"
-                className={`relative flex flex-col p-4 bg-white border rounded-xl cursor-pointer transition-all duration-200 ease-out
-                  hover:shadow-md hover:border-gray-300
+                className={`relative flex flex-col p-4 bg-white dark:bg-gray-800 border rounded-xl cursor-pointer transition-all duration-200 ease-out
+                  hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600
                   ${selectedProgram === '__none__' 
-                    ? 'border-blue-500 shadow-md ring-2 ring-blue-100' 
-                    : 'border-gray-200 shadow-sm'
+                    ? 'border-blue-500 shadow-md ring-2 ring-blue-100 dark:ring-blue-900' 
+                    : 'border-gray-200 dark:border-gray-700 shadow-sm'
                   }`}
               >
                 <RadioGroupItem value="__none__" id="program-none" className="sr-only" />
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 rounded-full bg-gray-400" />
-                    <span className="font-semibold text-gray-900 text-sm">To be determined</span>
+                    <div className="w-3 h-3 rounded-full bg-gray-400 dark:bg-gray-500" />
+                    <span className="font-semibold text-gray-900 dark:text-white text-sm">To be determined</span>
                   </div>
-                  <p className="text-xs text-gray-600 leading-relaxed">
+                  <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
                     Program will be assigned during triage
                   </p>
                 </div>
@@ -381,11 +381,11 @@ export function ReferralSourceStep({ data, onComplete, onCancel }: ReferralSourc
                 <Label
                   key={program.id}
                   htmlFor={`program-${program.id}`}
-                  className={`relative flex flex-col p-4 bg-white border rounded-xl cursor-pointer transition-all duration-200 ease-out
-                    hover:shadow-md hover:border-gray-300
+                  className={`relative flex flex-col p-4 bg-white dark:bg-gray-800 border rounded-xl cursor-pointer transition-all duration-200 ease-out
+                    hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600
                     ${selectedProgram === program.id 
-                      ? 'border-blue-500 shadow-md ring-2 ring-blue-100' 
-                      : 'border-gray-200 shadow-sm'
+                      ? 'border-blue-500 shadow-md ring-2 ring-blue-100 dark:ring-blue-900' 
+                      : 'border-gray-200 dark:border-gray-700 shadow-sm'
                     }`}
                 >
                   <RadioGroupItem value={program.id} id={`program-${program.id}`} className="sr-only" />
@@ -393,25 +393,25 @@ export function ReferralSourceStep({ data, onComplete, onCancel }: ReferralSourc
                     <div className="flex items-center space-x-2">
                       <div className={`w-3 h-3 rounded-full ${
                         program.status === 'operational' ? 'bg-green-500' : 
-                        program.status === 'inactive' ? 'bg-yellow-500' : 'bg-gray-400'
+                        program.status === 'inactive' ? 'bg-yellow-500' : 'bg-gray-400 dark:bg-gray-500'
                       }`} />
-                      <span className="font-semibold text-gray-900 text-sm">{program.name}</span>
+                      <span className="font-semibold text-gray-900 dark:text-white text-sm">{program.name}</span>
                     </div>
-                    <p className="text-xs text-gray-600 leading-relaxed">
+                    <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
                       Status: {program.status}
                     </p>
                   </div>
                 </Label>
               ))}
             </RadioGroup>
-            <p className="text-sm text-gray-600 leading-relaxed px-1">
+            <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed px-1">
               If you know which program this referral should go to, select it. Otherwise, it can be assigned during triage.
             </p>
           </div>
 
           {/* Urgency Level */}
           <div className="space-y-6">
-            <Label className="text-lg font-semibold text-gray-900">Urgency Level *</Label>
+            <Label className="text-lg font-semibold text-gray-900 dark:text-white">Urgency Level *</Label>
             <RadioGroup
               value={watch('priority_id')?.toString() || ''}
               onValueChange={(value) => setValue('priority_id', parseInt(value))}
@@ -454,26 +454,26 @@ export function ReferralSourceStep({ data, onComplete, onCancel }: ReferralSourc
                   <Label
                     key={priority.id}
                     htmlFor={`priority-${priority.id}`}
-                    className={`relative flex flex-col p-6 bg-white border rounded-2xl cursor-pointer transition-all duration-200 ease-out
-                      hover:shadow-lg hover:-translate-y-0.5 hover:border-gray-300
+                    className={`relative flex flex-col p-6 bg-white dark:bg-gray-800 border rounded-2xl cursor-pointer transition-all duration-200 ease-out
+                      hover:shadow-lg hover:-translate-y-0.5 hover:border-gray-300 dark:hover:border-gray-600
                       ${isSelected 
-                        ? 'border-blue-500 shadow-lg ring-4 ring-blue-100' 
-                        : 'border-gray-200 shadow-sm'
+                        ? 'border-blue-500 shadow-lg ring-4 ring-blue-100 dark:ring-blue-900' 
+                        : 'border-gray-200 dark:border-gray-700 shadow-sm'
                       }`}
                   >
                     <RadioGroupItem 
                       value={priority.id.toString()} 
                       id={`priority-${priority.id}`} 
-                      className="absolute top-4 right-4 border-gray-300" 
+                      className="absolute top-4 right-4 border-gray-300 dark:border-gray-600" 
                     />
                     <div className="space-y-4 pr-8">
                       <div className="flex items-center space-x-3">
                         <div className={`w-3 h-3 rounded-full ${urgencyData.dotColor} shadow-sm`} />
-                        <span className="font-semibold text-gray-900 text-base">
+                        <span className="font-semibold text-gray-900 dark:text-white text-base">
                           {urgencyData.priority}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-600 leading-relaxed">
+                      <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
                         {urgencyData.desc}
                       </p>
                     </div>
@@ -488,12 +488,12 @@ export function ReferralSourceStep({ data, onComplete, onCancel }: ReferralSourc
 
           {/* Referral Date */}
           <div className="space-y-4">
-            <Label htmlFor="referral_date" className="text-lg font-semibold text-gray-900">Referral Date *</Label>
+            <Label htmlFor="referral_date" className="text-lg font-semibold text-gray-900 dark:text-white">Referral Date *</Label>
             <Input
               id="referral_date"
               type="date"
               {...register('referral_date', { required: 'Referral date is required' })}
-              className={`h-14 text-base border-2 border-gray-200 hover:border-gray-300 focus:border-blue-500 focus:ring-0 ${
+              className={`h-14 text-base border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white hover:border-gray-300 dark:hover:border-gray-500 focus:border-blue-500 focus:ring-0 ${
                 errors.referral_date ? 'border-red-500' : ''
               }`}
             />

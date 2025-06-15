@@ -18,8 +18,7 @@ import {
   Phone, 
   MapPin, 
   Users, 
-  Search, 
-  Filter,
+  Search,
   Plus,
   MoreVertical,
   Edit,
@@ -48,9 +47,151 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Cross2Icon, CheckIcon, PlusCircledIcon } from '@radix-ui/react-icons';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+} from '@/components/ui/command';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Separator } from '@/components/ui/separator';
+import { cn } from '@/lib/utils';
 
 type ExternalOrganisation = components['schemas']['ExternalOrganisationSchemaOut'];
 type OrganisationType = components['schemas']['ExtOrgDropdownItemOut'];
+
+const statusOptions = [
+  { label: 'Active', value: 'true', icon: Users },
+  { label: 'Inactive', value: 'false', icon: X },
+];
+
+interface StandaloneFacetedFilterProps {
+  title?: string;
+  options: {
+    label: string;
+    value: string;
+    icon?: React.ComponentType<{ className?: string }>;
+  }[];
+  selectedValues: string[];
+  onSelectionChange: (values: string[]) => void;
+}
+
+function StandaloneFacetedFilter({
+  title,
+  options,
+  selectedValues,
+  onSelectionChange,
+}: StandaloneFacetedFilterProps) {
+  const selectedSet = new Set(selectedValues);
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline" size="sm" className="h-10 border-dashed text-base">
+          <PlusCircledIcon className="h-5 w-5" />
+          {title}
+          {selectedValues?.length > 0 && (
+            <>
+              <Separator orientation="vertical" className="mx-2 h-5" />
+              <Badge
+                variant="secondary"
+                className="rounded-sm px-1 font-normal lg:hidden"
+              >
+                {selectedValues.length}
+              </Badge>
+              <div className="hidden space-x-1 lg:flex">
+                {selectedValues.length > 2 ? (
+                  <Badge
+                    variant="secondary"
+                    className="rounded-sm px-1 font-normal"
+                  >
+                    {selectedValues.length} selected
+                  </Badge>
+                ) : (
+                  options
+                    .filter((option) => selectedSet.has(option.value))
+                    .map((option) => (
+                      <Badge
+                        variant="secondary"
+                        key={option.value}
+                        className="rounded-sm px-1 font-normal"
+                      >
+                        {option.label}
+                      </Badge>
+                    ))
+                )}
+              </div>
+            </>
+          )}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[240px] p-0" align="start">
+        <Command>
+          <CommandInput placeholder={title} />
+          <CommandList>
+            <CommandEmpty>No results found.</CommandEmpty>
+            <CommandGroup>
+              {options.map((option) => {
+                const isSelected = selectedSet.has(option.value);
+                return (
+                  <CommandItem
+                    key={option.value}
+                    onSelect={() => {
+                      const newSet = new Set(selectedSet);
+                      if (isSelected) {
+                        newSet.delete(option.value);
+                      } else {
+                        newSet.add(option.value);
+                      }
+                      onSelectionChange(Array.from(newSet));
+                    }}
+                    className="flex items-center space-x-2"
+                  >
+                    <div
+                      className={cn(
+                        'border-primary flex h-4 w-4 items-center justify-center rounded-sm border',
+                        isSelected
+                          ? 'bg-primary text-primary-foreground'
+                          : 'opacity-50 [&_svg]:invisible'
+                      )}
+                    >
+                      <CheckIcon className={cn('h-4 w-4')} />
+                    </div>
+                    {option.icon && (
+                      <option.icon className="text-muted-foreground h-4 w-4" />
+                    )}
+                    <span className="flex-1">{option.label}</span>
+                  </CommandItem>
+                );
+              })}
+            </CommandGroup>
+            {selectedValues.length > 0 && (
+              <>
+                <CommandSeparator />
+                <CommandGroup>
+                  <CommandItem
+                    onSelect={() => onSelectionChange([])}
+                    className="justify-center text-center"
+                  >
+                    Clear filters
+                  </CommandItem>
+                </CommandGroup>
+              </>
+            )}
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
+}
 
 function useExternalOrganisations(accessToken: string | null) {
   const [organisations, setOrganisations] = useState<ExternalOrganisation[]>([]);
@@ -431,12 +572,12 @@ function OrganisationCard({ organisation }: { organisation: ExternalOrganisation
   );
 }
 
-function SearchAndFilters({ 
+function OrganisationsToolbar({ 
   searchTerm, 
   onSearchChange, 
-  selectedType, 
+  selectedTypes,
   onTypeChange, 
-  selectedStatus, 
+  selectedStatuses, 
   onStatusChange, 
   organisationTypes, 
   onAddClick, 
@@ -444,95 +585,67 @@ function SearchAndFilters({
 }: {
   searchTerm: string;
   onSearchChange: (value: string) => void;
-  selectedType: string;
-  onTypeChange: (value: string) => void;
-  selectedStatus: string;
-  onStatusChange: (value: string) => void;
+  selectedTypes: string[];
+  onTypeChange: (values: string[]) => void;
+  selectedStatuses: string[];
+  onStatusChange: (values: string[]) => void;
   organisationTypes: OrganisationType[];
   onAddClick: () => void;
   onClearFilters: () => void;
 }) {
-  const [showFilters, setShowFilters] = useState(false);
+  const isFiltered = selectedTypes.length > 0 || selectedStatuses.length > 0;
+
+  // Convert organisation types to the format expected by DataTableFacetedFilter
+  const typeOptions = organisationTypes.map(type => ({
+    label: type.label || 'Unknown Type',
+    value: type.slug,
+    icon: Building
+  }));
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
+    <div className="flex items-center justify-between">
+      <div className="flex flex-1 flex-col-reverse items-start gap-y-2 sm:flex-row sm:items-center sm:space-x-4">
+        <Button 
+          onClick={onAddClick}
+          className="bg-blue-500 hover:bg-blue-600 text-white text-base px-4 py-2 h-10"
+        >
+          <Plus className="mr-2 h-4 w-4" />
+          Add Organisation
+        </Button>
+        <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
-            placeholder="Search organisations..."
+            placeholder="Filter by organisation name..."
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-10"
+            className="h-10 w-[180px] lg:w-[300px] text-lg font-bold placeholder:font-bold pl-10"
           />
         </div>
-        <div className="flex space-x-2">
-          <Button 
-            variant="outline" 
-            onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center space-x-2"
-          >
-            <Filter className="h-4 w-4" />
-            <span>Filters</span>
-            {(selectedType || selectedStatus) && (
-              <Badge variant="secondary" className="ml-1 h-5 w-5 rounded-full p-0 text-xs">
-                {(selectedType ? 1 : 0) + (selectedStatus ? 1 : 0)}
-              </Badge>
-            )}
-          </Button>
-          <Button onClick={onAddClick} className="flex items-center space-x-2">
-            <Plus className="h-4 w-4" />
-            <span>Add Organisation</span>
-          </Button>
+        <div className="flex gap-x-2 text-sm">
+          <StandaloneFacetedFilter
+            title="Type"
+            options={typeOptions}
+            selectedValues={selectedTypes}
+            onSelectionChange={onTypeChange}
+          />
+          <StandaloneFacetedFilter
+            title="Status"
+            options={statusOptions}
+            selectedValues={selectedStatuses}
+            onSelectionChange={onStatusChange}
+          />
         </div>
+        {isFiltered && (
+          <Button
+            variant="ghost"
+            onClick={onClearFilters}
+            className="h-10 px-3 lg:px-4 text-base"
+          >
+            Reset
+            <Cross2Icon className="ml-2 h-5 w-5" />
+          </Button>
+        )}
       </div>
-
-      {showFilters && (
-        <Card>
-          <CardContent className="pt-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <Label className="text-sm font-medium mb-2">
-                  Organisation Type
-                </Label>
-                <Select value={selectedType} onValueChange={onTypeChange}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All Types" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Types</SelectItem>
-                    {organisationTypes.map((type) => (
-                      <SelectItem key={type.id} value={type.slug}>
-                        {type.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label className="text-sm font-medium mb-2">
-                  Status
-                </Label>
-                <Select value={selectedStatus} onValueChange={onStatusChange}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All Statuses" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">All Statuses</SelectItem>
-                    <SelectItem value="true">Active</SelectItem>
-                    <SelectItem value="false">Inactive</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex items-end">
-                <Button variant="outline" className="w-full" onClick={onClearFilters}>
-                  Clear Filters
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }
@@ -545,8 +658,8 @@ export default function ExternalOrganisationsPage() {
 
   // Filter and search state
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedType, setSelectedType] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('');
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [showAddDialog, setShowAddDialog] = useState(false);
 
   // Filter organisations based on search and filters
@@ -557,20 +670,20 @@ export default function ExternalOrganisationsPage() {
         org.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         org.phone?.includes(searchTerm);
       
-      const matchesType = !selectedType || org.type.slug === selectedType;
+      const matchesType = selectedTypes.length === 0 || selectedTypes.includes(org.type.slug);
       
-      const matchesStatus = !selectedStatus || 
-        (selectedStatus === 'true' && org.is_active) ||
-        (selectedStatus === 'false' && !org.is_active);
+      const matchesStatus = selectedStatuses.length === 0 || 
+        (selectedStatuses.includes('true') && org.is_active) ||
+        (selectedStatuses.includes('false') && !org.is_active);
 
       return matchesSearch && matchesType && matchesStatus;
     });
-  }, [organisations, searchTerm, selectedType, selectedStatus]);
+  }, [organisations, searchTerm, selectedTypes, selectedStatuses]);
 
   const handleClearFilters = () => {
     setSearchTerm('');
-    setSelectedType('');
-    setSelectedStatus('');
+    setSelectedTypes([]);
+    setSelectedStatuses([]);
   };
 
   const handleAddSuccess = () => {
@@ -628,13 +741,13 @@ export default function ExternalOrganisationsPage() {
         </div>
 
         {/* Search and Filters */}
-        <SearchAndFilters 
+        <OrganisationsToolbar 
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
-          selectedType={selectedType}
-          onTypeChange={setSelectedType}
-          selectedStatus={selectedStatus}
-          onStatusChange={setSelectedStatus}
+          selectedTypes={selectedTypes}
+          onTypeChange={setSelectedTypes}
+          selectedStatuses={selectedStatuses}
+          onStatusChange={setSelectedStatuses}
           organisationTypes={organisationTypes}
           onAddClick={() => setShowAddDialog(true)}
           onClearFilters={handleClearFilters}

@@ -178,12 +178,22 @@ export default function NewReferralPage() {
 
   // Memoize the updated steps to prevent infinite re-renders
   const steps = useMemo(() => {
-    return baseSteps.map(step => ({
-      ...step,
-      status: step.id < currentStep ? 'completed' : 
-              step.id === currentStep ? 'current' : 'pending'
-    }));
-  }, [baseSteps, currentStep]);
+    return baseSteps.map(step => {
+      const stepStatus = step.id < currentStep ? 'completed' : 
+                        step.id === currentStep ? 'current' : 'pending';
+      
+      // Check for warnings on step 3 (Consent & Documents) if no documents uploaded
+      const hasWarning = step.id === 3 && 
+                        stepStatus === 'completed' && 
+                        (!formData.documents || formData.documents.length === 0);
+      
+      return {
+        ...step,
+        status: stepStatus,
+        warning: hasWarning
+      };
+    });
+  }, [baseSteps, currentStep, formData.documents]);
 
   // Update page context based on current step
   useEffect(() => {
